@@ -1,0 +1,26 @@
+<World>
+    <Region>
+        <Country>
+            <name>USA</name>
+            <states>
+                <state_name>'NY'</state_name>
+                <capital>'New York'</capital>
+            </states>
+            <states>
+                <state_name>"AT"</state_name>
+                <capital>'Georgia'</capital>
+            </states>
+        </Country>
+        <Country>
+            <name>India</name>
+            <states>
+                <state_name>'MH'</state_name>
+                <capital>'Mumbai'</capital>
+            </states>
+            <states>
+                <state_name>"KA"</state_name>
+                <capital>'Bengaluru'</capital>
+            </states>
+        </Country>
+    </Region>
+</World>

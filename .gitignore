@@ -188,6 +188,7 @@ dmypy.json
 .pyre/
 ##################End of Python General gitignore###############################
 ##################Start of VS Code General gitignore############################
+.vscode/
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json

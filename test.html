@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <!-- CSS only -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+    integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+
+  <!-- JS, Popper.js, and jQuery -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+    integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+    crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+    integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+    crossorigin="anonymous"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      font-family: Arial;
+    }
+
+    /* Style the tab */
+    .tab {
+      overflow: hidden;
+      border: 1px solid #ccc;
+      background-color: #f1f1f1;
+    }
+
+    /* Style the buttons inside the tab */
+    .tab button {
+      background-color: inherit;
+      float: left;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      padding: 14px 16px;
+      transition: 0.3s;
+      font-size: 17px;
+    }
+
+    /* Change background color of buttons on hover */
+    .tab button:hover {
+      background-color: #ddd;
+    }
+
+    /* Create an active/current tablink class */
+    .tab button.active {
+      background-color: #ccc;
+    }
+
+    /* Style the tab content */
+    .tabcontent {
+      display: none;
+      padding: 6px 12px;
+      border: 1px solid #ccc;
+      border-top: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="table-responsive">
+      <h2>POC</h2>
+      <p>Check the status of file</p>
+
+      <div class="tab">
+        <button class="tablinks" onclick="openTab(event, 'Added')">
+          Added
+        </button>
+        <button class="tablinks" onclick="openTab(event, 'Changed')">
+          Changed
+        </button>
+        <button class="tablinks" onclick="openTab(event, 'Removed')">
+          Removed
+        </button>
+      </div>
+
+      <div>
+        <p>Summary of comparison of table between </p>
+      </div>
+
+      <div id="added" class="tabcontent">
+      </div>
+
+      <div id="changed" class="tabcontent">
+      </div>
+
+      <div id="removed" class="tabcontent">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function openTab(evt, actionType) {
+      var i, tabcontent, tablinks;
+      var doc_title = document.title
+      var actionName = actionType.toLowerCase();
+      tabcontent = document.getElementsByClassName("tabcontent");
+      for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+      }
+      tablinks = document.getElementsByClassName("tablinks");
+      for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+      }
+      document.getElementById(actionName).style.display = "block";
+      evt.currentTarget.className += " active";
+
+      $.ajax({
+        url: actionName + ".csv",
+        dataType: "text",
+        success: function (data) {
+          var file_data = data.split(/\r?\n|\r/);
+          var table_data =
+            '<table class="table table-bordered table-striped">';
+          for (var count = 0; count < file_data.length; count++) {
+            var cell_data = file_data[count].split(",");
+            table_data += "<tr>";
+            for (
+              var cell_count = 0;
+              cell_count < cell_data.length;
+              cell_count++
+            ) {
+              if (count === 0) {
+                table_data += "<th>" + cell_data[cell_count] + "</th>";
+              } else {
+                var strValue = cell_data[cell_count];
+                var valChanged = strValue.includes("--->");
+                if (valChanged) {
+                  table_data +=
+                    '<td style="background-color:red">' +
+                    cell_data[cell_count] +
+                    "</td>";
+                } else {
+                  table_data += "<td>" + cell_data[cell_count] + "</td>";
+                }
+              }
+            }
+            table_data += "</tr>";
+          }
+          table_data += "</table>";
+          var divID = "#" + actionName;
+          $(divID).html(table_data);
+        },
+      });
+    }
+  </script>
+</body>
+
+</html>
