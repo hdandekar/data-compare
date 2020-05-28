@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 ############ Start of Mac OS General gitignore ################################
 .DS_Store
 .AppleDouble
@@ -217,11 +216,9 @@ tags
 [._]*.un~
 
 ##################End of Vim  General gitignore#################################
-=======
 .vscode
 *.csv
 
 *__pycache__*
 
 db.sqlite3
->>>>>>> ce955fa... Added version of comparison
