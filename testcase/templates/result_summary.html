@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+{% block title %}Result
+{% endblock  %}
+{% block content %}
+    <div class="container-fluid">
+
+        <h2>Result</h2>
+        <p>Click either of the tabs for results</p>
+
+
+<ul class="nav nav-tabs" role="tablist">
+  <li class="nav-item">
+    <a class="nav-link" href="#added" role="tab" data-toggle="tab">Added</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="#removed" role="tab" data-toggle="tab">Removed</a>
+  </li>
+    <li class="nav-item">
+    <a class="nav-link active show" href="#modified" role="tab" data-toggle="tab">Modified</a>
+  </li>
+</ul>
+
+<!-- Tab panes -->
+<div class="tab-content">
+  <div role="tabpanel" class="tab-pane fade" id="added">
+    <table class="table table-sm table-bordered table-responsive">
+        <thead>
+            {% for row in added_data.columns %}
+                <th>{{row}}</th>
+            {% endfor %}
+        </thead>
+            {% for row in added %}
+            <tr>            
+                {% for i in row %}
+                    <td class="{% if '--->' in i %} table-danger {%endif %}">{{i}}</td>
+                {% endfor %}
+            </tr>      
+            {% endfor %}      
+    </table>
+  </div>
+  <div role="tabpanel" class="tab-pane fade" id="removed">
+      <table class="table table-sm table-bordered table-responsive">
+        <thead>
+            {% for row in removed_data.columns %}
+                <th>{{row}}</th>
+            {% endfor %}
+        </thead>
+            {% for row in removed %}
+            <tr>            
+                {% for i in row %}
+                    <td class="{% if '--->' in i %} table-danger {%endif %}">{{i}}</td>
+                {% endfor %}
+            </tr>      
+            {% endfor %}      
+    </table>
+  
+  </div>
+  <div role="tabpanel" class="tab-pane fade show active" id="modified">
+          <table class="table table-sm table-bordered table-responsive">
+        <thead>
+            {% for row in changed_data.columns %}
+                <th>{{row}}</th>
+            {% endfor %}
+        </thead>
+            {% for row in changed %}
+            <tr>            
+                {% for i in row %}
+                    <td class="{% if '--->' in i %} table-danger {%endif %}">{{i}}</td>
+                {% endfor %}
+            </tr>      
+            {% endfor %}      
+    </table>
+  </div>
+</div>
+
+{% comment %} <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+  <li class="nav-item">
+    <a class="nav-link active" id="pills-added-tab" data-toggle="pill" href="#pills-added" role="tab" aria-controls="pills-added" aria-selected="false">Added</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="pills-removed-tab" data-toggle="pill" href="#pills-removed" role="tab" aria-controls="pills-removed" aria-selected="false">Removed</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="pills-changed-tab" data-toggle="pill" href="#pills-changed" role="tab" aria-controls="pills-changed" aria-selected="false">Changed</a>
+  </li>
+</ul>
+<div class="tab-content" id="pills-tabContent">
+  <div class="tab-pane fade show active" id="pills-added" role="tabpanel" aria-labelledby="pills-added-tab">
+    <table class="table">
+        <thead>
+            {% for row in added_data.columns %}
+                <th>{{row}}</th>
+            {% endfor %}
+        </thead>
+            {% for row in added %}
+            <tr>            
+                {% for i in row %}
+                    <td>{{i}}</td>
+                {% endfor %}
+            </tr>      
+            {% endfor %}      
+    </table>
+    </div>
+
+    <div class="tab-pane fade show active" id="pills-removed" role="tabpanel" aria-labelledby="pills-removed-tab">
+    <table class="table">
+        <thead>
+            {% for row in removed_data.columns %}
+                <th>{{row}}</th>
+            {% endfor %}
+        </thead>
+
+            {% for row in removed %}
+            <tr>            
+                {% for i in row %}
+                    <td>{{i}}</td>
+                {% endfor %}
+            </tr>      
+            {% endfor %}      
+    </table>
+    </div>
+
+    <div class="tab-pane fade show active" id="pills-changed" role="tabpanel" aria-labelledby="pills-changed-tab">
+    <table class="table">
+        <thead>
+            {% for row in changed_data.columns %}
+                <th>{{row}}</th>
+            {% endfor %}
+        </thead>
+            {% for row in changed %}
+            <tr>            
+                {% for i in row %}
+                    <td>{{i}}</td>
+                {% endfor %}
+            </tr>      
+            {% endfor %}      
+    </table>
+    </div> {% endcomment %}
+
+
+  {% comment %} <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">{{removed}}</div>
+  <div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">{{changed}}</div> {% endcomment %}
+</div>
+
+    </div>
+{% endblock  %}
+
+{% block domready %}
+$(document).ready(function(){
+  $(".nav-tabs a").click(function(){
+    $(this).tab('show');
+  });
+});
+{% endblock  %}}

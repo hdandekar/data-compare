@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+
+
+{% if form.errors %}
+<p>Your username and password didn't match. Please try again.</p>
+{% endif %}
+
+{% if next %}
+    {% if user.is_authenticated %}
+    <p>Your account doesn't have access to this page. To proceed,
+    please login with an account that has access.</p>
+    {% else %}
+    <p>Please login to see this page.</p>
+    {% endif %}
+{% endif %}
+
+<form method="post" action="{% url 'login' %}" class="p-5" action="#!">
+    {% csrf_token %}
+    <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+    {% comment %} <label for="inputEmail" class="sr-only">Email address</label> {% endcomment %}
+    <input type="text" input id="id_username" name="username" class="form-control" placeholder="E-mail">
+    {% comment %} <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required="" autofocus=""> {% endcomment %}
+    {% comment %} <label for="inputPassword" class="sr-only">Password</label> {% endcomment %}
+    <input type="password" id="id_password"name="password" class="form-control" placeholder="Password" required="">
+
+        
+        {% comment %} {{ form.username.label_tag }}
+       
+        {{ form.password.label_tag }}
+        {{ form.password }} {% endcomment %}
+
+<input type="submit" value="login" />
+<input type="hidden" name="next" value="{{ next }}" />
+</form>
+
+<p><a href="{% url 'password_reset' %}">Lost password?</a></p>
+
+{% endblock %}
+
+
+{% comment %} {% block content %}
+<form role="form" class="form-horizontal" method="post" action="{% url 'login' %}" class="p-5" >
+{% csrf_token %}
+    <div class="form-group">
+        <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+        {% for field in form %}
+            <div class="input-group">
+                <span class="input-group-addon" style="background-color:#b77b48; color:white"><span class="glyphicon glyphicon-user"></span></span>
+                <input class="form-control" id="{{ field.id_for_label }}" maxlength="30" name="{{ field.html_name }}" value="{{ field.value }}" type="text" /> 
+                {{ field.errors }}
+            </div>
+        {% endfor %}
+        <input type="submit" class="btn btn-primary" value="login" />
+        <input type="hidden" name="next" value="{{ next }}" />
+    </div>
+</form>
+{% endblock  %} {% endcomment %}

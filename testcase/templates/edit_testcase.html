@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block title %}Edit Testcase{% endblock  %}
+
+{% block  content %}
+<div class="container">
+<h3>Edit Testcase</h3>
+
+
+    <form method="POST" class="post-form">
+        <fieldset>
+            {% comment %} {% for field in form %}     {% endcomment %}
+            <div class="col-md-9">
+                <div class="form-group row" >
+                    <label for="keycolumns" class="col-2 col-form-label">Test Case Name:</label>
+                    <div class="col-10">
+                        <input value = "{{form.tcname.value}}" type="text" class="form-control" id="tcname" placeholder="Enter Test Case Name" name="tcname">
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label for="sourcedbid" class="col-2 col-form-label" >Source DB:</label>
+                    <div class="col-10">
+                        {{form.sourcedbid}}
+                    </div>
+                </div>
+                <div class="form-group row ">
+                    <label for="sourcesql" class="col-2 col-form-label">Source SQL:</label>
+                    <div class="col-10">
+                        <textarea id="sourcesql"  name="sourcesql" class="form-control">{{ form.sourcesql.value }}</textarea>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="targetdbid" class="col-2 col-form-label bold" >Target DB:</label>
+                    <div class="col-10">
+                        {{form.targetdbid}}
+                    </div>
+                </div>        
+                <div class="form-group row">
+                    <label for="targetsql" class="col-sm-2 col-form-label">Target SQL:</label>
+                    <div class="col-10">
+                    
+                        <textarea id="targetsql" name="targetsql" class="form-control">{{form.targetsql.value}}</textarea>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label for="keycolumns" class="col-sm-2 col-form-label">Key Columns:</label>
+                    <div class="col-sm-10">
+                        <input value="{{form.keycolumns.value}}" type="text" id="keycolumns" name="keycolumns" class="form-control" ></input>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-10">
+                    <button type="submit" class="col-sm-2 col-form-label btn btn-primary">Save</button>
+                    <div>
+                </div>
+            </div>
+            {% comment %} {% endfor %} {% endcomment %}
+            {% csrf_token %}
+        </fieldset>
+    </form>
+{% endblock   %}
+</div>
