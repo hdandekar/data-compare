@@ -48,7 +48,7 @@
             {% for row in removed %}
             <tr>            
                 {% for i in row %}
-                    <td class="{% if '--->' in i %} table-danger {%endif %}">{{i}}</td>
+                    <td class="{% if '--->' in i %} table-danger {% endif %}">{{i}}</td>
                 {% endfor %}
             </tr>      
             {% endfor %}      
