@@ -2,16 +2,12 @@ import argparse
 import pandas as pd
 import numpy as np
 
+from datacompare.helpers.utils import Helper
+
 
 def report_diff(x):
     """Function to use with groupby.apply to highlight value changes."""
     return x[0] if x[0] == x[1] or pd.isna(x).all() else "{}--->{}".format(x[0], x[1])  # noqa E501
-    # f'{x[0]} ---> {x[1]}'
-
-
-def strip(x):
-    """Function to use with applymap to strip whitespaces in a dataframe."""
-    return x.strip() if isinstance(x, str) else x
 
 
 def added_removed(old_df, new_df, old_keys, new_keys):
@@ -22,20 +18,14 @@ def added_removed(old_df, new_df, old_keys, new_keys):
     else:
         removed_keys = np.setdiff1d(old_keys, new_keys)
         added_keys = np.setdiff1d(new_keys, old_keys)
-    out_data = {
-        'removed': old_df.loc[removed_keys],
-        'added': new_df.loc[added_keys]
-    }
+
+    if len(added_keys) > 0:
+        out_data['added'] = new_df.loc[added_keys]
+
+    if len(removed_keys) > 0:
+        out_data['removed'] = old_df.loc[removed_keys]
+        # out_data = {'removed': old_df.loc[removed_keys], }
     return out_data
-
-
-def highlight_differences(value):
-    if "--->" in value:
-        print()
-        color = "orange"
-    else:
-        color = "white"
-    return 'color: %s' % color
 
 
 def diff_pd(old_df, new_df, idx_col):
@@ -63,8 +53,8 @@ def diff_pd(old_df, new_df, idx_col):
     common_columns = np.intersect1d(
         old_df.columns, new_df.columns, assume_unique=True
     )
-    new_common = new_df.loc[common_keys, common_columns].applymap(strip)
-    old_common = old_df.loc[common_keys, common_columns].applymap(strip)
+    new_common = new_df.loc[common_keys, common_columns].applymap(Helper.strip)
+    old_common = old_df.loc[common_keys, common_columns].applymap(Helper.strip)
     # get the changed rows keys by dropping identical rows
     # (indexes are ignored, so we'll reset them)
     common_data = pd.concat(
@@ -94,12 +84,19 @@ def compare_excel(
 ):
 
     old_df = pd.read_excel(path1, sheet_name=sheet_name, **kwargs)
+    col_list = old_df.columns
+    print(col_list)
     new_df = pd.read_excel(path2, sheet_name=sheet_name, **kwargs)
     diff = diff_pd(old_df, new_df, index_col_name)
     for sname, data in diff.items():
-        data.reset_index().to_csv("{}.csv".format(sname),
-                                  index=False,
-                                  header=True)
+        print(sname)
+        new_data = data.reset_index()
+        new_data = new_data[col_list]
+        # print(data)
+        # print(new_dat÷a)
+        new_data.to_csv("{}.csv".format(sname),
+                        index=False,
+                        header=True)
 
 
 def build_parser():

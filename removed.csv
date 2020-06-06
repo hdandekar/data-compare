@@ -1,0 +1,7 @@
+Country,State,City,ZipCode,Sales,Units,Transaction
+AUS,VIC,Melbourne,3001,123123,23,10
+IND,BH,Nagpur,440018,984234,2123,4
+IND,MH,Mumbai      ,40001,120,1,1
+IND,MH,Pune,411045,120,43,3
+SGP,Singapore,Singapore,52956,1923,123,12
+USA,NY,New York,12345,890,312,23
