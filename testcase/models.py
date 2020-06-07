@@ -23,3 +23,6 @@ class TestCaseResult(models.Model):
     summary = models.TextField(max_length=200, blank=True)
     execution_start = models.DateTimeField(auto_now_add=True)
     execution_end = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-execution_end']

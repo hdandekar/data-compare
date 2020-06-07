@@ -26,13 +26,15 @@
     <table class="table table-sm table-bordered table-responsive">
         <thead>
             {% for row in added_data.columns %}
-                <th>{{row}}</th>
+                {% if row != 'index' %}
+                  <th>{{row}}</th>
+                {% endif %}
             {% endfor %}
         </thead>
             {% for row in added %}
             <tr>            
                 {% for i in row %}
-                    <td class="{% if '--->' in i %} table-danger {%endif %}">{{i}}</td>
+                    <td class="{% if '--->' in i %} table-danger {% endif %}">{{i}}</td>
                 {% endfor %}
             </tr>      
             {% endfor %}      
@@ -42,7 +44,9 @@
       <table class="table table-sm table-bordered table-responsive">
         <thead>
             {% for row in removed_data.columns %}
-                <th>{{row}}</th>
+                {% if row != 'index' %}
+                  <th>{{row}}</th>
+                {% endif %}
             {% endfor %}
         </thead>
             {% for row in removed %}
@@ -59,13 +63,15 @@
           <table class="table table-sm table-bordered table-responsive">
         <thead>
             {% for row in changed_data.columns %}
-                <th>{{row}}</th>
+                {% if row != 'index' %}
+                  <th>{{row}}</th>
+                {% endif %}
             {% endfor %}
         </thead>
             {% for row in changed %}
             <tr>            
                 {% for i in row %}
-                    <td class="{% if '--->' in i %} table-danger {%endif %}">{{i}}</td>
+                    <td class="{% if '--->' in i %} table-danger {% endif %}">{{i}}</td>
                 {% endfor %}
             </tr>      
             {% endfor %}      
