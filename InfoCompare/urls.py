@@ -15,8 +15,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from connection.views import dashboard
 
 urlpatterns = [
+    path('', dashboard),
     path('accounts/', include('django.contrib.auth.urls')),
     path('connection/', include('connection.urls', namespace='connection')),
     path('testcase/', include('testcase.urls', namespace='testcase')),
