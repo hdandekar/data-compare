@@ -8,7 +8,7 @@ class ConnectionForm(forms.ModelForm):
     class Meta:
         model = Connection
         fields = ['dbtype', 'name', 'dbname', 'hostname',
-                  'username', 'password', 'portno']
+                  'username', 'password', 'portno','warehouse_name','schema_name']
         labels = {
             'dbtype': 'Database Type',
             'name': 'Connection Name',
@@ -16,7 +16,9 @@ class ConnectionForm(forms.ModelForm):
             'hostname': 'DB Host Name',
             'username': 'DB User Name',
             'password': 'DB Password',
-            'portno': 'DB Port No#'
+            'portno': 'DB Port No#',
+            'warehouse_name' : 'Snowflake Warehouse name',
+            'schema_name': 'Snowflake Schema name'
         }
         widgets = {
             'dbtype': Select(attrs={'class': 'form-control'}),
@@ -26,4 +28,6 @@ class ConnectionForm(forms.ModelForm):
             'username': TextInput(attrs={'class': 'form-control'}),
             'password': TextInput(attrs={'class': 'form-control'}),
             'portno': TextInput(attrs={'class': 'form-control'}),
+            'warehouse_name': TextInput(attrs={'class': 'form-control'}),
+            'schema_name': TextInput(attrs={'class': 'form-control'}),
         }

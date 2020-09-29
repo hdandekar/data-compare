@@ -3,6 +3,8 @@
 # from .models import TestCaseResult
 # from connection.models import Connection
 import mysql.connector
+import snowflake.connector
+import pymssql  
 import pandas.io.sql as psql
 import pandas as pd
 import logging
@@ -96,24 +98,55 @@ class Comparison(object):
                             header=True)
         logger.info("Completed data comparison test")
 
-    def get_data(self, host, db, user, pwd, sql):
+    def get_data(self,dbtype, host, db, user, pwd, sql,warehouse_name,schema_name ):
         logger.info("Starting to pulling data from {} database".format(db))
-        cnx = mysql.connector.connect(
-            host=host,
-            database=db,
-            user=user,
-            password=pwd,
-            auth_plugin='mysql_native_password')
-        # cursor = cnx.cursor()
-        df = psql.read_sql(sql, cnx)
-        cnx.close()
-        logger.info("Completed pulling data from {} database".format(db))
-        return df
+        logger.info("DB Type is {}".format(dbtype))
+        if dbtype == "Snowflake":
+            cnx = snowflake.connector.connect(
+                user=user,
+                password=pwd,
+                account=host,
+                warehouse=warehouse_name,
+                database=db,
+                schema=schema_name
+                )
+            curs=cnx.cursor()
+            #execute SQL statement
+            curs.execute(sql)
+            df = curs.fetch_pandas_all()
+            logger.info("Completed pulling data from {} database".format(db))
+            return df
+        elif dbtype == "MySQL":
+            cnx = mysql.connector.connect(
+                host=host,
+                database=db,
+                user=user,
+                password=pwd,
+                auth_plugin='mysql_native_password')
+            # cursor = cnx.cursor()
+            df = psql.read_sql(sql, cnx)
+            cnx.close()
+            logger.info("Completed pulling data from {} database".format(db))
+            return df
+        elif dbtype == "MSSQL":
+            cnx = pymssql.connect(
+                server=host,
+                database=db,
+                user=user,
+                password=pwd)
+            # cursor = cnx.cursor()
+            df = psql.read_sql(sql, cnx)
+            cnx.close()
+            logger.info("Completed pulling data from {} database".format(db))
+            return df
 
     def get_src_data(self, conn, sql):
         host = conn.hostname
         user = conn.username
         pwd = conn.password
         db = conn.dbname
-        result_set = self.get_data(host, db, user, pwd, sql)
+        dbtype = conn.dbtype
+        warehouse_name = conn.warehouse_name
+        schema_name = conn.schema_name
+        result_set = self.get_data(dbtype, host, db, user, pwd, sql, warehouse_name,schema_name)
         return result_set
