@@ -1,0 +1,1 @@
+web: gunicorn InfoCompare.wsgi --log-file -

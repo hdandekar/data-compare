@@ -2,3 +2,11 @@ django
 mysql-connector-python
 pandas
 numpy
+snowflake-connector-python[secure-local-storage,pandas]
+pymssql
+
+gunicorn
+whitenoise
+python-decouple
+dj-database-url
+django_heroku

@@ -1,7 +1,4 @@
 # Data Compare
 
-Just checking for ID-1 now 
-
-ID-1
-
-ID-2
+For SQL Server support using pymssql package instead of odbc
+Ref: https://docs.microsoft.com/en-us/sql/connect/python/pymssql/python-sql-driver-pymssql?view=sql-server-ver15
