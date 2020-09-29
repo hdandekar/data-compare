@@ -86,7 +86,7 @@ def execute_testcase(request, pk):
     result.summary = 'Completed'
     result.save()
     return redirect('testcase:list')
-    return render(request, 'result_summary.html', {'summary': result.id})
+    # return render(request, 'result_summary.html', {'summary': result.id})
 
 
 @ login_required
@@ -99,14 +99,19 @@ def testcase_result(request, pk):
 @ login_required
 def testcase_instance_result(request, pk):
     # results = TestCaseResult.objects.filter(id=pk)
-    added_data = pd.read_csv("{}_added.csv".format(pk))
-    added_set = added_data.values.tolist()
-    removed_data = pd.read_csv("{}_dropped.csv".format(pk))
-    removed_set = removed_data.values.tolist()
-    changed_data = pd.read_csv("{}_changed.csv".format(pk))
-    changed_set = changed_data.values.tolist()
-    return render(request, 'result_summary.html',
-                  {'added': added_set, 'added_data': added_data,
-                   'removed': removed_set, 'removed_data': removed_data,
-                   'changed': changed_set, 'changed_data': changed_data,
-                   })
+    try: 
+        added_data = pd.read_csv("{}_added.csv".format(pk))
+        added_set = added_data.values.tolist()
+        removed_data = pd.read_csv("{}_dropped.csv".format(pk))
+        removed_set = removed_data.values.tolist()
+        changed_data = pd.read_csv("{}_changed.csv".format(pk))
+        changed_set = changed_data.values.tolist()
+        return render(request, 'result_summary.html',
+                {'added': added_set, 'added_data': added_data,
+                'removed': removed_set, 'removed_data': removed_data,
+                'changed': changed_set, 'changed_data': changed_data,
+                })
+    except: 
+        message = "No data available"
+        return render(request, 'result_summary.html', {'message': message})
+

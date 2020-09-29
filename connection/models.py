@@ -6,7 +6,7 @@ from django.db import models
 class Connection(models.Model):
     DB_TYPES = (
         ('MySQL', 'MySQL'),
-        ('PgSQL', 'PostGres'),
+        ('Snowflake', 'Snowflake'),
         ('MSSQL', 'MS SQL Server'),
     )
     name = models.CharField(max_length=50)
@@ -16,6 +16,10 @@ class Connection(models.Model):
     username = models.CharField(max_length=100)
     password = models.CharField(max_length=100)
     portno = models.IntegerField()
+
+    # Add new columns for Snowflake support
+    warehouse_name = models.CharField(max_length=100)
+    schema_name = models.CharField(max_length=100)
 
     def __str__(self):
         return self.name
