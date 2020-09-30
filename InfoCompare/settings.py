@@ -55,7 +55,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
-
 ]
 
 ROOT_URLCONF = 'InfoCompare.urls'
@@ -144,39 +143,16 @@ LOGIN_REDIRECT_URL = '/connection/'
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
-    'formatters': {
-        'console': {
-            'format': '%(name)-12s %(levelname)-8s %(message)s'
-        },
-        'file': {
-            'format': '%(asctime)s %(name)-12s %(levelname)-8s %(message)s'
-        }
-    },
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
-            'formatter': 'console'
         },
-        'file': {
-            'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'formatter': 'file',
-            'filename': '/tmp/debug.log'
-        }
     },
     'loggers': {
-        '': {
-            'level': 'INFO',
-            'handlers': ['console', 'file']
+        'django': {
+            'handlers': ['console'],
+             'level': os.getenv('DJANGO_LOG_LEVEL', 'DEBUG'),
         },
-        'django.request': {
-            'level': 'INFO',
-            'handlers': ['console', 'file']
-        }
-    },
-    'root': {
-        'handlers': ['console', 'file'],
-        'level': 'INFO',
     },
 }
 
