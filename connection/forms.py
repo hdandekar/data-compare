@@ -1,5 +1,6 @@
 from django.forms import TextInput, Select
 from django import forms
+from django.forms.widgets import PasswordInput
 from .models import Connection
 from django.contrib.auth.models import User
 
@@ -26,7 +27,7 @@ class ConnectionForm(forms.ModelForm):
             'hostname': TextInput(attrs={'class': 'form-control'}),
             'dbname': TextInput(attrs={'class': 'form-control'}),
             'username': TextInput(attrs={'class': 'form-control'}),
-            'password': TextInput(attrs={'class': 'form-control'}),
+            'password' :PasswordInput(attrs={'class': 'form-control'}),
             'portno': TextInput(attrs={'class': 'form-control'}),
             'warehouse_name': TextInput(attrs={'class': 'form-control'}),
             'schema_name': TextInput(attrs={'class': 'form-control'}),

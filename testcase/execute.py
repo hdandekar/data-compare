@@ -80,10 +80,6 @@ class Comparison(object):
 
     def compare_data(self, srcdf, tgtdf, index_col_name, id, **kwargs):
         idx_col = list(index_col_name.split(","))
-        # logger.info("Source DF memory_usage is: {}".format(
-        #     srcdf.memory_usage(index=True).sum()))
-        # logger.info("Target DF memory_usage is: {}".format(
-        #     tgtdf.memory_usage(index=True).sum()))
         logger.info("Source DF syssize is: {}".format(sys.getsizeof(srcdf)))
         logger.info("Target DF syssize is: {}".format(sys.getsizeof(tgtdf)))
         diff = self.diff_pd(srcdf, tgtdf, idx_col)
@@ -103,19 +99,26 @@ class Comparison(object):
         logger.info("DB Type is {}".format(dbtype))
         if dbtype == "Snowflake":
             cnx = snowflake.connector.connect(
-                user=user,
-                password=pwd,
-                account=host,
-                warehouse=warehouse_name,
-                database=db,
-                schema=schema_name
-                )
+                                user=user,
+                                password=pwd,
+                                account=host,
+                                warehouse=warehouse_name,
+                                database=db,
+                                schema=schema_name
+                                )
             curs=cnx.cursor()
-            #execute SQL statement
-            curs.execute(sql)
-            df = curs.fetch_pandas_all()
-            logger.info("Completed pulling data from {} database".format(db))
-            return df
+            try:
+                #execute SQL statement
+                curs.execute(sql)
+                df = curs.fetch_pandas_all()
+                logger.info("Completed pulling data from {} database".format(db))
+                return df
+            except snowflake.connector.errors.ProgrammingError as e:
+                logger.error('Error {0} ({1}): {2} ({3})'.format(e.errno, e.sqlstate, e.msg, e.sfqid))
+                df = pd.DataFrame()
+            finally:
+                cnx.close()
+                return df
         elif dbtype == "MySQL":
             cnx = mysql.connector.connect(
                 host=host,
