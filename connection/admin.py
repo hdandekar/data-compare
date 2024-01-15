@@ -5,4 +5,4 @@ from .models import Connection
 
 @admin.register(Connection)
 class ConnectionAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'hostname', 'dbtype', 'username', 'password', 'portno']
+    list_display = ["id", "name", "hostname", "dbtype", "username", "password", "portno"]

@@ -5,9 +5,9 @@ from django.db import models
 
 class Connection(models.Model):
     DB_TYPES = (
-        ('MySQL', 'MySQL'),
-        ('Snowflake', 'Snowflake'),
-        ('MSSQL', 'MS SQL Server'),
+        ("MySQL", "MySQL"),
+        ("Snowflake", "Snowflake"),
+        ("MSSQL", "MS SQL Server"),
     )
     name = models.CharField(max_length=50)
     dbtype = models.CharField(max_length=50, choices=DB_TYPES)
