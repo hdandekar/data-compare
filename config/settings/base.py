@@ -72,6 +72,7 @@ THIRD_PARTY_APPS = [
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
+    "django_htmx",
 ]
 
 LOCAL_APPS = [
@@ -135,6 +136,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",
+    "django_htmx.middleware.HtmxMiddleware",
 ]
 
 # STATIC
@@ -166,7 +168,11 @@ TEMPLATES = [
         # https://docs.djangoproject.com/en/dev/ref/settings/#std:setting-TEMPLATES-BACKEND
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         # https://docs.djangoproject.com/en/dev/ref/settings/#dirs
-        "DIRS": [str(APPS_DIR / "templates")],
+        "DIRS": [
+            str(APPS_DIR / "templates"),
+            str(BASE_DIR),
+        ],
+        # "DIRS": ["connection/templates",],
         # https://docs.djangoproject.com/en/dev/ref/settings/#app-dirs
         "APP_DIRS": True,
         "OPTIONS": {
@@ -200,6 +206,8 @@ FIXTURE_DIRS = (str(APPS_DIR / "fixtures"),)
 
 # SECURITY
 # ------------------------------------------------------------------------------
+ALLOWED_HOSTS = env.list("BASE_ALLOWED_HOSTS", default=["localhost"])
+
 # https://docs.djangoproject.com/en/dev/ref/settings/#session-cookie-httponly
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SECURE = True
@@ -207,6 +215,8 @@ SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_HTTPONLY = True
 # https://docs.djangoproject.com/en/dev/ref/settings/#x-frame-options
 X_FRAME_OPTIONS = "DENY"
+# https://docs.djangoproject.com/en/dev/ref/settings/#std-setting-CSRF_TRUSTED_ORIGINS
+CSRF_TRUSTED_ORIGINS = []
 
 # EMAIL
 # ------------------------------------------------------------------------------
@@ -266,7 +276,7 @@ ACCOUNT_USERNAME_REQUIRED = False
 # https://docs.allauth.org/en/latest/account/configuration.html
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 # https://docs.allauth.org/en/latest/account/configuration.html
-ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_EMAIL_VERIFICATION = "none"
 # https://docs.allauth.org/en/latest/account/configuration.html
 ACCOUNT_ADAPTER = "data_compare.users.adapters.AccountAdapter"
 # https://docs.allauth.org/en/latest/account/forms.html

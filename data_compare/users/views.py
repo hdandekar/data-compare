@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
+from django.http import HttpResponse
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, RedirectView, UpdateView
@@ -44,3 +45,28 @@ class UserRedirectView(LoginRequiredMixin, RedirectView):
 
 
 user_redirect_view = UserRedirectView.as_view()
+
+
+def check_username(request):
+    email = request.POST.get("email")
+    login_url = reverse("account_login")
+    email_registered_response = """
+                <div class='smaller text-danger-emphasis' id='username-error'>
+                    This email address is already registered, please
+                    <a xlass='small' href='{url}'>Sign In</a>
+                </div>""".format(
+        url=login_url
+    )
+    email_absent_response = """
+                <div class='smaller text-success' id='username-error'>
+                    This email address is not registered yet,
+                </div>""".format()
+    if get_user_model().objects.filter(email=email).exists():
+        return HttpResponse(email_registered_response)
+    else:
+        return HttpResponse(email_absent_response)
+
+    # success_response = f"
+    # <div class='small' id='username-error' class='.text-error'>
+    # This email address is already registered, please
+    # <a xlass='small' href='{login_url}'>Sign In</a></div>"

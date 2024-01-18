@@ -16,7 +16,53 @@
         method="post"
         action="{% url 'account_signup' %}">
     {% csrf_token %}
-    {{ form|crispy }}
+    <!-- {{ form|crispy }} -->
+    <div id="div_id_email" class="mb-3">
+      <label for="id_email" class="form-label requiredField">
+        Email
+        <span class="asteriskField">*</span>
+      </label>
+      <input type="email"
+             name="email"
+             placeholder="Email address"
+             autocomplete="email"
+             maxlength="320"
+             class="textinput form-control"
+             required=""
+             id="id_email"
+             hx-post="{% url 'users:check-username' %}"
+             hx-swap="outerhtml"
+             hx-trigger="change"
+             hx-target="#username-error" />
+      <div id="username-error"></div>
+    </div>
+    <div id="div_id_password1" class="mb-3">
+      <label for="id_password1" class="form-label requiredField">
+        Password
+        <span class="asteriskField">*</span>
+      </label>
+      <input type="password"
+             name="password1"
+             placeholder="Password"
+             autocomplete="new-password"
+             class="passwordinput form-control"
+             required=""
+             aria-describedby="id_password1_helptext"
+             id="id_password1" />
+    </div>
+    <div id="div_id_password2" class="mb-3">
+      <label for="id_password2" class="form-label requiredField">
+        Password (again)
+        <span class="asteriskField">*</span>
+      </label>
+      <input type="password"
+             name="password2"
+             placeholder="Password (again)"
+             autocomplete="new-password"
+             class="passwordinput form-control"
+             required=""
+             id="id_password2" />
+    </div>
     {% if redirect_field_value %}
       <input type="hidden"
              name="{{ redirect_field_name }}"

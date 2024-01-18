@@ -11,8 +11,8 @@ SECRET_KEY = env(
     default="qaJYVWyNfe4k3R74UvuMBCRLnnikZwAyBfnuwWme0HuwZLeA43vrSJK33ZR4Gkv0",
 )
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1"]
-
+ALLOWED_HOSTS += ["localhost", "0.0.0.0", "127.0.0.1"]
+CSRF_TRUSTED_ORIGINS += ['https://localhost:8000','http://localhost:8000']
 # CACHES
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#caches
@@ -63,3 +63,5 @@ DATABASES = {
     }
 }
 DATABASES["default"]["ATOMIC_REQUESTS"] = True
+
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")

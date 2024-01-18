@@ -1,5 +1,7 @@
 from django.db import models
 
+from data_compare.users.models import User
+
 # Create your models here.
 
 
@@ -16,10 +18,11 @@ class Connection(models.Model):
     username = models.CharField(max_length=100)
     password = models.CharField(max_length=100)
     portno = models.IntegerField()
+    schema_name = models.CharField(max_length=100)
+    created_by = models.ForeignKey(User, related_name="connection", on_delete=models.PROTECT)
 
     # Add new columns for Snowflake support
-    warehouse_name = models.CharField(max_length=100)
-    schema_name = models.CharField(max_length=100)
+    warehouse_name = models.CharField(max_length=100, blank=True)
 
     def __str__(self):
         return self.name

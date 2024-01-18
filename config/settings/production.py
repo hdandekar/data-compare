@@ -6,7 +6,9 @@ from .base import env
 # https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
 SECRET_KEY = env("DJANGO_SECRET_KEY")
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["example.com"])
+ALLOWED_HOSTS += env.list("DJANGO_ALLOWED_HOSTS")
+
+CSRF_TRUSTED_ORIGINS += env.list("TRUSTED_ORIGINS")
 
 # DATABASES
 # ------------------------------------------------------------------------------
@@ -17,8 +19,10 @@ DATABASES = {
         "USER": env("POSTGRES_USER"),
         "PASSWORD": env("POSTGRES_PASSWORD"),
         "HOST": env("POSTGRES_HOST"),
+        "OPTIONS": {"sslmode": "require"},
     }
 }
+
 DATABASES["default"]["CONN_MAX_AGE"] = env.int("CONN_MAX_AGE", default=60)  # noqa: F405
 DATABASES["default"]["ATOMIC_REQUESTS"] = True
 
@@ -38,15 +42,6 @@ CACHES = {
     }
 }
 
-
-# DATABASES
-
-DATABASES = {
-    "default": env.db(
-        "DATABASE_URL",
-        default="postgres://localhost/dbname",
-    ),
-}
 
 # SECURITY
 # ------------------------------------------------------------------------------
@@ -96,7 +91,7 @@ DEFAULT_FROM_EMAIL = env(
     default="data-compare <noreply@example.com>",
 )
 # https://docs.djangoproject.com/en/dev/ref/settings/#server-email
-SERVER_EMAIL = env("DJANGO_SERVER_EMAIL", default=DEFAULT_FROM_EMAIL)
+SERVER_EMAIL = env("DJANGO_SERVER_EMAIL", default="data-compare <noreply@example.com")
 # https://docs.djangoproject.com/en/dev/ref/settings/#email-subject-prefix
 EMAIL_SUBJECT_PREFIX = env(
     "DJANGO_EMAIL_SUBJECT_PREFIX",
