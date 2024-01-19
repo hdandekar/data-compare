@@ -1,8 +1,8 @@
 from django.contrib import admin
 
-from .models import Connection
+from .models import DbConnection
 
 
-@admin.register(Connection)
+@admin.register(DbConnection)
 class ConnectionAdmin(admin.ModelAdmin):
     list_display = ["id", "name", "hostname", "dbtype", "username", "password", "portno"]

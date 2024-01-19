@@ -5,7 +5,7 @@ from data_compare.users.models import User
 # Create your models here.
 
 
-class Connection(models.Model):
+class DbConnection(models.Model):
     DB_TYPES = (
         ("MySQL", "MySQL"),
         ("Snowflake", "Snowflake"),
