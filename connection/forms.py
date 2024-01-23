@@ -1,11 +1,11 @@
 from django import forms
 
-from .models import Connection
+from .models import DbConnection
 
 
 class ConnectionForm(forms.ModelForm):
     class Meta:
-        model = Connection
+        model = DbConnection
         fields = [
             "dbtype",
             "name",

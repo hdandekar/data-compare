@@ -27,10 +27,17 @@ body {
   border-color: #eed3d7;
 }
 
-.smaller, smaller {
+.smaller,
+smaller {
   font-size: .75em;
 }
 
-.text-danger-emphasis{
+.text-danger-emphasis {
   color: #f08080;
+}
+
+
+.required::after {
+  content: ' *';
+  color: red;
 }
