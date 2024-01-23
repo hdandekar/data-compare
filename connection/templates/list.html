@@ -2,7 +2,7 @@
   {% for conn in conn_list %}
     <tr>
       {% comment %} <th scope="row">{{conn.pk}}</th> {% endcomment %}
-      <td>
+      <td class="col-2">
         <a class="px-1"
            data-bs-title="Edit Connection"
            data-bs-toggle="tooltip"
@@ -19,11 +19,13 @@
           <i class="fa fa-trash fa-fw fa-xs text-danger" aria-hidden="true"></i></a>
         {{ conn.name }}
       </td>
-      <td>{{ conn.dbtype }}</td>
-      <td>{{ conn.hostname }}</td>
-      <td>{{ conn.dbname }}</td>
-      <td>{{ conn.username }}</td>
-      {% comment %} <td>{{conn.pk }}</td> {% endcomment %}
+      <td class="col-1">{{ conn.dbtype }}</td>
+      <td class="col-4">{{ conn.hostname }}</td>
+      <td class="col-1">{{ conn.dbname }}</td>
+      <td class="col-1">{{ conn.username }}</td>
+      {% comment %} <td class="col-xs-1">{{conn.pk }}</td> {% endcomment %}
+      <td class="col-1">{{ conn.portno }}</td>
+      <td class="col-1">{{ conn.created_by.name }}</td>
     </tr>
   {% endfor %}
 {% endblock content %}

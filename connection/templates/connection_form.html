@@ -1,9 +1,20 @@
 {% block content %}
   <div class="container">
-    <form hx-post="{{ request.path }}" hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}' class="modal-content">
+    <form hx-post="{{ request.path }}"
+          hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
+          class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">{% if connection.name %}Modify {{connection.name}}{% else %}New Connection{% endif %}</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <h5 class="modal-title">
+          {% if connection.name %}
+            Modify {{ connection.name }}
+          {% else %}
+            New Connection
+          {% endif %}
+        </h5>
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <div class="row align-items-center">
@@ -12,86 +23,135 @@
           </div>
           <div class="col-3 form-control-sm">
             <div class="col-auto ">
-              <input type="text" name="name" value="{{ connection.name }}" id="id_name" class="form-control form-control-sm">
+              <input type="text"
+                     name="name"
+                     value="{{ connection.name }}"
+                     id="id_name"
+                     required
+                     class="form-control form-control-sm" />
             </div>
           </div>
-
           <div class="col-2 small">
             <label for="id_dbtype" class="col-form-label">Database Type:</label>
           </div>
-          <div class="col-3 form-control-sm">
-            <select name="dbtype" class="form-control form-control-sm" required aria-invalid="true" id="id_dbtype" onChange="snowflake_warehouse_required()">
-              <option value="{{ connection.dbtype }}" selected>{{connection.dbtype}}</option>
-              <option value="MySQL">MySQL</option>
-              <option value="Snowflake">Snowflake</option>
-              <option value="MSSQL">MS SQL Server</option>
+          <div class="col-3">
+            <select name="dbtype"
+                    class="form-control form-control-sm form-select form-select-sm"
+                    required
+                    aria-invalid="true"
+                    id="id_dbtype"
+                    onChange="check_db_type()">
+              <option value="{{ connection.dbtype.id }}" selected>{{ connection.dbtype.dbname }}</option>
+              {% for item in dbtypes %}<option value="{{ item.id }}">{{ item.dbname }}</option>{% endfor %}
             </select>
           </div>
-        </div>  
-                  
-        <div class="row align-items-center">
+        </div>
+        <div class="row align-items-center" id="db_details">
           <div class="col-2 small">
             <label for="id_hostname" class="col-form-label">Hostname:</label>
           </div>
-          <div class="col-3 form-control-sm">
-            <input type="text" name="hostname" value="{{ connection.hostname }}" required id="id_hostname" class="form-control form-control-sm">
+          <div class="col-3">
+            <input type="text"
+                   name="hostname"
+                   value="{{ connection.hostname }}"
+                   required
+                   id="id_hostname"
+                   class="form-control form-control-sm" />
           </div>
           <div class="col-2 small">
             <label for="id_dbname" class="col-form-label-sm">Database Name:</label>
           </div>
-          <div class="col-3 form-control-sm">
+          <div class="col-3">
             <div class="col-auto ">
-              <input type="text" name="dbname" value="{{ connection.dbname }}" required id="id_dbname" class="form-control form-control-sm">
+              <input type="text"
+                     name="dbname"
+                     value="{{ connection.dbname }}"
+                     required
+                     id="id_dbname"
+                     class="form-control form-control-sm" />
             </div>
           </div>
         </div>
-        <div class="row align-items-center">
-          <div class="col-2 small">
-            <label for="id_schema_name" class="col-form-label">Database Schema:</label>
-          </div>
-          <div class="col-3 form-control-sm">
-            <input type="text" name="schema_name" value="{{ connection.schema_name }}" required id="id_schema_name" class="form-control form-control-sm">
-          </div>
-          <div class="col-2 small">
-            <label for="id_portno" class="col-form-label-sm">Database Port No:</label>
-          </div>
-          <div class="col-3 form-control-sm">
-            <div class="col-auto ">
-              <input type="number" name="portno" value="{{ connection.portno }}" required id="id_portno" class="form-control form-control-sm">
-            </div>
-          </div>
-        </div>  
-
-        <div class="row align-items-center">
+        <div class="row align-items-center" id="db_credential">
           <div class="col-2 small">
             <label for="id_username" class="col-form-label-sm">Database Username:</label>
           </div>
-          <div class="col-3 form-control-sm">
+          <div class="col-3">
             <div class="col-auto ">
-              <input type="text" name="username" value="{{ connection.username }}" required id="id_username" class="form-control form-control-sm">
+              <input type="text"
+                     name="username"
+                     value="{{ connection.username }}"
+                     required
+                     id="id_username"
+                     class="form-control form-control-sm" />
             </div>
           </div>
-
           <div class="col-2 small">
             <label for="id_password" class="col-form-label">Database Password:</label>
           </div>
-          <div class="col-3 form-control-sm">
+          <div class="col-3">
             {% if connection.password %}
-            <input type="password" name="password" id="id_password" class="form-control form-control-sm">
+              <input type="password"
+                     name="password"
+                     id="id_password"
+                     class="form-control form-control-sm" />
             {% else %}
-            <input type="password" name="password" id="id_password" required class="form-control form-control-sm">
+              <input type="password"
+                     name="password"
+                     id="id_password"
+                     required
+                     class="form-control form-control-sm" />
             {% endif %}
           </div>
         </div>
-
-        <p class="text-warning small">Optional</p>
-        <div class="row align-items-center">
+        <div class="row align-items-center" id="db_schema_port">
+          <div class="col-2 small">
+            <label for="id_portno" class="col-form-label-sm">Database Port No:</label>
+          </div>
+          <div class="col-3">
+            <input type="number"
+                   name="portno"
+                   value="{{ connection.portno }}"
+                   required
+                   id="id_portno"
+                   class="form-control form-control-sm" />
+          </div>
+          <div class="col-2 small">
+            <label for="id_schema_name" class="col-form-label">Database Schema:</label>
+          </div>
+          <div class="col-3">
+            <div class="col-auto ">
+              <input type="text"
+                     name="schema_name"
+                     value="{{ connection.schema_name }}"
+                     id="id_schema_name"
+                     class="form-control form-control-sm" />
+            </div>
+          </div>
+        </div>
+        <div class="row align-items-center" id="snowflake_details" hidden>
+          <div class="col-2 small">
+            <label for="id_sf_account_name" class="col-form-label-sm">Snowflake Account Name:</label>
+          </div>
+          <div class="col-3">
+            <div class="col-auto ">
+              <input type="text"
+                     name="sf_account_name"
+                     value="{{ connection.warehouse_name }}"
+                     id="id_sf_account_name"
+                     class="form-control form-control-sm" />
+            </div>
+          </div>
           <div class="col-2 small">
             <label for="id_warehouse_name" class="col-form-label-sm">Snowflake Warehouse:</label>
           </div>
           <div class="col-3 form-control-sm">
             <div class="col-auto ">
-              <input type="text" name="warehouse_name" value="{{ connection.warehouse_name }}" id="id_warehouse_name" class="form-control form-control-sm">
+              <input type="text"
+                     name="warehouse_name"
+                     value="{{ connection.warehouse_name }}"
+                     id="id_warehouse_name"
+                     class="form-control form-control-sm" />
             </div>
           </div>
         </div>
@@ -99,31 +159,37 @@
       <div class="row justify-content-between">
         <div class="modal-footer">
           <div id="connection_result"></div>
-          <button type="submit" name="test" class="btn btn-secondary btn-sm col-2"
-                      hx-post="{% url 'connection:create_connection' %}"
-                      hx-swap="outerhtml"
-                      hx-trigger="click"
-                      hx-target="#connection_result">
-                      Test Connection
-          </button>
+          <button type="submit"
+                  name="test"
+                  class="btn btn-secondary btn-sm col-2"
+                  hx-post="{% url 'connection:create_connection' %}"
+                  hx-swap="outerhtml"
+                  hx-trigger="click"
+                  hx-target="#connection_result">Test Connection</button>
           <button type="submit" name="save" class="btn btn-success btn-sm col-2">Save</button>
         </div>
       </div>
     </form>
   </div>
 {% endblock content %}
-
 {% block inline_javascript %}
   <script type="text/javascript">
-    function snowflake_warehouse_required() {
+    function check_db_type() {
       let dbType = document.getElementById('id_dbtype');
-      if(dbType.value.toLowerCase() === 'snowflake'){
+      console.log(dbType.selectedOptions[0].innerHTML.toLowerCase())
+      let isRDBMS = ['postgres', 'mssql', 'mysql'].includes(dbType.selectedOptions[0].innerHTML.toLowerCase())
+      if (dbType.selectedOptions[0].innerHTML.toLowerCase() === 'snowflake') {
         console.log("Snowflake selected");
-        document.getElementById('id_warehouse_name').setAttribute("required","true");
-      }
-      else {
-        console.log("Something else selected");
-        document.getElementById('id_warehouse_name').removeAttribute('required');
+        document.getElementById('snowflake_details').removeAttribute("hidden");
+        document.getElementById('id_hostname').removeAttribute("required", "true");
+        document.getElementById('id_portno').removeAttribute("required", "true");
+        document.getElementById('id_schema_name').removeAttribute("required", "true");
+        document.getElementById('id_warehouse_name').setAttribute("required", "true");
+        document.getElementById('id_sf_account_name').setAttribute("required", "true");
+      } else if (isRDBMS) {
+        console.log("RDBMS selected");
+      } else {
+        console.log("Something Else selected");
       }
     }
   </script>
