@@ -274,3 +274,5 @@ dump.rdb
 data_compare/media/
 
 .pytest_cache/
+
+*.vscode

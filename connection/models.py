@@ -2,17 +2,23 @@ from django.db import models
 
 from data_compare.users.models import User
 
-# Create your models here.
+
+class DbType(models.Model):
+    dbname = models.CharField(max_length=50, null=False, blank=False)
+    create_dt = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.dbname
 
 
-class Connection(models.Model):
+class DbConnection(models.Model):
     DB_TYPES = (
         ("MySQL", "MySQL"),
         ("Snowflake", "Snowflake"),
         ("MSSQL", "MS SQL Server"),
     )
     name = models.CharField(max_length=50)
-    dbtype = models.CharField(max_length=50, choices=DB_TYPES)
+    dbtype = models.ForeignKey(DbType, related_name="dbtype", on_delete=models.PROTECT, null=True)
     dbname = models.CharField(max_length=200)
     hostname = models.CharField(max_length=200)
     username = models.CharField(max_length=100)
@@ -20,6 +26,7 @@ class Connection(models.Model):
     portno = models.IntegerField()
     schema_name = models.CharField(max_length=100)
     created_by = models.ForeignKey(User, related_name="connection", on_delete=models.PROTECT)
+    create_dt = models.DateTimeField(auto_now=True)
 
     # Add new columns for Snowflake support
     warehouse_name = models.CharField(max_length=100, blank=True)

@@ -1,4 +1,4 @@
-FROM python:3-alpine AS builder
+FROM python:3.13.0a3-alpine AS builder
 
 WORKDIR /app
 
@@ -20,7 +20,6 @@ ENV PORT=8000
 
 WORKDIR /app
 
-RUN ls -al 
 COPY --from=builder /app/venv venv
 # COPY config config
 COPY . .
