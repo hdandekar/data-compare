@@ -8,7 +8,7 @@
   {% translate "Sign In" %}
 {% endblock head_title %}
 {% block inner %}
-  <h1>{% translate "Sign In" %}</h1>
+  <h5>{% translate "Sign In" %}</h5>
   {% get_providers as socialaccount_providers %}
   {% if socialaccount_providers %}
     <p>
@@ -37,14 +37,55 @@
       </p>
     {% endif %}
   {% endif %}
+  {% if form.non_field_errors %}
+    {% for error in form.non_field_errors %}<div class="alert alert-danger" role="alert">{{ error }}</div>{% endfor %}
+  {% endif %}
   <form class="login" method="post" action="{% url 'account_login' %}">
     {% csrf_token %}
-    {{ form|crispy }}
+    <div id="div_id_login" class="mb-3">
+      <label for="id_login" class="form-label requiredField">
+        Email
+        <span class="asteriskField">*</span>
+      </label>
+      <input type="email"
+             name="login"
+             placeholder="Email address"
+             autocomplete="email"
+             class="passwordinput form-control form-control-sm"
+             required=""
+             aria-describedby="id_password1_helptext"
+             id="id_password" />
+      {{ form.login.errors }}
+    </div>
+    <div id="div_id_password" class="mb-3">
+      <label for="id_password" class="form-label requiredField">
+        Password
+        <span class="asteriskField">*</span>
+      </label>
+      <input type="password"
+             name="password"
+             placeholder="Password"
+             autocomplete="new-password"
+             class="emailinput form-control form-control-sm"
+             required
+             id="id_login" />
+      {{ form.password.errors }}
+      <a href="{% url 'account_reset_password' %}" class="small">Reset password</a>
+    </div>
+    <div class="mb-3">
+      <div id="div_id_remember" class="mb-3 form-check">
+        <input type="checkbox"
+               name="remember"
+               class="checkboxinput form-check-input"
+               id="id_remember" />
+        <label for="id_remember" class="form-check-label">Remember Me</label>
+      </div>
+    </div>
+    <button class="btn btn-primary btn-sm" type="submit">{% translate "Sign In" %}</button>
     {% if redirect_field_value %}
       <input type="hidden"
              name="{{ redirect_field_name }}"
              value="{{ redirect_field_value }}" />
     {% endif %}
-    <button class="primaryAction btn btn-primary" type="submit">{% translate "Sign In" %}</button>
   </form>
 {% endblock inner %}

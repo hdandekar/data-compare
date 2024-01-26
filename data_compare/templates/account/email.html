@@ -7,7 +7,7 @@
   {% translate "Account" %}
 {% endblock head_title %}
 {% block inner %}
-  <h1>{% translate "E-mail Addresses" %}</h1>
+  <h5>{% translate "E-mail Addresses" %}</h5>
   {% if user.emailaddress_set.all %}
     <p>{% translate "The following e-mail addresses are associated with your account:" %}</p>
     <form action="{% url 'account_email' %}" class="email_list" method="post">
@@ -35,13 +35,13 @@
           </div>
         {% endfor %}
         <div class="form-group">
-          <button class="secondaryAction btn btn-primary"
+          <button class="secondaryAction btn btn-primary btn-sm"
                   type="submit"
                   name="action_primary">{% translate "Make Primary" %}</button>
-          <button class="secondaryAction btn btn-primary"
+          <button class="secondaryAction btn btn-primary btn-sm"
                   type="submit"
                   name="action_send">{% translate "Re-send Verification" %}</button>
-          <button class="primaryAction btn btn-primary"
+          <button class="primaryAction btn btn-primary btn-sm"
                   type="submit"
                   name="action_remove">{% translate "Remove" %}</button>
         </div>
@@ -52,11 +52,24 @@
       <strong>{% translate "Warning:" %}</strong> {% translate "You currently do not have any e-mail address set up. You should really add an e-mail address so you can receive notifications, reset your password, etc." %}
     </p>
   {% endif %}
-  <h2>{% translate "Add E-mail Address" %}</h2>
+  <br />
+  <h5>{% translate "Add E-mail Address" %}</h5>
   <form method="post" action="{% url 'account_email' %}" class="add_email">
     {% csrf_token %}
-    {{ form|crispy }}
-    <button class="btn btn-primary" name="action_add" type="submit">{% translate "Add E-mail" %}</button>
+    <!-- {{ form|crispy }} -->
+    <div id="div_id_email" class="mb-3">
+      <label for="id_email" class="form-label requiredField">
+        Email<span class="asteriskField">*</span>
+      </label>
+      <input type="email"
+             name="email"
+             placeholder="Email address"
+             maxlength="320"
+             class="textinput form-control form-control-sm"
+             required
+             id="id_email" />
+    </div>
+    <button class="btn btn-primary btn-sm" name="action_add" type="submit">{% translate "Add E-mail" %}</button>
   </form>
 {% endblock inner %}
 {% block inline_javascript %}

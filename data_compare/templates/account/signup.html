@@ -7,9 +7,9 @@
   {% translate "Signup" %}
 {% endblock head_title %}
 {% block inner %}
-  <h1>{% translate "Sign Up" %}</h1>
+  <h5>{% translate "Sign Up" %}</h5>
   <p>
-    {% blocktranslate %}Already have an account? Then please <a href="{{ login_url }}">sign in</a>.{% endblocktranslate %}
+    {% blocktranslate %}Already have an account, please <a href="{{ login_url }}">Login</a> here.{% endblocktranslate %}
   </p>
   <form class="signup"
         id="signup_form"
@@ -27,13 +27,14 @@
              placeholder="Email address"
              autocomplete="email"
              maxlength="320"
-             class="textinput form-control"
+             class="textinput form-control form-control-sm"
              required=""
              id="id_email"
              hx-post="{% url 'users:check-username' %}"
              hx-swap="outerhtml"
              hx-trigger="change"
              hx-target="#username-error" />
+      {{ form.email.errors }}
       <div id="username-error"></div>
     </div>
     <div id="div_id_password1" class="mb-3">
@@ -45,10 +46,11 @@
              name="password1"
              placeholder="Password"
              autocomplete="new-password"
-             class="passwordinput form-control"
+             class="passwordinput form-control form-control-sm"
              required=""
              aria-describedby="id_password1_helptext"
              id="id_password1" />
+      {{ form.password1.errors }}
     </div>
     <div id="div_id_password2" class="mb-3">
       <label for="id_password2" class="form-label requiredField">
@@ -59,15 +61,16 @@
              name="password2"
              placeholder="Password (again)"
              autocomplete="new-password"
-             class="passwordinput form-control"
+             class="passwordinput form-control form-control-sm"
              required=""
              id="id_password2" />
+      {{ form.password2.errors }}
     </div>
     {% if redirect_field_value %}
       <input type="hidden"
              name="{{ redirect_field_name }}"
              value="{{ redirect_field_value }}" />
     {% endif %}
-    <button class="btn btn-primary" type="submit">{% translate "Sign Up" %} »</button>
+    <button class="btn btn-primary btn-sm" type="submit">{% translate "Sign Up" %}</button>
   </form>
 {% endblock inner %}

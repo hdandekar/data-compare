@@ -22,7 +22,14 @@ class UserUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     model = User
     fields = [
         "name",
+        "designation",
         "email",
+        "avatar",
+        "website",
+        "github_link",
+        "twitter_link",
+        "mobile_number",
+        "address",
     ]
     success_message = _("Information successfully updated")
 
@@ -65,8 +72,3 @@ def check_username(request):
         return HttpResponse(email_registered_response)
     else:
         return HttpResponse(email_absent_response)
-
-    # success_response = f"
-    # <div class='small' id='username-error' class='.text-error'>
-    # This email address is already registered, please
-    # <a xlass='small' href='{login_url}'>Sign In</a></div>"
