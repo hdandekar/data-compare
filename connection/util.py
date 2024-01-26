@@ -24,4 +24,3 @@ def check_mysql_conn(db_name, uname, pwd, hostname, portno):
     except mysql_connector.Error as err:
         print(f"Error#{err.errno}, msg: {err.msg}")
         return {"connected": False, "error": err}
-

@@ -27,8 +27,7 @@ body {
   border-color: #eed3d7;
 }
 
-.smaller,
-smaller {
+.smaller {
   font-size: .75em;
 }
 
@@ -40,4 +39,17 @@ smaller {
 .required::after {
   content: ' *';
   color: red;
+}
+
+.errorlist {
+  font-size: smaller;
+  color: red;
+}
+
+hr {
+  margin: 0.5rem 0;
+  color: inherit;
+  border: 0;
+  border-top: var(--bs-border-width) solid;
+  opacity: .25
 }
