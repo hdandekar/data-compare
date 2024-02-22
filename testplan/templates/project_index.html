@@ -1,25 +1,23 @@
 {% extends 'app_base.html' %}
 
 {% block title %}
-  Dashboard
+  Projects
 {% endblock title %}
 {% block content %}
-  {% load static %}
+{% load static %}
 
   <div class="container">
     <div class="row">
-      <div class="col col-2">
-        <h5>Connection List</h5>
-      </div>
-      <div class="col col-1">
-        <a class="text-success"
-           data-bs-title="Add New Connection"
-           data-bs-toggle="tooltip"
-           data-bs-placement="right"
-           hx-get="{% url 'connection:create_connection' %}"
-           hx-target="#dialog">
-          <i class="fa fa-solid fa-plus fa-2xl" aria-hidden="true"></i></a>
-      </div>
+        <h5>Project List
+          <a class="text-success p-xl-1"
+          title="Add New Project"
+          data-toggle="tooltip" 
+          data-bs-placement="right"
+          hx-get="{% url 'create_project' %}"
+          hx-target="#dialog">
+            <i class="fa fa-solid fa-plus fa-xl" aria-hidden="true"></i>
+          </a>
+        </h5>
     </div>
     <table class="table table-striped table-bordered table-sm small"
            aria-label="Connection List">
@@ -27,16 +25,16 @@
       <thead class="thead-dark small">
         <tr>
           {% comment %} <th scope="col">ID</th> {% endcomment %}
-          <th scope="col" class="text-center">Connection Name</th>
-          <th scope="col" class="text-center">DB Type</th>
-          <th scope="col" class="text-center">Host Name</th>
-          <th scope="col" class="text-center">Database Name</th>
-          <th scope="col" class="text-center">Username</th>
-          <th scope="col" class="text-center">Port No</th>
+          <th class="sortable">Project name</th>
+          <th class="sortable hidden-xs">Unresolved defects</th>
+          <th class="sortable hidden-xs">Test runs</th>
+          <th class="sortable hidden-xs">Milestones</th>
+          <th class="sortable hidden-xs">Owner</th>
+          <th class="hidden-xs">Team members</th>
         </tr>
       </thead>
-      <tbody hx-trigger="load, connectionListChanged from:body"
-             hx-get="{% url 'connection:list' %}"
+      <tbody hx-trigger="load, projectListChanged from:body"
+             hx-get="{% url 'list_project' %}"
              hx-target="this"
              class="small">
         <tr class="text-center">
@@ -63,12 +61,9 @@
 
       // Change the toast class based on eventType
       htmx.on("showMessage", (e) => {
-        console.log("showMessage");
-        console.log(e);
         toastBody.innerText = e.detail.value;
         toast.show();
       })
-
 
       htmx.on("errors", (e) => {
         console.log("errors are", e)
@@ -76,10 +71,11 @@
 
       // Change the toast class based on eventType
       htmx.on("eventType", (e) => {
-        if (['created', 'edited'].includes(e.detail.value)) {
+        if (['created', 'updated'].includes(e.detail.value)) {
           toastElement.classList.remove('bg-danger', 'bg-success');
           toastElement.classList.add("bg-success");
-        } else if (['deleted'].includes(e.detail.value)) {
+        } else if (['deleted','permissiondenied'].includes(e.detail.value)) {
+          console.log("eventType:deleted,permissiondenied");
           toastElement.classList.remove('bg-danger', 'bg-success');
           toastElement.classList.add("bg-danger");
         }
@@ -89,8 +85,6 @@
       const modal = new bootstrap.Modal(document.getElementById("modal"))
 
       htmx.on("htmx:afterSwap", (e) => {
-        console.log("htmx:afterSwap")
-        console.log(e)
         // Response targeting #dialog => show the modal
         if (e.detail.target.id == "dialog") {
           modal.show()
@@ -99,8 +93,6 @@
 
       htmx.on("htmx:beforeSwap", (e) => {
         // Empty response targeting #dialog => hide the modal
-        console.log("htmx:beforeSwap");
-        console.log(e.detail.xhr.response);
         if (e.detail.target.id == "dialog" && !e.detail.xhr.response) {
           modal.hide()
           e.detail.shouldSwap = false
@@ -109,7 +101,6 @@
 
       // Remove dialog content after hiding
       htmx.on("hidden.bs.modal", () => {
-        console.log("what am I doing with hidden.bs.modal")
         document.getElementById("dialog").innerHTML = ""
       })
     })();
