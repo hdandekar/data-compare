@@ -34,7 +34,7 @@
           <div class="col-2 small">
             <label for="id_dbtype" class="col-form-label">Database Type:</label>
           </div>
-          <div class="col-3">
+          <div class="col-3 form-control-sm">
             <select name="dbtype"
                     class="form-control form-control-sm form-select form-select-sm"
                     required
@@ -50,7 +50,7 @@
           <div class="col-2 small">
             <label for="id_hostname" class="col-form-label">Hostname:</label>
           </div>
-          <div class="col-3">
+          <div class="col-3 form-control-sm">
             <input type="text"
                    name="hostname"
                    value="{{ connection.hostname }}"
@@ -61,7 +61,7 @@
           <div class="col-2 small">
             <label for="id_dbname" class="col-form-label-sm">Database Name:</label>
           </div>
-          <div class="col-3">
+          <div class="col-3 form-control-sm">
             <div class="col-auto ">
               <input type="text"
                      name="dbname"
@@ -76,7 +76,7 @@
           <div class="col-2 small">
             <label for="id_username" class="col-form-label-sm">Database Username:</label>
           </div>
-          <div class="col-3">
+          <div class="col-3 form-control-sm">
             <div class="col-auto ">
               <input type="text"
                      name="username"
@@ -89,7 +89,7 @@
           <div class="col-2 small">
             <label for="id_password" class="col-form-label">Database Password:</label>
           </div>
-          <div class="col-3">
+          <div class="col-3 form-control-sm">
             {% if connection.password %}
               <input type="password"
                      name="password"
@@ -108,7 +108,7 @@
           <div class="col-2 small">
             <label for="id_portno" class="col-form-label-sm">Database Port No:</label>
           </div>
-          <div class="col-3">
+          <div class="col-3 form-control-sm">
             <input type="number"
                    name="portno"
                    value="{{ connection.portno }}"
@@ -119,7 +119,7 @@
           <div class="col-2 small">
             <label for="id_schema_name" class="col-form-label">Database Schema:</label>
           </div>
-          <div class="col-3">
+          <div class="col-3 form-control-sm">
             <div class="col-auto ">
               <input type="text"
                      name="schema_name"
@@ -162,7 +162,7 @@
           <button type="submit"
                   name="test"
                   class="btn btn-secondary btn-sm col-2"
-                  hx-post="{% url 'connection:create_connection' %}"
+                  hx-post="{% url 'settings:create_connection' %}"
                   hx-swap="outerhtml"
                   hx-trigger="click"
                   hx-target="#connection_result">Test Connection</button>

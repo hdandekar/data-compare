@@ -53,3 +53,32 @@ hr {
   border-top: var(--bs-border-width) solid;
   opacity: .25
 }
+
+
+.img-avatar {
+  height: 30px;
+  width: 30px;
+}
+
+.link-undecorate {
+  text-decoration: none;
+}
+
+.fs-75 {
+  font-size: 0.75rem !important
+}
+
+
+::-webkit-input-placeholder {
+  font-size: 13px !important;
+}
+
+:-moz-placeholder {
+  /* Firefox 18- */
+  font-size: 13px !important;
+}
+
+::-moz-placeholder {
+  /* Firefox 19+ */
+  font-size: 13px !important;
+}

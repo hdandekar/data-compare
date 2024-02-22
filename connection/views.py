@@ -87,7 +87,7 @@ def connection_create(request):
 def connection_list(request):
     conn_list = DbConnection.objects.all()
     connection_count = conn_list.count()
-    return render(request, "list.html", {"conn_list": conn_list, "connection_count": connection_count})
+    return render(request, "connection_list.html", {"conn_list": conn_list, "connection_count": connection_count})
 
 
 @login_required
@@ -106,7 +106,6 @@ def connection_edit(request, pk):
                 db_connection.password = make_password(form.cleaned_data["password"])
                 db_connection.save()
             else:
-                print("Password not present")
                 db_connection.save()
             return HttpResponse(
                 status=204,
@@ -121,7 +120,6 @@ def connection_edit(request, pk):
                 },
             )
         else:
-            print("Form Errors are", form.errors)
             return HttpResponse(status=400, headers={"HX-Trigger": json.dumps({"errors": form.errors})})
     else:
         form = ConnectionForm(instance=connection)
@@ -130,7 +128,7 @@ def connection_edit(request, pk):
 
 @login_required
 def index(request):
-    return render(request, "index.html")
+    return render(request, "connection_index.html")
 
 
 @login_required

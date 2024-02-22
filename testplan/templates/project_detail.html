@@ -1,0 +1,106 @@
+{% extends 'app_base.html' %}
+
+{% block title %}
+  {{ project.name }}
+{% endblock title %}
+{% block content %}
+{% load static %}
+
+<div class="container">
+    <div class="row">
+        <h5>Module List
+          <a class="text-success p-xl-1"
+          title="Add New Module"
+          data-toggle="tooltip" 
+          data-bs-placement="right"
+          hx-get="{% url 'create_module' project.id %}"
+          hx-target="#dialog">
+            <i class="fa fa-solid fa-plus fa-xl" aria-hidden="true"></i>
+          </a>
+        </h5>
+    </div>
+    <table class="table table-striped table-bordered table-sm small"
+           aria-label="Module List">
+      {{ connection_count|json_script:"hello-data" }}
+      <thead class="thead-dark small">
+        <tr>
+          {% comment %} <th scope="col">ID</th> {% endcomment %}
+          <th class="sortable">Module name</th>
+          <th class="sortable hidden-xs">Project Name</th>
+          <th class="sortable hidden-xs"># of Defects</th>
+          <th class="sortable hidden-xs"># of Test Cases</th>
+        </tr>
+      </thead>
+      <tbody hx-trigger="load, moduleListChanged from:body"
+             hx-get="{% url 'list_modules' project.id %}"
+             hx-target="this"
+             class="small">
+        <tr class="text-center">
+          <td class="spinner-border" role="status">
+            <span class="visually-hidden text-center">Loading...</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <!-- Placeholder for the modal -->
+  <div id="modal" class="modal modal-lg fade">
+    <div id="dialog" class="modal-dialog" hx-target="this"></div>
+  </div>
+{% endblock content %}
+{% block inline_javascript %}
+  <script type="text/javascript">
+    (function() {
+      const toastElement = document.getElementById("toast")
+      const toastBody = document.getElementById("toast-body")
+      const toast = new bootstrap.Toast(toastElement, {
+        delay: 5000
+      })
+
+      // Change the toast class based on eventType
+      htmx.on("showMessage", (e) => {
+        toastBody.innerText = e.detail.value;
+        toast.show();
+      })
+
+      htmx.on("errors", (e) => {
+        console.log("errors are", e)
+      })
+
+      // Change the toast class based on eventType
+      htmx.on("eventType", (e) => {
+        if (['created', 'updated'].includes(e.detail.value)) {
+          toastElement.classList.remove('bg-danger', 'bg-success');
+          toastElement.classList.add("bg-success");
+        } else if (['deleted','permissiondenied'].includes(e.detail.value)) {
+          console.log("eventType:deleted,permissiondenied");
+          toastElement.classList.remove('bg-danger', 'bg-success');
+          toastElement.classList.add("bg-danger");
+        }
+      })
+    })();
+    (function() {
+      const modal = new bootstrap.Modal(document.getElementById("modal"))
+
+      htmx.on("htmx:afterSwap", (e) => {
+        // Response targeting #dialog => show the modal
+        if (e.detail.target.id == "dialog") {
+          modal.show()
+        }
+      })
+
+      htmx.on("htmx:beforeSwap", (e) => {
+        // Empty response targeting #dialog => hide the modal
+        if (e.detail.target.id == "dialog" && !e.detail.xhr.response) {
+          modal.hide()
+          e.detail.shouldSwap = false
+        }
+      })
+
+      // Remove dialog content after hiding
+      htmx.on("hidden.bs.modal", () => {
+        document.getElementById("dialog").innerHTML = ""
+      })
+    })();
+  </script>
+{% endblock inline_javascript %}

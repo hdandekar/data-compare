@@ -3,18 +3,19 @@
     <tr>
       {% comment %} <th scope="row">{{conn.pk}}</th> {% endcomment %}
       <td class="col-2">
-        <a class="px-1"
+        <a class="px-1 link-undecorate"
            data-bs-title="Edit Connection"
            data-bs-toggle="tooltip"
            data-bs-placement="left"
-           hx-get="{% url 'connection:edit' conn.pk %}"
+           hx-get="{% url 'settings:edit_connection' conn.pk %}"
            hx-target="#dialog">
-          <i class="fa fa-pen-to-square fa-fw fa-xs" aria-hidden="true"></i></a>
-        <a class="px-1 confirm-delete"
+          <i class="fa fa-pen-to-square fa-fw fa-xs" aria-hidden="true"></i>
+        </a>
+        <a class="px-1 confirm-delete link-undecorate"
            data-bs-title="Delete Connection"
            data-bs-toggle="tooltip"
            data-bs-placement="right"
-           hx-get="{% url 'connection:delete' conn.pk %}"
+           hx-get="{% url 'settings:delete_connection' conn.pk %}"
            hx-target="#dialog">
           <i class="fa fa-trash fa-fw fa-xs text-danger" aria-hidden="true"></i></a>
         {{ conn.name }}
@@ -25,7 +26,7 @@
       <td class="col-1">{{ conn.username }}</td>
       {% comment %} <td class="col-xs-1">{{conn.pk }}</td> {% endcomment %}
       <td class="col-1">{{ conn.portno }}</td>
-      <td class="col-1">{{ conn.created_by.name }}</td>
+      <td class="col-1" data-toggle="tooltip" title={{ conn.created_by.name|default:conn.created_by }}>{{ conn.created_by.name|default:conn.created_by|truncatechars:10 }}</td>
     </tr>
   {% endfor %}
 {% endblock content %}
