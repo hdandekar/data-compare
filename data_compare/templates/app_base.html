@@ -59,10 +59,10 @@
                      aria-expanded="false">Go To</a>
                   <ul class="dropdown-menu" aria-labelledby="navbarCreateMenuLink">
                     <li>
-                      <a class="dropdown-item" href="{% url 'connection:connections' %}">{% translate "Connection" %}</a>
+                      <a class="dropdown-item" href="{% url 'settings:connections' %}">{% translate "Connection" %}</a>
                     </li>
                     <li>
-                      <a class="dropdown-item" href="#">Test Case</a>
+                      <a class="dropdown-item" href="{% url 'projects' %}">Projects</a>
                     </li>
                     <li>
                       <a class="dropdown-item" href="#">Test Set</a>
@@ -75,7 +75,11 @@
                      id="navbarAccountMenuLink"
                      role="button"
                      data-bs-toggle="dropdown"
-                     aria-expanded="false">Account</a>
+                     aria-expanded="false">Account
+                    <img alt="profile"
+                         class="img-avatar me-1 rounded-circle"
+                         src="{{ request.user.avatar.url }}" />
+                  </a>
                   <ul class="dropdown-menu" aria-labelledby="navbarAccountMenuLink">
                     <li>
                       <a class="dropdown-item" href="{% url 'users:detail' request.user.pk %}">{% translate "My Profile" %}</a>
@@ -165,6 +169,10 @@
       });
       document.body.addEventListener('htmx:configRequest', (event) => {
         event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
+      });
+
+      $(function() {
+        $('[data-toggle="tooltip"]').tooltip()
       })
     </script>
       {% endcomment %}

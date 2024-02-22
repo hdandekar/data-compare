@@ -1,0 +1,75 @@
+{% block content %}
+  <div class="container">
+    <form hx-post="{{ request.path }}"
+          hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
+          class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">New Project</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-8">
+            <div class="row">
+              <div class="col-10">
+                <div class="form-group ">
+                  <label class="required bold col-form-label-sm">Project name</label>
+                  <input type="text" name="name" id="id_name" class="form-control form-control-sm" placeholder="For example: Web Application" required="" autofocus="" value="{{ object.name }}" />
+                </div>
+              </div>
+            </div>
+                <div class="row">
+                  <div class="col-6">
+                    <div class="form-group">
+                  <label class="required bold col-form-label-sm">Project Code
+                        <span aria-label="Code is short name of your project. It should be from 2 to 10 letters. Only latin characters and numbers are allowed." data-balloon-pos="up" class="tooltip-extra-right">
+                          <em class="fas fa-question-circle"></em>
+                        </span>
+                      </label>
+                      <input maxlength="6" type="text" name="project_code" id="id_project_code" class="form-control form-control-sm" placeholder="For example: WA" required="" value="{{ object.project_code }}" />
+                    </div>
+                  </div>
+              </div>
+              <div class="row">
+                <div class="col-md-5">
+                  <div class="form-group">
+                    <label class="required col-form-label-sm" for="id_owner">Owner</label>
+                    <select class="form-select form-select-sm form-control form-control-sm" name="owner" id="id_id_owner" aria-label=".form-select-sm example">
+                      {% for user in form.fields.members.queryset %}
+                        <option value="{{ user.id }}" {% if user.id == request.user.id %} selected {% endif %}>{{ user.email }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-10">
+                  <div class="form-group">
+                    <label class="id_description col-form-label-sm">Description</label>
+                    <textarea class="form-control form-control-sm" name="description" id="id_description" rows="4" placeholder="Write a few sentences about your project">{{object.description}}</textarea>
+                  </div>
+                </div>
+              </div>
+              <div class="row mt-2">
+                  <div class="col">
+                      <button class="btn btn-primary btn-sm" type="submit">Save</button>
+                  </div>
+              </div>
+          </div>
+          <div class="col-md-4">
+            <div id="div_id_members" class="col-form-label-sm">
+              <label for="id_members">Members</label>
+            </div>
+            <select name="members" size="14"  class="selectmultiple form-control form-control-sm" id="id_members" multiple="">
+              {% for user in form.fields.members.queryset %}
+                {% if request.user.id != user.id %}
+                  <option value="{{ user.id }}" {% if user in object.members.all %} selected {% endif %}>{{ user.email }}</option>
+                {% endif %}
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  {% endblock content %}
