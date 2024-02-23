@@ -78,7 +78,6 @@
           toastElement.classList.remove('bg-danger', 'bg-success');
           toastElement.classList.add("bg-success");
         } else if (['deleted', 'permissiondenied'].includes(e.detail.value)) {
-          console.log("eventType:deleted,permissiondenied");
           toastElement.classList.remove('bg-danger', 'bg-success');
           toastElement.classList.add("bg-danger");
         }
