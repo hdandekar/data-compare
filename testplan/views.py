@@ -28,17 +28,17 @@ class ProjectCreateView(LoginRequiredMixin, CreateView):
         form.save_m2m()
         project.members.add(self.request.user.id)
         return HttpResponse(
-                    status=204,
-                    headers={
-                        "HX-Trigger": json.dumps(
-                            {
-                                "projectListChanged": None,
-                                "showMessage": f"{project.name} added.",
-                                "eventType": "created",
-                            }
-                        )
-                    },
+            status=204,
+            headers={
+                "HX-Trigger": json.dumps(
+                    {
+                        "projectListChanged": None,
+                        "showMessage": f"{project.name} added.",
+                        "eventType": "created",
+                    }
                 )
+            },
+        )
 
     def form_invalid(self, form):
         return self.render_to_response(self.get_context_data(form=form))
@@ -96,7 +96,7 @@ class ProjectUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
             headers={
                 "HX-Trigger": json.dumps(
                     {
-                        "showMessage": "You do not have permission to edit '{}'".format(project.name),
+                        "showMessage": f"You do not have permission to edit '{project.name}'",
                         "eventType": "permissiondenied",
                     }
                 )
@@ -110,7 +110,9 @@ class ProjectListView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['access_records'] = Project.objects.filter(members__id__exact=self.request.user.id).order_by("-owner").select_related("owner")  # noqa: E501
+        context["access_records"] = (
+            Project.objects.filter(members__id__exact=self.request.user.id).order_by("-owner").select_related("owner")
+        )  # noqa: E501
         return context
 
 
@@ -127,35 +129,36 @@ class ProjectDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         try:
             self.get_object().delete()
             return HttpResponse(
-                    status=204,
-                    headers={
-                        "HX-Trigger": json.dumps(
-                            {
-                                "projectListChanged": None,
-                                "showMessage": f"{project.name} deleted.",
-                                "eventType": "deleted",
-                            }
-                        )
-                    },
-                )
+                status=204,
+                headers={
+                    "HX-Trigger": json.dumps(
+                        {
+                            "projectListChanged": None,
+                            "showMessage": f"{project.name} deleted.",
+                            "eventType": "deleted",
+                        }
+                    )
+                },
+            )
         except ProtectedError as e:
             print("Error is: ", e)
             print("Exception Type is:", e.__class__.__name__)
             print("Exception message is: ", repr(e))
             print("Type of arg[1]", type(e.args[1]))
             return HttpResponse(
-                    status=204,
-                    headers={
-                        "HX-Trigger": json.dumps(
-                            {
-                                "projectListChanged": None,
-                                "showMessage": "Cannot delete '{}' as there are {} modules".format(project.name, 
-                                                                                                   len(e.args[1])),
-                                "eventType": "deleted",
-                            }
-                        )
-                    },
-                )
+                status=204,
+                headers={
+                    "HX-Trigger": json.dumps(
+                        {
+                            "projectListChanged": None,
+                            "showMessage": "'{}' cannot be deleted as it has {} dependent modules".format(
+                                project.name, len(e.args[1])
+                            ),
+                            "eventType": "deleted",
+                        }
+                    )
+                },
+            )
 
     def test_func(self):
         project = self.get_object()
@@ -172,7 +175,7 @@ class ProjectDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
             headers={
                 "HX-Trigger": json.dumps(
                     {
-                        "showMessage": "You do not have permission to delete '{}'".format(project.name),
+                        "showMessage": f"You do not have permission to delete '{project.name}'",
                         "eventType": "permissiondenied",
                     }
                 )
@@ -187,7 +190,9 @@ class ProjectDetailView(LoginRequiredMixin, DetailView):
 
 class ModuleCreateView(LoginRequiredMixin, CreateView):
     model = Module
-    fields = ["name",]
+    fields = [
+        "name",
+    ]
     template_name = "module_form.html"
 
     def form_valid(self, form):
@@ -197,17 +202,17 @@ class ModuleCreateView(LoginRequiredMixin, CreateView):
         module.project = Project.objects.get(id=self.kwargs["project_id"])
         module.save()
         return HttpResponse(
-                            status=204,
-                            headers={
-                                "HX-Trigger": json.dumps(
-                                    {
-                                        "moduleListChanged": None,
-                                        "showMessage": f"{module.name} added.",
-                                        "eventType": "created",
-                                    }
-                                )
-                            },
-                        )
+            status=204,
+            headers={
+                "HX-Trigger": json.dumps(
+                    {
+                        "moduleListChanged": None,
+                        "showMessage": f"{module.name} added.",
+                        "eventType": "created",
+                    }
+                )
+            },
+        )
 
     def form_invalid(self, form):
         return self.render_to_response(self.get_context_data(form=form))
@@ -222,14 +227,16 @@ class ModuleListView(LoginRequiredMixin, ListView):
         return Module.objects.filter(project=project).order_by("-created_date")
 
     def get_context_data(self, **kwargs):
-        context = super(ModuleListView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context["project"] = Project.objects.get(id=self.kwargs["project_id"])
         return context
 
 
 class ModuleUpdateView(LoginRequiredMixin, UpdateView):
     model = Module
-    fields = ["name",]
+    fields = [
+        "name",
+    ]
     template_name = "module_form.html"
 
     def form_valid(self, form):
@@ -246,7 +253,7 @@ class ModuleUpdateView(LoginRequiredMixin, UpdateView):
                         "eventType": "updated",
                     }
                 )
-            }
+            },
         )
 
     def form_invalid(self, form):
@@ -274,3 +281,70 @@ class ModuleUpdateView(LoginRequiredMixin, UpdateView):
         queryset = queryset.filter(project=project_id, id=module_id)
         obj = queryset.get()
         return obj
+
+
+class ModuleDeleteView(LoginRequiredMixin, DeleteView):
+    model = Module
+    template_name = "project_confirm_delete.html"
+
+    def get_object(self, queryset=None):
+        project = Module.objects.get(id=self.kwargs.get("module_id"))
+        return project
+
+    def post(self, *args, **kwargs):
+        project = self.get_object()
+        try:
+            self.get_object().delete()
+            return HttpResponse(
+                status=204,
+                headers={
+                    "HX-Trigger": json.dumps(
+                        {
+                            "projectListChanged": None,
+                            "showMessage": f"{project.name} deleted.",
+                            "eventType": "deleted",
+                        }
+                    )
+                },
+            )
+        except ProtectedError as e:
+            print("Error is: ", e)
+            print("Exception Type is:", e.__class__.__name__)
+            print("Exception message is: ", repr(e))
+            print("Type of arg[1]", type(e.args[1]))
+            return HttpResponse(
+                status=204,
+                headers={
+                    "HX-Trigger": json.dumps(
+                        {
+                            "projectListChanged": None,
+                            "showMessage": "Cannot delete '{}' as there are {} modules".format(
+                                project.name, len(e.args[1])
+                            ),
+                            "eventType": "deleted",
+                        }
+                    )
+                },
+            )
+
+
+@login_required
+def module_delete(request, project_id, module_id):
+    module = Module.objects.get(id=module_id)
+
+    if request.method == "POST":
+        module.delete()
+        return HttpResponse(
+            status=204,
+            headers={
+                "HX-Trigger": json.dumps(
+                    {
+                        "moduleListChanged": None,
+                        "showMessage": f"{module.name} deleted successfully",
+                        "eventType": "deleted",
+                    }
+                )
+            },
+        )
+
+    return render(request, "module_delete_confirm.html", {"module": module})

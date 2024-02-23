@@ -26,7 +26,8 @@
       <td class="col-1">{{ conn.username }}</td>
       {% comment %} <td class="col-xs-1">{{conn.pk }}</td> {% endcomment %}
       <td class="col-1">{{ conn.portno }}</td>
-      <td class="col-1" data-toggle="tooltip" title={{ conn.created_by.name|default:conn.created_by }}>{{ conn.created_by.name|default:conn.created_by|truncatechars:10 }}</td>
+      <td class="col-1" data-toggle="tooltip" title={{ conn.created_by.name|default:conn.created_by }}>{{ conn.created_by.name|default:conn.created_by|truncatechars:10 }}
+      </td>
     </tr>
   {% endfor %}
 {% endblock content %}

@@ -82,3 +82,11 @@ hr {
   /* Firefox 19+ */
   font-size: 13px !important;
 }
+
+.navbar {
+  --bs-navbar-padding-y: 0.1rem !important;
+}
+
+.modal-sm {
+  --bs-modal-width: 400px;
+}
