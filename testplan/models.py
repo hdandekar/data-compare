@@ -41,9 +41,7 @@ class Project(models.Model):
 
 
 class Module(models.Model):
-    project = models.ForeignKey(
-        Project, related_name="modules", on_delete=models.PROTECT
-    )
+    project = models.ForeignKey(Project, related_name="modules", on_delete=models.PROTECT)
     name = models.CharField(max_length=255)
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
