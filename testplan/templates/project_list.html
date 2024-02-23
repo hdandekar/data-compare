@@ -1,67 +1,76 @@
 {% load static %}
 
 {% block content %}
-{% for project in object_list %}
-  <tr class="project-row" id="project-row">
-    <td>
-      {% if request.user.id == project.owner.id %}
-        <a class="px-1 link-undecorate"
-          data-bs-title="Edit Project"
-          data-bs-toggle="tooltip"
-          data-bs-placement="left"
-          hx-get="{% url 'edit_project' project.id %}"
-          hx-target="#dialog">
-          <i class="fa fa-pen-to-square fa-fw fa-xs" aria-hidden="true"></i>
-        </a>
-        <a class="px-1 confirm-delete link-undecorate"
-          data-bs-title="Delete Project"
-          data-bs-toggle="tooltip"
-          data-bs-placement="right"
-          hx-post="{% url 'delete_project' project.id %}"
-          hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}' >
+  {% for project in object_list %}
+    <tr class="project-row" id="project-row">
+      <td>
+        {% if request.user.id == project.owner.id %}
+          <a class="px-1 link-undecorate"
+             data-bs-title="Edit Project"
+             data-bs-toggle="tooltip"
+             data-bs-placement="left"
+             hx-get="{% url 'edit_project' project.id %}"
+             hx-target="#dialog">
+            <i class="fa fa-pen-to-square fa-fw fa-xs" aria-hidden="true"></i>
+          </a>
+          <a class="px-1 confirm-delete link-undecorate"
+             data-bs-title="Delete Project"
+             data-bs-toggle="tooltip"
+             data-bs-placement="right"
+             hx-post="{% url 'delete_project' project.id %}"
+             hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'>
             <i class="fa fa-trash fa-fw fa-xs text-danger" aria-hidden="true"></i>
-        </a>
+          </a>
         {% endif %}
-      <span class="fw-bold fs-75"><a href="{% url 'project_details' project.id %}">{{ project.name }}</a></span>
-      <div>
-        <span class="project-cases">
-          {% with mod_total=project.modules.count %}
-              {{ mod_total }} module{{ mod_total|pluralize }}
-          {% endwith %}
-          |
-          {% with tc_total=project.testcases.count %}
-            {{ tc_total|default:0 }} testcase{{ tc_total|pluralize }}
-          {% endwith %}
-          | No active runs
-        </span>
-      </div>
-    </td>
-    <td class="hidden-xs"><em class="green fa fa-check"></em> No open defects</td>
-    <td class="hidden-xs">No test runs</td>
-    <td class="hidden-xs">No milestones</td>
-    <td class="hidden-xs">
-      <a class="project-name" href="{% url 'users:detail' project.owner.id %}">
-        {% if project.owner.avatar %}
-          <img alt="{{ project.owner.email }}" title="{{ project.owner.email }}" class="img-avatar rounded-circle" src="{{ project.owner.avatar.url }}"/>
-        {% else %}
-          <img alt="{{ project.owner.email }}" title="{{ project.owner.email }}" class="img-avatar rounded-circle" src="{% static 'images/default_avatar.jpg' %}"/>
-        {% endif %}
-      </a>
-    </td>
-    <td class="hidden-xs">
-      {% for member in project.members.all %}
-        {% if member.id != project.owner.id %}
-        <a class="project-name" href="{% url 'users:detail' member.id %}">
-          {% if member.avatar %}
-            <img alt="{{ member.email }}" title="{{ member.email }}" class="img-avatar rounded" src="{{ member.avatar.url }}" />
+        <span class="fw-bold fs-75"><a href="{% url 'project_details' project.id %}">{{ project.name }}</a></span>
+        <div>
+          <span class="project-cases">
+            {% with mod_total=project.modules.count %}{{ mod_total }} module{{ mod_total|pluralize }}{% endwith %}
+            |
+            {% with tc_total=project.testcases.count %}{{ tc_total|default:0 }} testcase{{ tc_total|pluralize }}{% endwith %}
+            | No active runs
+          </span>
+        </div>
+      </td>
+      <td class="hidden-xs">
+        <em class="green fa fa-check"></em> No open defects
+      </td>
+      <td class="hidden-xs">No test runs</td>
+      <td class="hidden-xs">No milestones</td>
+      <td class="hidden-xs">
+        <a class="project-name" href="{% url 'users:detail' project.owner.id %}">
+          {% if project.owner.avatar %}
+            <img alt="{{ project.owner.email }}"
+                 title="{{ project.owner.email }}"
+                 class="img-avatar rounded-circle"
+                 src="{{ project.owner.avatar.url }}" />
           {% else %}
-            <img alt="{{ member.email }}" title="{{ member.email }}" class="img-avatar rounded" src="{% static 'images/default_avatar.jpg' %}" />
+            <img alt="{{ project.owner.email }}"
+                 title="{{ project.owner.email }}"
+                 class="img-avatar rounded-circle"
+                 src="{% static 'images/default_avatar.jpg' %}" />
           {% endif %}
         </a>
-        {% endif %}
-      {% endfor %}
-    </td>
-  </tr>
+      </td>
+      <td class="hidden-xs">
+        {% for member in project.members.all %}
+          {% if member.id != project.owner.id %}
+            <a class="project-name" href="{% url 'users:detail' member.id %}">
+              {% if member.avatar %}
+                <img alt="{{ member.email }}"
+                     title="{{ member.email }}"
+                     class="img-avatar rounded"
+                     src="{{ member.avatar.url }}" />
+              {% else %}
+                <img alt="{{ member.email }}"
+                     title="{{ member.email }}"
+                     class="img-avatar rounded"
+                     src="{% static 'images/default_avatar.jpg' %}" />
+              {% endif %}
+            </a>
+          {% endif %}
+        {% endfor %}
+      </td>
+    </tr>
   {% endfor %}
 {% endblock content %}
-

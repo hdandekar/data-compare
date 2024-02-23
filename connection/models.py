@@ -10,6 +10,9 @@ class DbType(models.Model):
     def __str__(self):
         return self.dbname
 
+    class Meta:
+        verbose_name = "DB Type"
+
 
 class DbConnection(models.Model):
     DB_TYPES = (
@@ -33,3 +36,6 @@ class DbConnection(models.Model):
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        verbose_name = "DB Connection"
