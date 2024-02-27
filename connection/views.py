@@ -28,7 +28,7 @@ def connection_create(request):
                     headers={
                         "HX-Trigger": json.dumps(
                             {
-                                "connectionListChanged": None,
+                                "listChanged": None,
                                 "showMessage": f"{db_connection.name} added.",
                                 "eventType": "created",
                             }
@@ -112,9 +112,9 @@ def connection_edit(request, pk):
                 headers={
                     "HX-Trigger": json.dumps(
                         {
-                            "connectionListChanged": None,
+                            "listChanged": None,
                             "showMessage": f"{connection.name} updated",
-                            "eventType": "edited",
+                            "eventType": "updated",
                         }
                     )
                 },
@@ -140,7 +140,7 @@ def connection_delete(request, pk):
         headers={
             "HX-Trigger": json.dumps(
                 {
-                    "connectionListChanged": None,
+                    "listChanged": None,
                     "showMessage": f"{connection.name} deleted.",
                     "eventType": "deleted",
                 }

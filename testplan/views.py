@@ -32,7 +32,7 @@ class ProjectCreateView(LoginRequiredMixin, CreateView):
             headers={
                 "HX-Trigger": json.dumps(
                     {
-                        "projectListChanged": None,
+                        "listChanged": None,
                         "showMessage": f"{project.name} added.",
                         "eventType": "created",
                     }
@@ -60,7 +60,7 @@ class ProjectUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
             headers={
                 "HX-Trigger": json.dumps(
                     {
-                        "projectListChanged": None,
+                        "listChanged": None,
                         "showMessage": f"{project.name} updated.",
                         "eventType": "updated",
                     }
@@ -133,7 +133,7 @@ class ProjectDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
                 headers={
                     "HX-Trigger": json.dumps(
                         {
-                            "projectListChanged": None,
+                            "listChanged": None,
                             "showMessage": f"{project.name} deleted.",
                             "eventType": "deleted",
                         }
@@ -150,7 +150,7 @@ class ProjectDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
                 headers={
                     "HX-Trigger": json.dumps(
                         {
-                            "projectListChanged": None,
+                            "listChanged": None,
                             "showMessage": "'{}' cannot be deleted as it has {} dependent modules".format(
                                 project.name, len(e.args[1])
                             ),
@@ -206,7 +206,7 @@ class ModuleCreateView(LoginRequiredMixin, CreateView):
             headers={
                 "HX-Trigger": json.dumps(
                     {
-                        "moduleListChanged": None,
+                        "listChanged": None,
                         "showMessage": f"{module.name} added.",
                         "eventType": "created",
                     }
@@ -248,7 +248,7 @@ class ModuleUpdateView(LoginRequiredMixin, UpdateView):
             headers={
                 "HX-Trigger": json.dumps(
                     {
-                        "moduleListChanged": None,
+                        "listChanged": None,
                         "showMessage": f"'{module.name}' module updated.",
                         "eventType": "updated",
                     }
@@ -300,7 +300,7 @@ class ModuleDeleteView(LoginRequiredMixin, DeleteView):
                 headers={
                     "HX-Trigger": json.dumps(
                         {
-                            "projectListChanged": None,
+                            "listChanged": None,
                             "showMessage": f"{project.name} deleted.",
                             "eventType": "deleted",
                         }
@@ -317,7 +317,7 @@ class ModuleDeleteView(LoginRequiredMixin, DeleteView):
                 headers={
                     "HX-Trigger": json.dumps(
                         {
-                            "projectListChanged": None,
+                            "listChanged": None,
                             "showMessage": "Cannot delete '{}' as there are {} modules".format(
                                 project.name, len(e.args[1])
                             ),
@@ -339,7 +339,7 @@ def module_delete(request, project_id, module_id):
             headers={
                 "HX-Trigger": json.dumps(
                     {
-                        "moduleListChanged": None,
+                        "listChanged": None,
                         "showMessage": f"{module.name} deleted successfully",
                         "eventType": "deleted",
                     }
