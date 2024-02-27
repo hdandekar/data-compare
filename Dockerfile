@@ -1,4 +1,4 @@
-FROM python:3.13.0a3-alpine AS builder
+FROM python:3-alpine AS builder
 
 WORKDIR /app
 
@@ -8,8 +8,9 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 COPY requirements/production.txt .
 COPY requirements/base.txt .
+COPY requirements/connectors.txt .
 COPY . .
-RUN pip install -r production.txt
+RUN pip install -r production.txt -r connectors.txt
 
 # Stage 2
 FROM python:3-alpine AS runner

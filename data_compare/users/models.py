@@ -13,7 +13,7 @@ class User(AbstractUser):
     def user_profile_avatar_path(self, instance):
         print("deleting file", self.avatar.delete)
         ext = instance.split(".")[-1]
-        return f"{self.username}/avatars/profile.{ext}"
+        return f"{self.id}/avatars/profile.{ext}"
 
     """
     Default custom user model for data-compare.

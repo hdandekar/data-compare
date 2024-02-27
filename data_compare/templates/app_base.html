@@ -76,9 +76,11 @@
                      role="button"
                      data-bs-toggle="dropdown"
                      aria-expanded="false">Account
-                    <img alt="profile"
-                         class="img-avatar me-1 rounded-circle"
-                         src="{{ request.user.avatar.url }}" />
+                     {% if request.user.avatar == '' %}
+                       <i class="fa-solid fa-user"></i>
+                     {% else %} 
+                       <img alt="profile" class="img-avatar me-1 rounded-circle" src="{{ request.user.avatar.url }}" />
+                     {% endif %}
                   </a>
                   <ul class="dropdown-menu" aria-labelledby="navbarAccountMenuLink">
                     <li>
