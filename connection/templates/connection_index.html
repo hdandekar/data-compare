@@ -4,7 +4,7 @@
   Database Connection
 {% endblock title %}
 {% block content %}
-{% load static %}
+  {% load static %}
 
   <div class="container">
     <nav aria-label="breadcrumb">
@@ -40,7 +40,7 @@
           <th scope="col" class="text-center">Created By</th>
         </tr>
       </thead>
-      <tbody hx-trigger="load, connectionListChanged from:body"
+      <tbody hx-trigger="load, listChanged from:body"
              hx-get="{% url 'settings:list_connection' %}"
              hx-target="this"
              class="small">
@@ -56,60 +56,6 @@
   <div id="modal" class="modal modal-lg fade">
     <div id="dialog" class="modal-dialog" hx-target="this"></div>
   </div>
+  <script src="{% static 'js/toast.js' %}"></script>
+  <script src="{% static 'js/dialog.js' %}"></script>
 {% endblock content %}
-{% block inline_javascript %}
-  <script type="text/javascript">
-    (function() {
-      const toastElement = document.getElementById("toast")
-      const toastBody = document.getElementById("toast-body")
-      const toast = new bootstrap.Toast(toastElement, {
-        delay: 5000
-      })
-
-      // Change the toast class based on eventType
-      htmx.on("showMessage", (e) => {
-        toastBody.innerText = e.detail.value;
-        toast.show();
-      })
-
-
-      htmx.on("errors", (e) => {
-        console.log("errors are", e)
-      })
-
-      // Change the toast class based on eventType
-      htmx.on("eventType", (e) => {
-        if (['created', 'edited'].includes(e.detail.value)) {
-          toastElement.classList.remove('bg-danger', 'bg-success');
-          toastElement.classList.add("bg-success");
-        } else if (['deleted'].includes(e.detail.value)) {
-          toastElement.classList.remove('bg-danger', 'bg-success');
-          toastElement.classList.add("bg-danger");
-        }
-      })
-    })();
-    (function() {
-      const modal = new bootstrap.Modal(document.getElementById("modal"))
-
-      htmx.on("htmx:afterSwap", (e) => {
-        // Response targeting #dialog => show the modal
-        if (e.detail.target.id == "dialog") {
-          modal.show()
-        }
-      })
-
-      htmx.on("htmx:beforeSwap", (e) => {
-        // Empty response targeting #dialog => hide the modal
-        if (e.detail.target.id == "dialog" && !e.detail.xhr.response) {
-          modal.hide()
-          e.detail.shouldSwap = false
-        }
-      })
-
-      // Remove dialog content after hiding
-      htmx.on("hidden.bs.modal", () => {
-        document.getElementById("dialog").innerHTML = ""
-      })
-    })();
-  </script>
-{% endblock inline_javascript %}

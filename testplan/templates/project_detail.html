@@ -39,7 +39,7 @@
           <th class="sortable hidden-xs"># of Test Cases</th>
         </tr>
       </thead>
-      <tbody hx-trigger="load, moduleListChanged from:body"
+      <tbody hx-trigger="load, listChanged from:body"
              hx-get="{% url 'list_modules' project.id %}"
              hx-target="this"
              class="small">
@@ -55,66 +55,6 @@
   <div id="modal" class="modal modal-lg fade">
     <div id="dialog" class="modal-dialog" hx-target="this"></div>
   </div>
+  <script src="{% static 'js/toast.js' %}"></script>
+  <script src="{% static 'js/dialog.js' %}"></script>
 {% endblock content %}
-{% block inline_javascript %}
-  <script type="text/javascript">
-    (function() {
-      const toastElement = document.getElementById("toast")
-      const toastBody = document.getElementById("toast-body")
-      const toast = new bootstrap.Toast(toastElement, {
-        delay: 5000
-      })
-
-      // Change the toast class based on eventType
-      htmx.on("showMessage", (e) => {
-        toastBody.innerText = e.detail.value;
-        toast.show();
-      })
-
-      htmx.on("errors", (e) => {
-        console.log("errors are", e)
-      })
-
-      // Change the toast class based on eventType
-      htmx.on("eventType", (e) => {
-        if (['created', 'updated'].includes(e.detail.value)) {
-          toastElement.classList.remove('bg-danger', 'bg-success');
-          toastElement.classList.add("bg-success");
-        } else if (['deleted', 'permissiondenied'].includes(e.detail.value)) {
-          console.log("eventType:deleted,permissiondenied");
-          toastElement.classList.remove('bg-danger', 'bg-success');
-          toastElement.classList.add("bg-danger");
-        }
-      })
-    })();
-    (function() {
-      const modal = new bootstrap.Modal(document.getElementById("modal"))
-
-      htmx.on("htmx:afterSwap", (e) => {
-        // Response targeting #dialog => show the modal
-        console.log("e", e)
-        if (e.detail.target.id == "dialog") {
-          if (e.detail.pathInfo.requestPath.includes('delete')) {
-            console.log("checking for delete requestpath")
-            let modal_dialog = document.getElementById("dialog")
-            modal_dialog.classList.add("modal-sm")
-          }
-          modal.show()
-        }
-      })
-
-      htmx.on("htmx:beforeSwap", (e) => {
-        // Empty response targeting #dialog => hide the modal
-        if (e.detail.target.id == "dialog" && !e.detail.xhr.response) {
-          modal.hide()
-          e.detail.shouldSwap = false
-        }
-      })
-
-      // Remove dialog content after hiding
-      htmx.on("hidden.bs.modal", () => {
-        document.getElementById("dialog").innerHTML = ""
-      })
-    })();
-  </script>
-{% endblock inline_javascript %}
