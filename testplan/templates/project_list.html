@@ -1,7 +1,7 @@
 {% load static %}
 
 {% block content %}
-  {% for project in object_list %}
+  {% for project in projects %}
     <tr class="project-row" id="project-row">
       <td>
         {% if request.user.id == project.owner.id %}
@@ -27,7 +27,7 @@
           <span class="project-cases">
             {% with mod_total=project.modules.count %}{{ mod_total }} module{{ mod_total|pluralize }}{% endwith %}
             |
-            {% with tc_total=project.testcases.count %}{{ tc_total|default:0 }} testcase{{ tc_total|pluralize }}{% endwith %}
+            <a href="{% url 'list_testcase' project.id %}">{% with tc_total=project.project_testcases.count %}{{ tc_total|default:0 }} testcase{{ tc_total|pluralize }}{% endwith %}</a>
             | No active runs
           </span>
         </div>
