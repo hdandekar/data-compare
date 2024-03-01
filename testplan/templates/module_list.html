@@ -27,8 +27,8 @@
       <td data-toggle="tooltip"
           data-placement="bottom"
           title="{{ module.updated_date|date:'s-M-y H:i e' }}">{{ module.modified_by.email }}</td>
-      <td class="hidden-xs">0</td>
-      <td class="hidden-xs">0</td>
+      <td class="hidden-xs text-center">0</td>
+      <td class="hidden-xs text-center">{{ module.module_testcases.count }}</td>
     </tr>
   {% endfor %}
 {% endblock content %}

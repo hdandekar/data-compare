@@ -4,6 +4,7 @@ from django.db import models
 from django.urls import reverse
 from django.utils.text import slugify
 
+from connection.models import DbConnection
 from data_compare.users.models import User
 
 
@@ -58,3 +59,33 @@ class Module(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class TestCase(models.Model):
+    tcname = models.CharField(max_length=50, blank=False, null=False)
+    project = models.ForeignKey(Project, related_name="project_testcases", on_delete=models.PROTECT)
+    module = models.ForeignKey(Module, related_name="module_testcases", on_delete=models.PROTECT)
+    sourcedb = models.ForeignKey(DbConnection, null=True,
+                                   on_delete=models.PROTECT,
+                                   related_name='sourcedb')
+    sourcesql = models.TextField(max_length=None, null=False, blank=False)
+    targetdb = models.ForeignKey(DbConnection, null=True,
+                                   on_delete=models.PROTECT,
+                                   related_name='targetdb')
+    targetsql = models.TextField(max_length=None, null=False, blank=False)
+    keycolumns = models.TextField(max_length=None, default="All")
+    create_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(
+                                    User,
+                                    related_name="testcase_created_by",
+                                    on_delete=models.SET(get_deleted_user_instance),
+                                )
+    modified_by = models.ForeignKey(
+                                    User,
+                                    related_name="testcase_modified_by", null=True,
+                                    on_delete=models.SET(get_deleted_user_instance),
+                                )
+
+    def __str__(self):
+        return str(self.id)
