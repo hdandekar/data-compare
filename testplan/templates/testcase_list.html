@@ -4,57 +4,60 @@
   {{ project.name }} - TestCases
 {% endblock title %}
 {% block content %}
-{% load static %}
-<div class="container">
-  <nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-      <li class="breadcrumb-item">
-        <a href="{% url 'projects' %}">Projects</a>
-      </li>
-      <li class="breadcrumb-item active">Test Cases</li>
-      <li class="breadcrumb-item ">
-        <a class="text-success p-xl-1"
-           title="Add New Module"
-           data-toggle="tooltip"
-           data-bs-placement="right"
-           href="{% url 'create_testcase' project.id %}">
-          <i class="fa fa-solid fa-plus fa-xl" aria-hidden="true"></i>
-        </a>
-      </li>
-    </ol>
-  </nav>
+  {% load static %}
 
-  <table class="table table-striped table-bordered table-sm small" aria-label="Connection List">
-    <thead class="thead-dark small">
-      <tr>
-        {% comment %} <th scope="col">ID</th> {% endcomment %}
-        <th scope="col" class="text-center">Test Case Title</th>
-        <th scope="col" class="text-center">Key Columns</th>
-        <th scope="col" class="text-center">Source Database</th>
-        <th scope="col" class="text-center">Source SQL</th>
-        <th scope="col" class="text-center">Target Database</th>
-        <th scope="col" class="text-center">Target SQL</th>
-      </tr>
-    </thead>
-    <tbody class="small">
-      {% for tc in testcases %}
+  <div class="container">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="{% url 'projects' %}">Projects</a>
+        </li>
+        <li class="breadcrumb-item active">Test Cases</li>
+        <li class="breadcrumb-item ">
+          <a class="text-success p-xl-1"
+             title="Add New Module"
+             data-toggle="tooltip"
+             data-bs-placement="right"
+             href="{% url 'create_testcase' project.id %}">
+            <i class="fa fa-solid fa-plus fa-xl" aria-hidden="true"></i>
+          </a>
+        </li>
+      </ol>
+    </nav>
+    <table class="table table-striped table-bordered table-sm small"
+           aria-label="Connection List">
+      <thead class="thead-dark small">
         <tr>
-          <td class="col-2">
-            <a class="px-1 link-undecorate" href="{% url 'edit_testcase' project.id tc.id %}">
-              <i class="fa fa-pen-to-square fa-fw fa-xs" aria-hidden="true"></i>
-            </a>
-            <a class="px-1 confirm-delete link-undecorate" href="#">
-              <i class="fa fa-trash fa-fw fa-xs text-danger" aria-hidden="true"></i>
-            </a>
-            {{ tc.tcname }}
-          </td>
-          <td class="col-auto">{{ tc.keycolumns|truncatechars:20 }}</td>
-          <td class="col-auto">{{ tc.sourcedb }}</td>
-          <td class="col-auto">{{ tc.sourcesql|truncatechars:40 }}</td>
-          <td class="col-auto">{{ tc.targetdb }}</td>
-          <td class="col-auto">{{ tc.targetsql|truncatechars:40 }}</td>      </tr>
-      {% endfor %}
+          {% comment %} <th scope="col">ID</th> {% endcomment %}
+          <th scope="col" class="text-center">Test Case Title</th>
+          <th scope="col" class="text-center">Key Columns</th>
+          <th scope="col" class="text-center">Source Database</th>
+          <th scope="col" class="text-center">Source SQL</th>
+          <th scope="col" class="text-center">Target Database</th>
+          <th scope="col" class="text-center">Target SQL</th>
+        </tr>
+      </thead>
+      <tbody class="small">
+        {% for tc in testcases %}
+          <tr>
+            <td class="col-2">
+              <a class="px-1 link-undecorate"
+                 href="{% url 'edit_testcase' project.id tc.id %}">
+                <i class="fa fa-pen-to-square fa-fw fa-xs" aria-hidden="true"></i>
+              </a>
+              <a class="px-1 confirm-delete link-undecorate" href="#">
+                <i class="fa fa-trash fa-fw fa-xs text-danger" aria-hidden="true"></i>
+              </a>
+              {{ tc.tcname }}
+            </td>
+            <td class="col-auto">{{ tc.keycolumns|truncatechars:20 }}</td>
+            <td class="col-auto">{{ tc.sourcedb }}</td>
+            <td class="col-auto">{{ tc.sourcesql|truncatechars:40 }}</td>
+            <td class="col-auto">{{ tc.targetdb }}</td>
+            <td class="col-auto">{{ tc.targetsql|truncatechars:40 }}</td>
+          </tr>
+        {% endfor %}
       </tbody>
-  </table>
-</div>
+    </table>
+  </div>
 {% endblock content %}

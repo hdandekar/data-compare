@@ -3,6 +3,7 @@ import json
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
+from django.core.paginator import Paginator
 from django.db.models.deletion import ProtectedError
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -111,9 +112,12 @@ class ProjectListView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["projects"] = (
+        page_num = self.kwargs.get("page")
+        member_projects = (
             Project.objects.filter(members__id__exact=self.request.user.id).order_by("-owner").select_related("owner")
-        )  # noqa: E501
+        )
+        paginator = Paginator(member_projects, per_page=2)
+        context["projects"] = paginator.get_page(page_num)
         return context
 
 
@@ -380,7 +384,7 @@ class TestCaseListView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["testcases"] = TestCase.objects.filter(project_id=self.kwargs['project_id'])
+        context["testcases"] = TestCase.objects.filter(project_id=self.kwargs["project_id"])
         context["project"] = Project.objects.get(id=self.kwargs["project_id"])
         return context
 

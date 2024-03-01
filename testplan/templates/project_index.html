@@ -22,31 +22,16 @@
         </li>
       </ol>
     </nav>
-    <table class="table table-striped table-bordered table-sm small"
-           aria-label="Connection List">
-      {{ connection_count|json_script:"hello-data" }}
-      <thead class="thead-dark small">
-        <tr>
-          {% comment %} <th scope="col">ID</th> {% endcomment %}
-          <th class="sortable">Project name</th>
-          <th class="sortable hidden-xs">Unresolved defects</th>
-          <th class="sortable hidden-xs">Test runs</th>
-          <th class="sortable hidden-xs">Milestones</th>
-          <th class="sortable hidden-xs">Owner</th>
-          <th class="hidden-xs">Team members</th>
-        </tr>
-      </thead>
-      <tbody hx-trigger="load, listChanged from:body"
-             hx-get="{% url 'list_project' %}"
-             hx-target="this"
-             class="small">
-        <tr class="text-center">
-          <td class="spinner-border" role="status">
-            <span class="visually-hidden text-center">Loading...</span>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div hx-trigger="load, listChanged from:body"
+         hx-get="{% url 'list_project' 1 %}"
+         hx-target="this"
+         id="project_items">
+      <tr class="text-center">
+        <td class="spinner-border" role="status">
+          <span class="visually-hidden text-center">Loading...</span>
+        </td>
+      </tr>
+    </div>
   </div>
   <!-- Placeholder for the modal -->
   <div id="modal" class="modal modal-lg fade">

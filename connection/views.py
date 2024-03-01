@@ -2,6 +2,7 @@ import json
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import make_password
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 
@@ -14,7 +15,6 @@ CONNECTION_LIST_VIEW = "connection:list"
 
 @login_required
 def connection_create(request):
-    print("request:", request)
     if request.method == "POST":
         if "save" in request.POST:
             form = ConnectionForm(request.POST)
@@ -84,10 +84,25 @@ def connection_create(request):
 
 
 @login_required
-def connection_list(request):
-    conn_list = DbConnection.objects.all()
-    connection_count = conn_list.count()
-    return render(request, "connection_list.html", {"conn_list": conn_list, "connection_count": connection_count})
+def connection_list(request, page=1):
+    connections = DbConnection.objects.all()
+    connection_count = connections.count()
+    paginator = Paginator(connections, per_page=5)
+    try:
+        connections = paginator.page(page)
+        page_range = paginator.get_elided_page_range(number=page)
+    except PageNotAnInteger:
+        connections = paginator.page(1)
+        page_range = paginator.get_elided_page_range(number=page)
+    except EmptyPage:
+        # If page is out of range deliver last page of results
+        connections = paginator.page(paginator.num_pages)
+        page_range = paginator.get_elided_page_range(number=page)
+    return render(
+        request,
+        "connection_list.html",
+        {"connections": connections, "connection_count": connection_count, "page_range": page_range},
+    )
 
 
 @login_required
