@@ -8,7 +8,8 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
-from testplan.models import Module, Project
+from connection.models import DbConnection
+from testplan.models import Module, Project, TestCase
 
 
 @login_required
@@ -110,7 +111,7 @@ class ProjectListView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["access_records"] = (
+        context["projects"] = (
             Project.objects.filter(members__id__exact=self.request.user.id).order_by("-owner").select_related("owner")
         )  # noqa: E501
         return context
@@ -198,7 +199,6 @@ class ModuleCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         module = form.save(commit=False)
         module.created_by = self.request.user
-        module.modified_by = self.request.user
         module.project = Project.objects.get(id=self.kwargs["project_id"])
         module.save()
         return HttpResponse(
@@ -348,3 +348,68 @@ def module_delete(request, project_id, module_id):
         )
 
     return render(request, "module_delete_confirm.html", {"module": module})
+
+
+class TestCaseCreateView(LoginRequiredMixin, CreateView):
+    model = TestCase
+    fields = ["tcname", "module", "sourcedb", "sourcesql", "targetdb", "targetsql", "keycolumns"]
+    template_name = "testcase_form.html"
+
+    def form_valid(self, form):
+        testcase = form.save(commit=False)
+        testcase.created_by = self.request.user
+        testcase.project = Project.objects.get(id=self.kwargs["project_id"])
+        testcase.save()
+        form.save_m2m()
+        return redirect("list_testcase", testcase.project.id)
+
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["project"] = Project.objects.get(id=self.kwargs["project_id"])
+        context["modules"] = Module.objects.filter(project=self.kwargs["project_id"])
+        context["db_connections"] = DbConnection.objects.all()
+        return context
+
+
+class TestCaseListView(LoginRequiredMixin, ListView):
+    model = TestCase
+    template_name = "testcase_list.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["testcases"] = TestCase.objects.filter(project_id=self.kwargs['project_id'])
+        context["project"] = Project.objects.get(id=self.kwargs["project_id"])
+        return context
+
+
+class TestCaseUpdateView(LoginRequiredMixin, UpdateView):
+    model = TestCase
+    fields = ["tcname", "module", "sourcedb", "sourcesql", "targetdb", "targetsql", "keycolumns"]
+    template_name = "testcase_form.html"
+
+    def form_valid(self, form):
+        testcase = form.save(commit=False)
+        testcase.modified_by = self.request.user
+        testcase.save()
+        return redirect("list_testcase", testcase.project.id)
+
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_object(self, queryset=None):
+        if queryset is None:
+            queryset = self.get_queryset()
+        project_id = self.kwargs.get("project_id")
+        testcase_id = self.kwargs.get("testcase_id")
+        queryset = queryset.filter(project=project_id, id=testcase_id)
+        testcase = queryset.get()
+        return testcase
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["db_connections"] = DbConnection.objects.all()
+        context["modules"] = Module.objects.filter(project=self.kwargs["project_id"])
+        return context
