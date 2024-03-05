@@ -39,7 +39,7 @@
                  class="form-control form-control-sm"
                  id="id_project"
                  type="text"
-                 value="{{ testcase.project.name }}"
+                 value="{% if testcase.project.name %}{{ testcase.project.name }} {% else %} {{ project.name }} {% endif %}"
                  aria-label="readonly input example"
                  disabled
                  readonly />

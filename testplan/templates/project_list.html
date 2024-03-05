@@ -14,7 +14,7 @@
         <th class="hidden-xs col-2">Team members</th>
       </tr>
     </thead>
-    <tbody class="small table-group-divider">
+    <tbody class="small table-group-divider align-middle">
       {% for project in projects %}
         <tr class="project-row" id="project-row">
           <td>
@@ -119,10 +119,12 @@
               </li>
             {% else %}
               <li class="page-item">
-                <a class="page-link"
-                   hx-get="/project/list/{{ i }}/"
-                   hx-target="#project_items"
-                   hx-swap="outerhtml">{{ i }}</a>
+                {% with pg_no=i %}
+                  <a class="page-link"
+                     hx-get="{% url 'list_project' pg_no %}"
+                     hx-target="#project_items"
+                     hx-swap="outerhtml">{{ i }}</a>
+                {% endwith %}
               </li>
             {% endif %}
           {% endif %}

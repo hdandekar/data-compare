@@ -13,7 +13,7 @@
         <th scope="col-2" class="text-center">Created By</th>
       </tr>
     </thead>
-    <tbody class="small table-group-divider">
+    <tbody class="small table-group-divider align-middle">
       {% for conn in connections %}
         <tr>
           {% comment %} <th scope="row">{{conn.pk}}</th> {% endcomment %}
@@ -78,10 +78,12 @@
               </li>
             {% else %}
               <li class="page-item">
-                <a class="page-link"
-                   hx-get="/settings/connection/list/{{ i }}/"
-                   hx-target="#connection_items"
-                   hx-swap="outerhtml">{{ i }}</a>
+                {% with pg_no=i %}
+                  <a class="page-link"
+                     hx-get="{% url 'settings:list_connection' pg_no %}"
+                     hx-target="#connection_items"
+                     hx-swap="outerhtml">{{ i }}</a>
+                {% endwith %}
               </li>
             {% endif %}
           {% endif %}

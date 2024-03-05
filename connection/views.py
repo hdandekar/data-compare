@@ -87,7 +87,7 @@ def connection_create(request):
 def connection_list(request, page=1):
     connections = DbConnection.objects.all()
     connection_count = connections.count()
-    paginator = Paginator(connections, per_page=5)
+    paginator = Paginator(connections, per_page=20)
     try:
         connections = paginator.page(page)
         page_range = paginator.get_elided_page_range(number=page)

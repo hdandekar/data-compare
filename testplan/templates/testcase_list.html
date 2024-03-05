@@ -38,7 +38,7 @@
         </tr>
       </thead>
       <tbody class="small">
-        {% for tc in testcases %}
+        {% for tc in testcase_list %}
           <tr>
             <td class="col-2">
               <a class="px-1 link-undecorate"
@@ -60,4 +60,43 @@
       </tbody>
     </table>
   </div>
+  <!-- Pagination -->
+  <p>p:{{ page_obj }}</p>
+  <p>page_object.next {{ page_obj.has_next }}</p>
+  {% if page_obj.has_other_pages %}
+    <nav aria-label="Page navigation Projects">
+      <ul class="pagination pagination-sm justify-content-end">
+        {% if page_obj.has_previous %}
+          <li>
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}"><i class="fa-solid fa-angles-left"></i></a>
+          </li>
+        {% endif %}
+        {% for i in page_range|default_if_none:page_obj.paginator.get_elided_page_range %}
+          {% if page_obj.number == i %}
+            <li class="active page-item">
+              <span class="page-link">{{ i }}
+                <span class="sr-only">(current)</span>
+              </span>
+            </li>
+          {% else %}
+            {% if i == page_obj.paginator.ELLIPSIS %}
+              <li class="page-item">
+                <span class="page-link">{{ i }}</span>
+              </li>
+            {% else %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+              </li>
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+        {% if page_obj.has_next %}
+          <li>
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}"><i class="fa-solid fa-angles-right"></i></a>
+          </li>
+        {% endif %}
+      </ul>
+    </nav>
+  {% endif %}
+  <!-- end Pagination -->
 {% endblock content %}
