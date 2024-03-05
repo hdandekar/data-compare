@@ -1,12 +1,12 @@
 {% extends 'app_base.html' %}
 
 {% block title %}
-  Database Connection
+  Database Connections
 {% endblock title %}
 {% block content %}
   {% load static %}
 
-  <div class="container">
+  <div class="container-fluid">
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb">
         <li class="breadcrumb-item">
@@ -25,31 +25,16 @@
         </li>
       </ol>
     </nav>
-    <table class="table table-striped table-bordered table-sm small"
-           aria-label="Connection List">
-      <thead class="thead-dark small">
-        <tr>
-          {% comment %} <th scope="col">ID</th> {% endcomment %}
-          <th scope="col" class="text-center">Connection Name</th>
-          <th scope="col" class="text-center">DB Type</th>
-          <th scope="col" class="text-center">Host Name</th>
-          <th scope="col" class="text-center">Database Name</th>
-          <th scope="col" class="text-center">Username</th>
-          <th scope="col" class="text-center">Port No</th>
-          <th scope="col" class="text-center">Created By</th>
-        </tr>
-      </thead>
-      <tbody hx-trigger="load, listChanged from:body"
-             hx-get="{% url 'settings:list_connection' %}"
-             hx-target="this"
-             class="small">
-        <tr class="text-center">
-          <td class="spinner-border" role="status">
-            <span class="visually-hidden text-center">Loading...</span>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div hx-trigger="load, listChanged from:body"
+         hx-get="{% url 'settings:list_connection' 1 %}"
+         hx-target="this"
+         id="connection_items">
+      <tr class="text-center">
+        <td class="spinner-border" role="status">
+          <span class="visually-hidden text-center">Loading...</span>
+        </td>
+      </tr>
+    </div>
   </div>
   <!-- Placeholder for the modal -->
   <div id="modal" class="modal modal-lg fade">

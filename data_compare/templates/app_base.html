@@ -36,7 +36,7 @@
   <body>
     <div class="mb-1">
       <nav class="navbar navbar-expand-md navbar-dark bg-dark">
-        <div class="container">
+        <div class="container-fluid px-5">
           <a class="navbar-brand" href="{% url 'home' %}">Data Match</a>
           <button class="navbar-toggler navbar-toggler-right"
                   type="button"
@@ -76,11 +76,13 @@
                      role="button"
                      data-bs-toggle="dropdown"
                      aria-expanded="false">Account
-                     {% if request.user.avatar == '' %}
-                       <i class="fa-solid fa-user"></i>
-                     {% else %} 
-                       <img alt="profile" class="img-avatar me-1 rounded-circle" src="{{ request.user.avatar.url }}" />
-                     {% endif %}
+                    {% if request.user.avatar == '' %}
+                      <i class="fa-solid fa-user"></i>
+                    {% else %}
+                      <img alt="profile"
+                           class="img-avatar me-1 rounded-circle"
+                           src="{{ request.user.avatar.url }}" />
+                    {% endif %}
                   </a>
                   <ul class="dropdown-menu" aria-labelledby="navbarAccountMenuLink">
                     <li>
@@ -149,12 +151,12 @@
           </div>
         {% endfor %}
       {% endif %}
-      <div class="container-fluid">
-        <div class="row px-3 pt-2 pb-3">
-          <div class="col-lg-12">
-            {% block content %}
-            {% endblock content %}
-          </div>
+    </div>
+    <div class="container-fluid">
+      <div class="row px-3 pt-2 pb-3">
+        <div class="col-lg-12">
+          {% block content %}
+          {% endblock content %}
         </div>
       </div>
     </div>
