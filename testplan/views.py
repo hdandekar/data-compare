@@ -3,6 +3,7 @@ import json
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
+from django.core.paginator import Paginator
 from django.db.models.deletion import ProtectedError
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -111,9 +112,12 @@ class ProjectListView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["projects"] = (
+        page_num = self.kwargs.get("page")
+        member_projects = (
             Project.objects.filter(members__id__exact=self.request.user.id).order_by("-owner").select_related("owner")
-        )  # noqa: E501
+        )
+        paginator = Paginator(member_projects, per_page=20)
+        context["projects"] = paginator.get_page(page_num)
         return context
 
 
@@ -142,10 +146,6 @@ class ProjectDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
                 },
             )
         except ProtectedError as e:
-            print("Error is: ", e)
-            print("Exception Type is:", e.__class__.__name__)
-            print("Exception message is: ", repr(e))
-            print("Type of arg[1]", type(e.args[1]))
             return HttpResponse(
                 status=204,
                 headers={
@@ -221,6 +221,7 @@ class ModuleCreateView(LoginRequiredMixin, CreateView):
 class ModuleListView(LoginRequiredMixin, ListView):
     model = Module
     template_name = "module_list.html"
+    paginate_by = 20
 
     def get_queryset(self):
         project = get_object_or_404(Project, id=self.kwargs["project_id"])
@@ -308,10 +309,6 @@ class ModuleDeleteView(LoginRequiredMixin, DeleteView):
                 },
             )
         except ProtectedError as e:
-            print("Error is: ", e)
-            print("Exception Type is:", e.__class__.__name__)
-            print("Exception message is: ", repr(e))
-            print("Type of arg[1]", type(e.args[1]))
             return HttpResponse(
                 status=204,
                 headers={
@@ -377,10 +374,14 @@ class TestCaseCreateView(LoginRequiredMixin, CreateView):
 class TestCaseListView(LoginRequiredMixin, ListView):
     model = TestCase
     template_name = "testcase_list.html"
+    paginate_by = 1
+
+    def get_queryset(self):
+        return TestCase.objects.filter(project_id=self.kwargs["project_id"])
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["testcases"] = TestCase.objects.filter(project_id=self.kwargs['project_id'])
+
         context["project"] = Project.objects.get(id=self.kwargs["project_id"])
         return context
 

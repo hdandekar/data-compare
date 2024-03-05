@@ -8,143 +8,163 @@
   {% endif %}
 {% endblock title %}
 {% block content %}
-
-<nav aria-label="breadcrumb">
-  <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="{% url 'projects' %}">Projects</a></li>
-    <li class="breadcrumb-item">
-      {% if project.name %}
-        <a href="{% url 'list_testcase' project.id %}">Test Cases</a>
-      {% else %}
-      <a href="{% url 'list_testcase' testcase.project.id %}">Test Cases</a>
-      {% endif %}
-    </li>
-    <li class="breadcrumb-item active">{% if testcase %} {{ testcase.tcname }} {% else %} New Test Case {% endif %}</li>
-  </ol>
-</nav>
-<form method="post" enctype="multipart/form-data" id="testcase_form">
-  {% csrf_token %}
-
-  <div class="row">
-    <div class="col-md-3">
-      <div class="form-group">
-        <label for="id_project"  class="col-auto col-form-label-sm">Project:</label>
-        <input name="project" class="form-control form-control-sm" id="id_project" type="text" value="{{ testcase.project.name }}" aria-label="readonly input example" disabled readonly/>
-      </div>
-    </div>
-  
-    <div class="col-md-3">
-      <div class="form-group">
-        <label for="id_module" class="col-auto col-form-label-sm {% if form.module.errors %} error{% endif %}">Module:</label>
-        <select name="module" required="" id="id_module" class="form-control form-control-sm form-select form-select-sm">
-          {% for module in modules %}
-            <option value="{{ module.id }}" {% if module.id == testcase.module.id %} selected {% endif %}>{{ module.name }}</option>
-          {% endfor %}
-        </select>
-        {% if form.module.errors %}
-          <div class="form-text smaller text-danger">
-              {{ form.module.errors|striptags }}
-          </div>
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="{% url 'projects' %}">Projects</a>
+      </li>
+      <li class="breadcrumb-item">
+        {% if project.name %}
+          <a href="{% url 'list_testcase' project.id %}">Test Cases</a>
+        {% else %}
+          <a href="{% url 'list_testcase' testcase.project.id %}">Test Cases</a>
         {% endif %}
-      </div>
-    </div>
-  
-    <div class="col-md-6">
-      <div class="form-group">
-        <label for="tcname" class="col-auto col-form-label-sm">TC Name:</label>
-        <input type="text" class="form-control form-control-sm" id="id_tcname" placeholder="Enter Test Case Name" name="tcname" value="{{ testcase.tcname }}"/>
-        {% if form.tcname.errors %}
-        <div class="form-text smaller text-danger">
-            {{ form.tc.errors|striptags }}
+      </li>
+      <li class="breadcrumb-item active">
+        {% if testcase %}
+          {{ testcase.tcname }}
+        {% else %}
+          New Test Case
+        {% endif %}
+      </li>
+    </ol>
+  </nav>
+  <form method="post" enctype="multipart/form-data" id="testcase_form">
+    {% csrf_token %}
+    <div class="row">
+      <div class="col-md-3">
+        <div class="form-group">
+          <label for="id_project"  class="col-auto col-form-label-sm">Project:</label>
+          <input name="project"
+                 class="form-control form-control-sm"
+                 id="id_project"
+                 type="text"
+                 value="{% if testcase.project.name %}{{ testcase.project.name }} {% else %} {{ project.name }} {% endif %}"
+                 aria-label="readonly input example"
+                 disabled
+                 readonly />
         </div>
-      {% endif %}
+      </div>
+      <div class="col-md-3">
+        <div class="form-group">
+          <label for="id_module"
+                 class="col-auto col-form-label-sm {% if form.module.errors %}error{% endif %}">Module:</label>
+          <select name="module"
+                  required=""
+                  id="id_module"
+                  class="form-control form-control-sm form-select form-select-sm">
+            {% for module in modules %}
+              <option value="{{ module.id }}"
+                      {% if module.id == testcase.module.id %}selected{% endif %}>{{ module.name }}</option>
+            {% endfor %}
+          </select>
+          {% if form.module.errors %}
+            <div class="form-text smaller text-danger">{{ form.module.errors|striptags }}</div>
+          {% endif %}
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="form-group">
+          <label for="tcname" class="col-auto col-form-label-sm">TC Name:</label>
+          <input type="text"
+                 class="form-control form-control-sm"
+                 id="id_tcname"
+                 placeholder="Enter Test Case Name"
+                 name="tcname"
+                 value="{{ testcase.tcname }}" />
+          {% if form.tcname.errors %}<div class="form-text smaller text-danger">{{ form.tc.errors|striptags }}</div>{% endif %}
+        </div>
       </div>
     </div>
-  </div>
-  
-  <div class="row">
-    <div class="col-md-8">
-      <div class="form-group">
-        <label for="id_keycolumns" class="col-auto col-form-label-sm">Key Columns:</label>
-        <input type="text" class="form-control form-control-sm" id="id_keycolumns" placeholder="Enter Test Case Name" value="{{ testcase.keycolumns }}" name="keycolumns" aria-describedby="keyColsHelpBlock" />
-        {% if form.keycolumns.errors %}
-          <div class="form-text smaller text-danger">
-              {{ form.keycolumns.errors|striptags }}
-          </div>
-        {% endif %}
+    <div class="row">
+      <div class="col-md-8">
+        <div class="form-group">
+          <label for="id_keycolumns" class="col-auto col-form-label-sm">Key Columns:</label>
+          <input type="text"
+                 class="form-control form-control-sm"
+                 id="id_keycolumns"
+                 placeholder="Enter Test Case Name"
+                 value="{{ testcase.keycolumns }}"
+                 name="keycolumns"
+                 aria-describedby="keyColsHelpBlock" />
+          {% if form.keycolumns.errors %}
+            <div class="form-text smaller text-danger">{{ form.keycolumns.errors|striptags }}</div>
+          {% endif %}
+        </div>
+      </div>
+      <div class="col-md-4 d-inline-flex p-3">
+        <div id="keyColsHelpBlock" class="form-text smaller">
+          Provide list of ',' separated columns to uniquely identify a row in the dataset, e.g id,emp_id,dept_id. Default is 'All'
+        </div>
       </div>
     </div>
-    <div class="col-md-4 d-inline-flex p-3">
-      <div id="keyColsHelpBlock" class="form-text smaller">
-        Provide list of ',' separated columns to uniquely identify a row in the dataset, e.g id,emp_id,dept_id. Default is 'All'
-      </div>
-    </div>
-  </div>
-  
-  <div class="row">
-    <div class="col-md-3">
-      <div class="form-group">
-        <label for="id_sourcedb"  class="col-auto col-form-label-sm">Source Database:</label>
-        <select name="sourcedb" required="" id="id_sourcedb" class="form-control form-control-sm form-select form-select-sm">
-          {% for connection in db_connections %}
-            <option value="{{ connection.id }}" {% if connection.id == testcase.sourcedb.id %} selected {% endif %}>{{ connection.name }}</option>
-          {% endfor %}
-        </select>
-        {% if form.sourcedbid.errors %}
-          <div class="form-text smaller text-danger">
-              {{ form.sourcedb.errors|striptags }}
-          </div>
-        {% endif %}
-      </div>
-    </div>
-  
-    <div class="col-md-9">
-      <div class="form-group">
-        <label for="id_sourcesql"  class="col-auto col-form-label-sm">Source SQL:</label>
-        <textarea name="sourcesql" id="id_sourcesql" class="form-control form-control-sm" style="height: 100px" >{{ testcase.sourcesql }}</textarea>
-        {% if form.sourcesql.errors %}
-          <div class="form-text smaller text-danger">
-            {{ form.sourcedbid.errors|striptags }}
-          </div>
-        {% endif %}
-      </div>
-    </div>
-  </div>
-  
-  <div class="row">
-    <div class="col-md-3">
-      <div class="form-group">
-        <label for="id_targetdb"  class="col-auto col-form-label-sm">Target Database:</label>
-        <select name="targetdb" required="" id="id_targetdb" class="form-control form-control-sm form-select form-select-sm">
+    <div class="row">
+      <div class="col-md-3">
+        <div class="form-group">
+          <label for="id_sourcedb"  class="col-auto col-form-label-sm">Source Database:</label>
+          <select name="sourcedb"
+                  required=""
+                  id="id_sourcedb"
+                  class="form-control form-control-sm form-select form-select-sm">
             {% for connection in db_connections %}
-            <option value="{{ connection.id }}" {% if connection.id == testcase.targetdb.id %} selected {% endif %}>{{ connection.name }}</option>
-          {% endfor %}
-        </select>
-        {% if form.targetdbid.errors %}
-          <div class="form-text smaller text-danger">
-              {{ form.targetdbid.errors|striptags }}
-          </div>
-        {% endif %}
+              <option value="{{ connection.id }}"
+                      {% if connection.id == testcase.sourcedb.id %}selected{% endif %}>{{ connection.name }}</option>
+            {% endfor %}
+          </select>
+          {% if form.sourcedbid.errors %}
+            <div class="form-text smaller text-danger">{{ form.sourcedb.errors|striptags }}</div>
+          {% endif %}
+        </div>
+      </div>
+      <div class="col-md-9">
+        <div class="form-group">
+          <label for="id_sourcesql"  class="col-auto col-form-label-sm">Source SQL:</label>
+          <textarea name="sourcesql"
+                    id="id_sourcesql"
+                    class="form-control form-control-sm"
+                    style="height: 100px">{{ testcase.sourcesql }}</textarea>
+          {% if form.sourcesql.errors %}
+            <div class="form-text smaller text-danger">{{ form.sourcedbid.errors|striptags }}</div>
+          {% endif %}
+        </div>
       </div>
     </div>
-  
-    <div class="col-md-9">
-      <div class="form-group">
-        <label for="id_targetsql"  class="col-auto col-form-label-sm">Target SQL:</label>
-        <textarea name="targetsql" id="id_targetsql" class="form-control form-control-sm" style="height: 100px">{{ testcase.sourcesql }}</textarea>
-        {% if form.targetsql.errors %}
-          <div class="form-text smaller text-danger">
-            {{ form.targetsql.errors|striptags }}
-          </div>
-        {% endif %}
+    <div class="row">
+      <div class="col-md-3">
+        <div class="form-group">
+          <label for="id_targetdb"  class="col-auto col-form-label-sm">Target Database:</label>
+          <select name="targetdb"
+                  required=""
+                  id="id_targetdb"
+                  class="form-control form-control-sm form-select form-select-sm">
+            {% for connection in db_connections %}
+              <option value="{{ connection.id }}"
+                      {% if connection.id == testcase.targetdb.id %}selected{% endif %}>{{ connection.name }}</option>
+            {% endfor %}
+          </select>
+          {% if form.targetdbid.errors %}
+            <div class="form-text smaller text-danger">{{ form.targetdbid.errors|striptags }}</div>
+          {% endif %}
+        </div>
+      </div>
+      <div class="col-md-9">
+        <div class="form-group">
+          <label for="id_targetsql"  class="col-auto col-form-label-sm">Target SQL:</label>
+          <textarea name="targetsql"
+                    id="id_targetsql"
+                    class="form-control form-control-sm"
+                    style="height: 100px">{{ testcase.sourcesql }}</textarea>
+          {% if form.targetsql.errors %}
+            <div class="form-text smaller text-danger">{{ form.targetsql.errors|striptags }}</div>
+          {% endif %}
+        </div>
       </div>
     </div>
-  </div>
-  
-  <div class="form-group row pt-2">
-    <div class="col-sm-12">
-      <button type="submit" class="col-sm-2 col-form-label btn btn-success float-end">Save</button>
+    <div class="form-group row pt-2">
+      <div class="col-sm-12">
+        <button type="submit"
+                class="col-sm-2 col-form-label btn btn-success float-end">Save</button>
+      </div>
     </div>
-  </div>
-</form>
+  </form>
 {% endblock content %}
