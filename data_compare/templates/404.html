@@ -1,15 +1,22 @@
-{% extends "base.html" %}
+{% extends "app_base.html" %}
 
 {% block title %}
   Page not found
 {% endblock title %}
 {% block content %}
-  <h1>Page not found</h1>
   <p>
-    {% if exception %}
-      {{ exception }}
-    {% else %}
-      This is not the page you were looking for.
+    <div id="notfound">
+      <div class="notfound">
+        {% if exception %}
+          {{ exception }}
+        {% else %}
+          <div class="notfound-404">
+            <h1>Oops!</h1>
+            <h2>404 - The Page can't be found</h2>
+          </div>
+          <a href="{% url 'home' %}">Go TO Homepage</a>
+        </div>
+      </div>
     {% endif %}
   </p>
 {% endblock content %}
