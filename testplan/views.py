@@ -6,6 +6,7 @@ from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.db.models.deletion import ProtectedError
 from django.http import HttpResponse
+from django.http.response import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
@@ -184,9 +185,17 @@ class ProjectDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         )
 
 
-class ProjectDetailView(LoginRequiredMixin, DetailView):
+class ProjectDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     model = Project
     template_name = "project_detail.html"
+
+    def test_func(self):
+        if self.request.user in self.get_object().members.all():
+            return True
+        return False
+
+    def handle_no_permission(self) -> HttpResponseRedirect:
+        return render(self.request, "404.html")
 
 
 class ModuleCreateView(LoginRequiredMixin, CreateView):
@@ -347,7 +356,7 @@ def module_delete(request, project_id, module_id):
     return render(request, "module_delete_confirm.html", {"module": module})
 
 
-class TestCaseCreateView(LoginRequiredMixin, CreateView):
+class TestCaseCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = TestCase
     fields = ["tcname", "module", "sourcedb", "sourcesql", "targetdb", "targetsql", "keycolumns"]
     template_name = "testcase_form.html"
@@ -370,8 +379,18 @@ class TestCaseCreateView(LoginRequiredMixin, CreateView):
         context["db_connections"] = DbConnection.objects.all()
         return context
 
+    def test_func(self):
+        project = Project.objects.get(id=self.kwargs["project_id"])
+        print("project", project)
+        if self.request.user in project.members.all():
+            return True
+        return False
 
-class TestCaseListView(LoginRequiredMixin, ListView):
+    def handle_no_permission(self) -> HttpResponseRedirect:
+        return render(self.request, "404.html")
+
+
+class TestCaseListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = TestCase
     template_name = "testcase_list.html"
     paginate_by = 1
@@ -381,12 +400,21 @@ class TestCaseListView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
         context["project"] = Project.objects.get(id=self.kwargs["project_id"])
         return context
 
+    def test_func(self):
+        project = Project.objects.get(id=self.kwargs["project_id"])
+        print("project", project)
+        if self.request.user in project.members.all():
+            return True
+        return False
 
-class TestCaseUpdateView(LoginRequiredMixin, UpdateView):
+    def handle_no_permission(self) -> HttpResponseRedirect:
+        return render(self.request, "404.html")
+
+
+class TestCaseUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = TestCase
     fields = ["tcname", "module", "sourcedb", "sourcesql", "targetdb", "targetsql", "keycolumns"]
     template_name = "testcase_form.html"
@@ -414,3 +442,13 @@ class TestCaseUpdateView(LoginRequiredMixin, UpdateView):
         context["db_connections"] = DbConnection.objects.all()
         context["modules"] = Module.objects.filter(project=self.kwargs["project_id"])
         return context
+
+    def test_func(self):
+        project = Project.objects.get(id=self.kwargs["project_id"])
+        print("project.members.all():", project)
+        if self.request.user in project.members.all():
+            return True
+        return False
+
+    def handle_no_permission(self) -> HttpResponseRedirect:
+        return render(self.request, "404.html")
