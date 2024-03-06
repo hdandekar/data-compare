@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Module, Project
+from .models import Module, Project, TestCase
 
 
 @admin.register(Project)
@@ -24,3 +24,8 @@ class ProjectAdmin(admin.ModelAdmin):
 @admin.register(Module)
 class ModuleAdmin(admin.ModelAdmin):
     list_display = ["project", "name", "created_date", "updated_date", "created_by", "modified_by"]
+
+
+@admin.register(TestCase)
+class TestCaseAdmin(admin.ModelAdmin):
+    list_display = [field.name for field in TestCase._meta.get_fields()]

@@ -60,7 +60,7 @@ def check_username(request):
     email_registered_response = """
                 <div class='smaller text-danger-emphasis' id='username-error'>
                     This email address is already registered, please
-                    <a xlass='small' href='{url}'>Sign In</a>
+                    <a xlass='small' href='{url}'>Login</a>
                 </div>""".format(
         url=login_url
     )

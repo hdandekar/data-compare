@@ -75,7 +75,8 @@
                      id="navbarAccountMenuLink"
                      role="button"
                      data-bs-toggle="dropdown"
-                     aria-expanded="false">Account
+                     aria-expanded="false">
+                    {% with user_email=user.email %}{{ user.name|default:user_email }}{% endwith %}
                     {% if request.user.avatar == '' %}
                       <i class="fa-solid fa-user"></i>
                     {% else %}

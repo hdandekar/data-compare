@@ -30,6 +30,7 @@
         <tr>
           {% comment %} <th scope="col">ID</th> {% endcomment %}
           <th scope="col" class="text-center">Test Case Title</th>
+          <th scope="col" class="text-center">Module</th>
           <th scope="col" class="text-center">Key Columns</th>
           <th scope="col" class="text-center">Source Database</th>
           <th scope="col" class="text-center">Source SQL</th>
@@ -50,6 +51,7 @@
               </a>
               {{ tc.tcname }}
             </td>
+            <td class="col-auto">{{ tc.module.name }}</td>
             <td class="col-auto">{{ tc.keycolumns|truncatechars:20 }}</td>
             <td class="col-auto">{{ tc.sourcedb }}</td>
             <td class="col-auto">{{ tc.sourcesql|truncatechars:40 }}</td>
@@ -59,44 +61,42 @@
         {% endfor %}
       </tbody>
     </table>
-  </div>
-  <!-- Pagination -->
-  <p>p:{{ page_obj }}</p>
-  <p>page_object.next {{ page_obj.has_next }}</p>
-  {% if page_obj.has_other_pages %}
-    <nav aria-label="Page navigation Projects">
-      <ul class="pagination pagination-sm justify-content-end">
-        {% if page_obj.has_previous %}
-          <li>
-            <a class="page-link" href="?page={{ page_obj.previous_page_number }}"><i class="fa-solid fa-angles-left"></i></a>
-          </li>
-        {% endif %}
-        {% for i in page_range|default_if_none:page_obj.paginator.get_elided_page_range %}
-          {% if page_obj.number == i %}
-            <li class="active page-item">
-              <span class="page-link">{{ i }}
-                <span class="sr-only">(current)</span>
-              </span>
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+      <nav aria-label="Page navigation Projects">
+        <ul class="pagination pagination-sm justify-content-end">
+          {% if page_obj.has_previous %}
+            <li>
+              <a class="page-link" href="?page={{ page_obj.previous_page_number }}"><i class="fa-solid fa-angles-left"></i></a>
             </li>
-          {% else %}
-            {% if i == page_obj.paginator.ELLIPSIS %}
-              <li class="page-item">
-                <span class="page-link">{{ i }}</span>
+          {% endif %}
+          {% for i in page_range|default_if_none:page_obj.paginator.get_elided_page_range %}
+            {% if page_obj.number == i %}
+              <li class="active page-item">
+                <span class="page-link">{{ i }}
+                  <span class="sr-only">(current)</span>
+                </span>
               </li>
             {% else %}
-              <li class="page-item">
-                <a class="page-link" href="?page={{ i }}">{{ i }}</a>
-              </li>
+              {% if i == page_obj.paginator.ELLIPSIS %}
+                <li class="page-item">
+                  <span class="page-link">{{ i }}</span>
+                </li>
+              {% else %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                </li>
+              {% endif %}
             {% endif %}
+          {% endfor %}
+          {% if page_obj.has_next %}
+            <li>
+              <a class="page-link" href="?page={{ page_obj.next_page_number }}"><i class="fa-solid fa-angles-right"></i></a>
+            </li>
           {% endif %}
-        {% endfor %}
-        {% if page_obj.has_next %}
-          <li>
-            <a class="page-link" href="?page={{ page_obj.next_page_number }}"><i class="fa-solid fa-angles-right"></i></a>
-          </li>
-        {% endif %}
-      </ul>
-    </nav>
-  {% endif %}
-  <!-- end Pagination -->
+        </ul>
+      </nav>
+    {% endif %}
+    <!-- end Pagination -->
+  </div>
 {% endblock content %}
