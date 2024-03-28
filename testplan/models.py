@@ -71,7 +71,7 @@ class TestCase(models.Model):
     targetdb = models.ForeignKey(DbConnection, null=True, on_delete=models.PROTECT, related_name="targetdb")
     targetsql = models.TextField(max_length=None, null=False, blank=False)
     keycolumns = models.TextField(max_length=None, default="All")
-    create_date = models.DateTimeField(auto_now_add=True)
+    created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(
         User,
@@ -87,3 +87,33 @@ class TestCase(models.Model):
 
     def __str__(self):
         return str(self.id)
+
+
+class TestCaseStatus(models.Model):
+    status_value = models.CharField(max_length=255)
+
+
+class TestRun(models.Model):
+    testcases = models.ManyToManyField(TestCase, blank=True, through="TestRunCases")
+    project = models.ForeignKey(Project, related_name="project_testruns", on_delete=models.PROTECT)
+    name = models.CharField(max_length=255)
+    created_by = models.ForeignKey(
+        User,
+        related_name="testrun_created_by",
+        on_delete=models.SET(get_deleted_user_instance),
+    )
+    modified_by = models.ForeignKey(
+        User,
+        related_name="testrun_modified_by",
+        null=True,
+        on_delete=models.SET(get_deleted_user_instance),
+    )
+    created_date = models.DateTimeField(auto_now_add=True)
+    closed_date = models.DateField(null=True)
+
+
+class TestRunCases(models.Model):
+    testcases = models.ForeignKey(TestCase, on_delete=models.CASCADE)
+    testrun = models.ForeignKey(TestRun, on_delete=models.CASCADE)
+    executed_date = models.DateTimeField(null=True)
+    testcase_status = models.ForeignKey(TestCaseStatus, null=True, default=1, on_delete=models.PROTECT)

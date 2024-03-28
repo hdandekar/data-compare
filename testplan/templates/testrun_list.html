@@ -1,0 +1,106 @@
+{% for testrun in testrun_list %}
+  <div class="card my-1">
+    <div class="card-body row">
+      <div class="col-4 text-no-wrap">
+        {{ testrun.id }}-{{ testrun.name }}
+        <span class="smaller font-weight-light font-weight-italics text-secondary">
+          {% with testrun_tc_count=testrun.testcases.all.count %}
+            ({{ testrun_tc_count }} Test Case{{ testrun_tc_count|pluralize }})
+          {% endwith %}
+        </span>
+      </div>
+      <div class="col-4 smaller">
+        {% regroup testcases by testrun_id as tc_by_run %}
+        {% for testrun_id in tc_by_run %}
+          {% if testrun_id.grouper == testrun.id %}
+            {% for tc_count_by_sts in testrun_id.list %}
+              {{ tc_count_by_sts.status_count }} {{ tc_count_by_sts.testcase_status__status_value }} |
+            {% endfor %}
+          {% endif %}
+        {% endfor %}
+      </div>
+      <div class="col-3">
+        <div class="progress">
+          {% for testrun_id in tc_by_run %}
+            {% if testrun_id.grouper == testrun.id %}
+              {% for tc_count_by_sts in testrun_id.list %}
+                {% with testrun_tc_count=testrun.testcases.all.count %}
+                  {% if tc_count_by_sts.testcase_status__status_value == 'Passed' %}
+                    {% widthratio tc_count_by_sts.status_count testrun_tc_count 100 as wdt %}
+                    <div class="progress-bar bg-success"
+                         role="progressbar"
+                         style="width: {% widthratio tc_count_by_sts.status_count testrun_tc_count 100 %}%"
+                         aria-valuenow="{{ tc_count_by_sts.status_count }}"
+                         aria-valuemin="0"
+                         aria-valuemax="100"
+                         data-bs-toggle="tooltip"
+                         data-bs-placement="top"
+                         title="{{ tc_count_by_sts.status_count }} {{ tc_count_by_sts.testcase_status__status_value }} {{ wdt }}%">
+                    </div>
+                  {% endif %}
+                  {% if tc_count_by_sts.testcase_status__status_value == 'Not Run' %}
+                    {% widthratio tc_count_by_sts.status_count testrun_tc_count 100 as wdt %}
+                    <div class="progress-bar bg-secondary"
+                         role="progressbar"
+                         style="width: {% widthratio tc_count_by_sts.status_count testrun_tc_count 100 %}%"
+                         aria-valuenow="{{ tc_count_by_sts.status_count }}"
+                         aria-valuemin="0"
+                         aria-valuemax="100"
+                         data-bs-toggle="tooltip"
+                         data-bs-placement="top"
+                         title="{{ tc_count_by_sts.status_count }} {{ tc_count_by_sts.testcase_status__status_value }} {{ wdt }}%">
+                    </div>
+                  {% endif %}
+                  {% if tc_count_by_sts.testcase_status__status_value == 'Blocked' %}
+                    {% widthratio tc_count_by_sts.status_count testrun_tc_count 100 as wdt %}
+                    <div class="progress-bar bg-warning"
+                         role="progressbar"
+                         style="width: {% widthratio tc_count_by_sts.status_count testrun_tc_count 100 %}%"
+                         aria-valuenow="{{ tc_count_by_sts.status_count }}"
+                         aria-valuemin="0"
+                         aria-valuemax="100"
+                         data-bs-toggle="tooltip"
+                         data-bs-placement="top"
+                         title="{{ tc_count_by_sts.status_count }} {{ tc_count_by_sts.testcase_status__status_value }} {{ wdt }}%">
+                    </div>
+                  {% endif %}
+                  {% if tc_count_by_sts.testcase_status__status_value == 'Skipped' %}
+                    {% widthratio tc_count_by_sts.status_count testrun_tc_count 100 as wdt %}
+                    <div class="progress-bar bg-secondary"
+                         role="progressbar"
+                         style="width: {% widthratio tc_count_by_sts.status_count testrun_tc_count 100 %}%"
+                         aria-valuenow="{{ tc_count_by_sts.status_count }}"
+                         aria-valuemin="0"
+                         aria-valuemax="100"
+                         data-bs-toggle="tooltip"
+                         data-bs-placement="top"
+                         title="{{ tc_count_by_sts.status_count }} {{ tc_count_by_sts.testcase_status__status_value }} {{ wdt }}%">
+                    </div>
+                  {% endif %}
+                  {% if tc_count_by_sts.testcase_status__status_value == 'Failed' %}
+                    {% widthratio tc_count_by_sts.status_count testrun_tc_count 100 as wdt %}
+                    <div class="progress-bar bg-danger"
+                         role="progressbar"
+                         style="width: {% widthratio tc_count_by_sts.status_count testrun_tc_count 100 %}%"
+                         aria-valuenow="{{ tc_count_by_sts.status_count }}"
+                         aria-valuemin="0"
+                         aria-valuemax="100"
+                         data-bs-toggle="tooltip"
+                         data-bs-placement="top"
+                         title="{{ tc_count_by_sts.status_count }} {{ tc_count_by_sts.testcase_status__status_value }} {{ wdt }}%">
+                    </div>
+                  {% endif %}
+                {% endwith %}
+              {% endfor %}
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+      <div class="col-1">
+        <a href="{% url 'detail_testrun' testrun.project.id testrun.id %}">
+          <i class="fa fa-pen-to-square fa-fw fa-xs"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+{% endfor %}

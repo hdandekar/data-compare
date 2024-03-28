@@ -5,7 +5,6 @@ from data_compare.users.models import User
 
 class DbType(models.Model):
     dbname = models.CharField(max_length=50, null=False, blank=False)
-    create_dt = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.dbname

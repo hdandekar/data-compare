@@ -10,7 +10,7 @@
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb">
         <li class="breadcrumb-item">
-          <a href="{% url 'projects' %}">Projects</a>
+          <a href="{% url 'projects' %}">{{ project.name }}</a>
         </li>
         <li class="breadcrumb-item active">Test Cases</li>
         <li class="breadcrumb-item ">
@@ -43,11 +43,12 @@
           <tr>
             <td class="col-2">
               <a class="px-1 link-undecorate"
+                 title="Edit"
                  href="{% url 'edit_testcase' project.id tc.id %}">
-                <i class="fa fa-pen-to-square fa-fw fa-xs" aria-hidden="true"></i>
+                <i class="fa fa-pen-to-square fa-fw fa-xs"></i>
               </a>
-              <a class="px-1 confirm-delete link-undecorate" href="#">
-                <i class="fa fa-trash fa-fw fa-xs text-danger" aria-hidden="true"></i>
+              <a class="px-1 confirm-delete link-undecorate" title="Delete" href="#">
+                <i class="fa fa-trash fa-fw fa-xs text-danger"></i>
               </a>
               {{ tc.tcname }}
             </td>

@@ -1,0 +1,24 @@
+<h6>Test Case List</h6>
+<div id="testcases_div">
+  <form method="post"
+        hx-post="{% url 'update_testrun' project.id testrun.id %}"
+        hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
+        hx-swap="innerHTML">
+    {% for tc in testcases %}
+      <div class="form-check">
+        <label for="id_testcases_{{ tc.id }}">
+          <input type="checkbox"
+                 name="testcases"
+                 value="{{ tc.id }}"
+                 id="id_testcases_{{ tc.id }}" />
+          {{ tc.tcname }}
+        </label>
+      </div>
+    {% endfor %}
+    <div class="row mt-2">
+      <div class="col">
+        <button class="btn btn-primary btn-sm" type="submit">Save</button>
+      </div>
+    </div>
+  </form>
+</div>

@@ -20,6 +20,7 @@
           <td>
             {% if request.user.id == project.owner.id %}
               <a class="px-1 link-undecorate"
+                 title="Edit"
                  data-bs-title="Edit Project"
                  data-bs-toggle="tooltip"
                  data-bs-placement="left"
@@ -28,6 +29,7 @@
                 <i class="fa fa-pen-to-square fa-fw fa-xs" aria-hidden="true"></i>
               </a>
               <a class="px-1 confirm-delete link-undecorate"
+                 title="Delete"
                  data-bs-title="Delete Project"
                  data-bs-toggle="tooltip"
                  data-bs-placement="right"
@@ -46,7 +48,13 @@
                     {{ tc_total|default:0 }} testcase{{ tc_total|pluralize }}
                   {% endwith %}
                 </a>
-                | No active runs
+                <!-- | No active runs -->
+                |
+                <a href="{% url 'testruns' project.id %}">
+                  {% with testrun_total=project.project_testruns.count %}
+                    {{ testrun_total|default:0 }} Test Run{{ testrun_total|pluralize }}
+                  {% endwith %}
+                </a>
               </span>
             </div>
           </td>

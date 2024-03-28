@@ -1,0 +1,34 @@
+<table class="table table-striped table-bordered table-sm small"
+       aria-label="Project List">
+  <thead class="thead-dark small">
+    <tr>
+      {% comment %} <th scope="col-1">ID</th> {% endcomment %}
+      <th class="sortable col-4 text-center">Test Case Name</th>
+      <th class="sortable hidden-xs col-1 text-center">Status</th>
+      <th class="hidden-xs col-2 text-center">Execution Date</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for tr_item in testrun_cases %}
+      <tr>
+        <td class="col-2">
+          <a class="px-1 link-undecorate" title="Edit" href="#">
+            <i class="fa fa-pen-to-square fa-fw fa-xs"></i>
+          </a>
+          <a class="px-1 confirm-delete link-undecorate"
+             title="Delete"
+             data-bs-title="Delete Test Case"
+             data-bs-toggle="tooltip"
+             data-bs-placement="right"
+             hx-post="{% url 'delete_testrun_testcase' tr_item.testrun.project.id tr_item.testrun_id tr_item.id %}"
+             hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'>
+            <i class="fa fa-trash fa-fw fa-xs text-danger" aria-hidden="true"></i>
+          </a>
+          {{ tr_item.testcases.tcname }}
+        </td>
+        <td class="col-auto text-center">{{ tr_item.testcase_status.status_value }}</td>
+        <td class="col-auto text-center">{{ tr_item.executed_date|date:"d-M-Y" }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
