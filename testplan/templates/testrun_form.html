@@ -1,0 +1,36 @@
+{% block content %}
+  <div class="container-fluid">
+    <form hx-post="{{ request.path }}"
+          hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
+          class="modal-content">
+      <div class="modal-header">
+        <h6 class="modal-title">New Test Run</h6>
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-9">
+            <div class="form-group">
+              <label for="name" class="col-auto col-form-label-sm">Test Run Name:</label>
+              <input type="text"
+                     class="form-control form-control-sm"
+                     id="id_name"
+                     placeholder="Enter Test Run Name"
+                     name="name"
+                     value="{{ object.name }}" />
+              {% if form.tcname.errors %}<div class="form-text smaller text-danger">{{ form.tc.errors|striptags }}</div>{% endif %}
+            </div>
+          </div>
+        </div>
+        <div class="row mt-2">
+          <div class="col">
+            <button class="btn btn-primary btn-sm" type="submit">Save</button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+{% endblock content %}
