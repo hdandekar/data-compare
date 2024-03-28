@@ -10,4 +10,4 @@ class ConnectionAdmin(admin.ModelAdmin):
 
 @admin.register(DbType)
 class DbTypeAdmin(admin.ModelAdmin):
-    list_display = ["dbname", "create_dt"]
+    list_display = ["dbname"]

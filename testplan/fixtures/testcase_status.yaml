@@ -1,0 +1,20 @@
+- model: testplan.TestCaseStatus
+  pk: 1
+  fields:
+    status_value: 'Not Run'
+- model: testplan.TestCaseStatus
+  pk: 2
+  fields:
+    status_value: 'Passed'
+- model: testplan.TestCaseStatus
+  pk: 3
+  fields:
+    status_value: 'Failed'
+- model: testplan.TestCaseStatus
+  pk: 4
+  fields:
+    status_value: 'Blocked'
+- model: testplan.TestCaseStatus
+  pk: 5
+  fields:
+    status_value: 'Skipped'

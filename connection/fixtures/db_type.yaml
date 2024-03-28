@@ -1,0 +1,16 @@
+- model: connection.DbType
+  pk: 1
+  fields:
+    dbname: 'PostgreSQL'
+- model: connection.dbtype
+  pk: 2
+  fields:
+    dbname: 'MySQL'
+- model: connection.dbtype
+  pk: 3
+  fields:
+    dbname: 'Snowflake'
+- model: connection.dbtype
+  pk: 4
+  fields:
+    dbname: 'MSSQL'
