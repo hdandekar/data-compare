@@ -33,4 +33,12 @@
         }
 
     })
+
+    htmx.on("removeTCListForm", (e) => {
+        if (e.detail.value === 'True') {
+            element = document.getElementById("testcase_list")
+            element.innerHTML = '';
+        }
+
+    })
 })();
