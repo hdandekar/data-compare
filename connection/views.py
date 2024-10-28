@@ -1,7 +1,6 @@
 import json
 
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.hashers import make_password
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
@@ -21,7 +20,8 @@ def connection_create(request):
             if form.is_valid():
                 db_connection = form.save(commit=False)
                 db_connection.created_by = request.user
-                db_connection.password = make_password(form.cleaned_data["password"])
+                # db_connection.password = make_password(form.cleaned_data["password"])
+                db_connection.password = form.cleaned_data["password"]
                 db_connection.save()
                 return HttpResponse(
                     status=204,
@@ -69,11 +69,11 @@ def connection_create(request):
                 error = conn_sts["error"]
                 conn_html = """
                             <div>
-                                <p id='connection_result' class='smaller my-1 text-danger'>{}:{}, please provide
+                                <p id='connection_result' class='smaller my-1 text-danger'>{}, please provide
                                  password to test connection</p>
                             </div>
                         """.format(
-                    error.errno, error.msg
+                    error
                 )
             return HttpResponse(conn_html)
 
@@ -118,7 +118,7 @@ def connection_edit(request, pk):
             db_connection = form.save(commit=False)
             print("form.cleaned_data", form.cleaned_data)
             if "password" in form.cleaned_data:
-                db_connection.password = make_password(form.cleaned_data["password"])
+                db_connection.password = form.cleaned_data["password"]
                 db_connection.save()
             else:
                 db_connection.save()

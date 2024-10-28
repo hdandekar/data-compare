@@ -20,6 +20,10 @@
             toastElement.classList.remove('bg-danger', 'bg-success');
             toastElement.classList.add("bg-danger");
         }
+        else if (['triggerd'].includes(e.detail.value)) {
+            toastElement.classList.remove('bg-danger', 'bg-success', 'bg-warning');
+            toastElement.classList.add("bg-warning")
+        }
     })
 
     htmx.on("removeTCListForm", (e) => {

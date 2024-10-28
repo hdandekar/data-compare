@@ -1,27 +1,35 @@
-import logging
-
+import psycopg
 from mysql import connector as mysql_connector
 
 
-def check_db_connection(dbtype, db_name, username, password, portno, **kwargs):
+def check_db_connection(dbtype, dbname, username, password, portno, **kwargs):
     hostname = kwargs["hostname"]
-    if dbtype == "postgres":
-        check_pgsql(db_name, username, password, **kwargs)
+    if dbtype.lower() == "postgresql":
+        connection_status = check_pgsql(dbname, username, password, hostname, portno)
+        return connection_status
     if dbtype.lower() == "mysql":
-        connection_status = check_mysql_conn(db_name, username, password, hostname, portno)
+        connection_status = check_mysql_conn(dbname, username, password, hostname, portno)
         return connection_status
 
 
-def check_pgsql(db_name, username, password, **kwargs):
-    pass
-
-
-def check_mysql_conn(db_name, uname, pwd, hostname, portno):
+def check_pgsql(dbname, uname, pwd, hostname, portno):
     try:
-        cnx = mysql_connector.connect(host=hostname, database=db_name, user=uname, password=pwd, port=portno)
+        cnx = psycopg.connect(
+            host=hostname,
+            port=portno,
+            dbname=dbname,
+            user=uname,
+            password=pwd,
+        )
+        return {"connected": True, "connection": cnx}
+    except psycopg.Error as err:
+        return {"connected": False, "error": err}
+
+
+def check_mysql_conn(dbname, uname, pwd, hostname, portno):
+    try:
+        cnx = mysql_connector.connect(host=hostname, database=dbname, user=uname, password=pwd, port=portno)
         if cnx.is_connected:
             return {"connected": True}
     except mysql_connector.Error as err:
-        logging.error(f"Error: {err.errno} msg: {err.msg}")
-        print(f"Error#{err.errno}, msg: {err.msg}")
         return {"connected": False, "error": err}
