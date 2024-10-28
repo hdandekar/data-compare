@@ -49,4 +49,9 @@ urlpatterns = [
         views.get_testrun_testcases,
         name="get_testrun_testcases",
     ),
+    path(
+        "project/<int:project_id>/testruns/<int:testrun_id>/testcaserun/<int:testruncase_id>/execute",
+        views.execute_testcase,
+        name="execute_testcase",
+    ),
 ]

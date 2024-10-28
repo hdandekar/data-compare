@@ -17,7 +17,7 @@
       <li class="breadcrumb-item active">{{ testrun.name }}</li>
       <li class="breadcrumb-item ">
         <a class="text-success p-xl-1"
-           title="Add New Module"
+           title="Add New Test Run"
            data-toggle="tooltip"
            data-bs-placement="right"
            hx-get="{% url 'create_testrun' testrun.project.id %}"
@@ -38,9 +38,10 @@
     </tr>
   </div>
   <div>
-    <a hx-get="{% url 'get_project_testcases' testrun.project.id testrun.id %}"
-       hx-target="#testcase_list"
-       hx-swap="innerHTML">Add more cases</a>
+    <button hx-get="{% url 'get_project_testcases' testrun.project.id testrun.id %}"
+            hx-target="#testcase_list"
+            hx-swap="innerHTML"
+            class="btn btn-sm btn-dark">Add Test Cases</button>
   </div>
   <div id="testcase_list"></div>
   <script src="{% static 'js/toast.js' %}"></script>

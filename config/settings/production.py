@@ -161,3 +161,11 @@ LOGGING = {
 
 # Your stuff...
 # ------------------------------------------------------------------------------
+
+# Celery Configuration Options
+CELERY_BROKER_URL = env("C_BROKER_URL")
+CELERY_RESULT_BACKEND = env("C_RESULT_BACKEND")
+CELERY_ACCEPT_CONTENT = ["application/json"]
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TASK_SERIALIZER = "json"
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True

@@ -1,4 +1,5 @@
 import json
+import logging
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
@@ -12,13 +13,17 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
 from connection.models import DbConnection
-from testplan.models import Module, Project, TestCase, TestRun, TestRunCases
+from testplan import tasks
+from testplan.models import Module, Project, TestCase, TestRun, TestRunCases, TestRunCasesHistory
 
 _404_Page = "404.html"
+
+logger = logging.getLogger(__name__)
 
 
 @login_required
 def project_index(request):
+    logger.info("Rendering Project Index")
     return render(request, "project_index.html")
 
 
@@ -114,6 +119,7 @@ class ProjectListView(LoginRequiredMixin, ListView):
     template_name = "project_list.html"
 
     def get_context_data(self, **kwargs):
+        logger.info("Came in ProjectListView.get_context_data")
         context = super().get_context_data(**kwargs)
         page_num = self.kwargs.get("page")
         member_projects = (
@@ -535,13 +541,44 @@ def testrun_index(request, project_id):
 @login_required
 def get_testrun_testcases(request, project_id, testrun_id):
     project = Project.objects.get(id=project_id)
+    latest_testcase_runs = []
+    most_recent_testcase_runs = []
+
     if request.user in project.members.all():
-        testrun_cases = (
-            TestRunCases.objects.filter(testrun_id=testrun_id)
-            .select_related("testcase_status")
-            .select_related("testcases")
+        testrun_cases = TestRunCases.objects.filter(testrun_id=testrun_id)
+
+        for rn in testrun_cases:
+            try:
+                most_recent_tc_run = TestRunCasesHistory.objects.filter(testrun_testcase_id=rn.id).latest("id")
+                most_recent_testcase_runs.append(
+                    {
+                        "testrun_testcase": rn,
+                        "most_recent_testcase_run": most_recent_tc_run,
+                    }
+                )
+            except Exception:
+                most_recent_testcase_runs.append(
+                    {
+                        "testrun_testcase": rn,
+                        "most_recent_testcase_run": None,
+                    }
+                )
+
+        for run in testrun_cases:
+            try:
+                latest_testcase_run = TestRunCasesHistory.objects.filter(testrun_testcase_id=run.id).latest("id")
+                latest_testcase_runs.append(latest_testcase_run)
+            except Exception:
+                latest_testcase_runs.append(None)
+        return render(
+            request,
+            "partials/testrun_cases.html",
+            {
+                "testrun_cases": testrun_cases,
+                "testcase_run_history": latest_testcase_runs,
+                "most_recent_testcase_runs": most_recent_testcase_runs,
+            },
         )
-        return render(request, "partials/testrun_cases.html", {"testrun_cases": testrun_cases})
     else:
         return render(request, _404_Page)
 
@@ -562,8 +599,6 @@ class TestRunDetails(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     template_name = "testrun_detail.html"
 
     def get_object(self, queryset=None):
-        if queryset is None:
-            queryset = self.get_queryset()
         project = get_object_or_404(Project, id=self.kwargs["project_id"])
         testrun = get_object_or_404(TestRun, id=self.kwargs["testrun_id"], project_id=project.id)
         return testrun
@@ -683,6 +718,53 @@ class TestRunCaseDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView)
                 "HX-Trigger": json.dumps(
                     {
                         "showMessage": f"You do not have permission to delete '{project.name}'",
+                        "eventType": "permissiondenied",
+                    }
+                )
+            },
+        )
+
+
+@login_required
+def execute_testcase(request, project_id, testrun_id, testruncase_id):
+    project = Project.objects.get(id=project_id)
+    if request.user in project.members.all():
+        print(f"request.user.id {request.user.id}")
+        print(f"request.user {request.user}")
+        testrun = TestRun.objects.get(id=testrun_id)
+        testrun_case = TestRunCases.objects.get(testrun_id=testrun.id, id=testruncase_id)
+        print(f"testrun_case_id: {testrun_case}")
+
+        testrun_tc_history = TestRunCasesHistory(
+            testrun_testcase=testrun_case, run_status_id=6, triggered_by=request.user
+        )
+        testrun_tc_history.save()
+        logger.info(f"Test Run TC History Save {testrun_tc_history.id}")
+        testcase = get_object_or_404(TestCase, id=testrun_case.testcases_id)
+
+        tasks.execute_comparison.delay(testrun_tc_history.id, testcase.id, testrun_case.id)
+        # dbutil.execute_comparison(testrun_tc_history.id, testcase.id, testrun_case.id)
+        print(f"Starting execution {testcase}")
+
+        return HttpResponse(
+            status=204,
+            headers={
+                "HX-Trigger": json.dumps(
+                    {
+                        "listChanged": None,
+                        "showMessage": "Test Case execution started",
+                        "eventType": "triggerd",
+                    }
+                )
+            },
+        )
+    else:
+        return HttpResponse(
+            status=204,
+            headers={
+                "HX-Trigger": json.dumps(
+                    {
+                        "showMessage": "Permission denied for execution,please contact your project owner",
                         "eventType": "permissiondenied",
                     }
                 )

@@ -69,22 +69,39 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
-    "handlers": {
-        "console": {
-            "level": "DEBUG",
-            "class": "logging.StreamHandler",
-        },
-        "file": {
-            "level": "DEBUG",
-            "class": "logging.FileHandler",
-            "filename": "django_queries.log",  # Choose a file name and path
+    "formatters": {
+        "verbose": {
+            "format": "%(asctime)s %(levelname)s %(filename)s %(funcName)s#%(lineno)d %(process)d %(thread)d %(message)s",  # noqa
         },
     },
-    # "loggers": {
-    #     "django.db.backends": {
-    #         "handlers": ["console", "file"],
-    #         "level": "DEBUG",
-    #         "propagate": False,
-    #     },
-    # },
+    "handlers": {
+        "console": {
+            "level": "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
+        "file": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": "django_queries.log",  # Choose a file name and path
+            "formatter": "verbose",
+        },
+    },
+    "loggers": {
+        "django.db.backends": {
+            "handlers": ["console", "file"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "testplan": {"handlers": ["console", "file"], "level": "INFO", "propogate": False},
+    },
 }
+
+
+# Celery Configuration Options
+CELERY_BROKER_URL = env("C_BROKER_URL")
+CELERY_RESULT_BACKEND = env("C_RESULT_BACKEND")
+CELERY_ACCEPT_CONTENT = ["application/json"]
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TASK_SERIALIZER = "json"
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
