@@ -24,7 +24,7 @@
         </li>
       </ol>
     </nav>
-    <table class="table table-striped table-bordered table-sm small"
+    <table class="table table-bordered table-sm small"
            aria-label="Connection List">
       <thead class="thead-dark small">
         <tr>
@@ -32,16 +32,16 @@
           <th scope="col" class="text-center">Test Case Title</th>
           <th scope="col" class="text-center">Module</th>
           <th scope="col" class="text-center">Key Columns</th>
-          <th scope="col" class="text-center">Source Database</th>
-          <th scope="col" class="text-center">Source SQL</th>
-          <th scope="col" class="text-center">Target Database</th>
-          <th scope="col" class="text-center">Target SQL</th>
+          <th scope="col" class="text-center">Database</th>
+          <th scope="col" class="text-center">SQL</th>
         </tr>
       </thead>
       <tbody class="small">
         {% for tc in testcase_list %}
-          <tr>
-            <td class="col-2">
+          <tr class="small">
+            <!-- This cell will take up
+                space on two rows -->
+            <td rowspan="2" class="col-2 align-middle">
               <a class="px-1 link-undecorate"
                  title="Edit"
                  href="{% url 'edit_testcase' project.id tc.id %}">
@@ -52,12 +52,14 @@
               </a>
               {{ tc.tcname }}
             </td>
-            <td class="col-auto">{{ tc.module.name }}</td>
-            <td class="col-auto">{{ tc.keycolumns|truncatechars:20 }}</td>
-            <td class="col-auto">{{ tc.sourcedb }}</td>
-            <td class="col-auto">{{ tc.sourcesql|truncatechars:40 }}</td>
-            <td class="col-auto">{{ tc.targetdb }}</td>
-            <td class="col-auto">{{ tc.targetsql|truncatechars:40 }}</td>
+            <td rowspan="2" class="col-1 align-middle">{{ tc.module.name }}</td>
+            <td rowspan="2" class="col-2 align-middle">{{ tc.keycolumns|truncatechars:50 }}</td>
+            <td class="col-1">{{ tc.sourcedb }}</td>
+            <td class="col-4">{{ tc.sourcesql|truncatechars:255 }}</td>
+          </tr>
+          <tr class="small">
+            <td class="col-1">{{ tc.targetdb }}</td>
+            <td class="col-4">{{ tc.targetsql|truncatechars:255 }}</td>
           </tr>
         {% endfor %}
       </tbody>

@@ -54,4 +54,14 @@ urlpatterns = [
         views.execute_testcase,
         name="execute_testcase",
     ),
+    path(
+        "project/<int:project_id>/testruns/<int:testrun_id>/testcaseruns/<int:testrun_case_id>",
+        views.testrun_history,
+        name="testrun_history",
+    ),
+    path(
+        "project/<int:project_id>/testruns/<int:testrun_id>/testcaseruns/<int:testrun_case_id>/history/<int:testrun_case_history_id>",
+        views.testrun_case_result_summary,
+        name="execution_history",
+    ),
 ]
