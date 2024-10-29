@@ -1,0 +1,53 @@
+{% extends 'app_base.html' %}
+
+{% block title %}
+  {{ project.name }}/TestRun/TestCases/History
+{% endblock title %}
+{% block content %}
+  {% load static %}
+
+  <div class="container">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="{% url 'projects' %}">{{ project.name }}</a>
+        </li>
+        <li class="breadcrumb-item active">
+          <a href="{% url 'detail_testrun' testrun.project.id testrun.id %}">{{ testrun.name }}</a>
+        </li>
+        <li class="breadcrumb-item ">{{ testcase.tcname }} History</li>
+      </ol>
+    </nav>
+    <div>
+      <table class="table table-striped table-bordered table-sm small"
+             aria-label="Execution History">
+        <thead class="thead-dark small">
+          <th class="text-center">Triggered By</th>
+          <th class="text-center">Status</th>
+          <th class="text-center">Execution Start</th>
+          <th class="text-center">Execution End</th>
+          <th class="text-center">Log</th>
+          <th class="text-center">Result</th>
+        </thead>
+        <tbody>
+          {% for item in testcase_run_history %}
+            <tr>
+              <td class="align-middle text-center">{{ item.triggered_by.email }}</td>
+              <td class="align-middle text-center">{{ item.run_status.status_value }}</td>
+              <td class="align-middle text-center">{{ item.execution_start|date:"d-M-y H:m:s T" }}</td>
+              <td class="align-middle text-center">{{ item.execution_end|date:"d-M-y H:m:s T" }}</td>
+              <td class="small">{{ item.comments }}</td>
+              <td class="align-middle text-center">
+                {% if item.run_status.status_value == "Failed" %}
+                  <a href="{% url 'execution_history' item.testrun_testcase.testcases.project.id item.testrun_testcase.testrun.id item.testrun_testcase.id item.id %}">
+                    View
+                  </a>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock content %}

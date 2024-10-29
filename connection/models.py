@@ -26,7 +26,7 @@ class DbConnection(models.Model):
     username = models.CharField(max_length=100)
     password = models.CharField(max_length=100)
     portno = models.IntegerField()
-    schema_name = models.CharField(max_length=100)
+    schema_name = models.CharField(max_length=100, blank=True)
     created_by = models.ForeignKey(User, related_name="connection", on_delete=models.PROTECT)
     create_dt = models.DateTimeField(auto_now=True)
 

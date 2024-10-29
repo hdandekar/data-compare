@@ -1,0 +1,105 @@
+{% extends 'app_base.html' %}
+
+{% block title %}
+  {{ project.name }}/TestRun/TestCases/History
+{% endblock title %}
+{% block content %}
+  {% load static %}
+
+  <div class="container-fluid">
+    {% if message %}
+      <p>History not available</p>
+    {% else %}
+      <h5>Result for {{ test_case.tcname }}</h5>
+      <p>
+        <a href="{{ request.META.HTTP_REFERER }}">Back</a>
+      </p>
+      <p class="small">Click either of the tabs for results</p>
+      {{ message }}
+      <ul class="nav nav-tabs small" role="listitem">
+        <li class="nav-item" role="presentation">
+          <a class="nav-link active"
+             id="simple-tab-0"
+             data-bs-toggle="tab"
+             href="#added"
+             role="tab"
+             aria-controls="added"
+             aria-selected="true">Added</a>
+        </li>
+        <li class="nav-item" role="presentation">
+          <a class="nav-link"
+             id="simple-tab-1"
+             data-bs-toggle="tab"
+             href="#removed"
+             role="tab"
+             aria-controls="removed"
+             aria-selected="false">Removed</a>
+        </li>
+        <li class="nav-item" role="presentation">
+          <a class="nav-link"
+             id="simple-tab-2"
+             data-bs-toggle="tab"
+             href="#changed"
+             role="tab"
+             aria-controls="changed"
+             aria-selected="false">Changed</a>
+        </li>
+      </ul>
+      <div class="tab-content pt-5" id="tab-content">
+        <div class="tab-pane active"
+             id="added"
+             role="tabpanel"
+             aria-labelledby="simple-tab-0">
+          <table class="table table-sm table-bordered table-responsive">
+            <thead class="small">
+              {% for row in added_data.columns %}
+                {% if row != 'index' %}<th>{{ row }}</th>{% endif %}
+              {% endfor %}
+            </thead>
+            {% for row in added %}
+              <tr class="smaller">
+                {% for i in row %}<td>{{ i }}</td>{% endfor %}
+              </tr>
+            {% endfor %}
+          </table>
+        </div>
+        <div class="tab-pane"
+             id="removed"
+             role="tabpanel"
+             aria-labelledby="simple-tab-1">
+          <table class="table table-sm table-bordered table-responsive">
+            <thead class="small">
+              {% for row in removed_data.columns %}
+                {% if row != 'index' %}<th>{{ row }}</th>{% endif %}
+              {% endfor %}
+            </thead>
+            {% for row in removed %}
+              <tr class="smaller">
+                {% for i in row %}<td>{{ i }}</td>{% endfor %}
+              </tr>
+            {% endfor %}
+          </table>
+        </div>
+        <div class="tab-pane"
+             id="changed"
+             role="tabpanel"
+             aria-labelledby="simple-tab-2">
+          <table class="table table-sm table-bordered table-responsive">
+            <thead class="small">
+              {% for row in changed_data.columns %}
+                {% if row != 'index' %}<th>{{ row }}</th>{% endif %}
+              {% endfor %}
+            </thead>
+            {% for row in changed %}
+              <tr class="smaller">
+                {% for i in row %}
+                  <td class="{% if '--->' in i %} table-danger {% endif %}">{{ i }}</td>
+                {% endfor %}
+              </tr>
+            {% endfor %}
+          </table>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+{% endblock content %}

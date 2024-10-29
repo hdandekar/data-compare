@@ -65,11 +65,14 @@
       </div>
       <div class="col-md-6">
         <div class="form-group">
-          <label for="tcname" class="col-auto col-form-label-sm">TC Name:</label>
+          <label for="tcname" class="col-auto col-form-label-sm">
+            TC Name: <span class="form-text smaller">limit to 50 characters</span>
+          </label>
           <input type="text"
                  class="form-control form-control-sm"
                  id="id_tcname"
                  placeholder="Enter Test Case Name"
+                 maxlength="50"
                  name="tcname"
                  value="{{ testcase.tcname }}" />
           {% if form.tcname.errors %}<div class="form-text smaller text-danger">{{ form.tc.errors|striptags }}</div>{% endif %}

@@ -1,6 +1,7 @@
 import json
 import logging
 
+import pandas as pd
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
@@ -729,11 +730,8 @@ class TestRunCaseDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView)
 def execute_testcase(request, project_id, testrun_id, testruncase_id):
     project = Project.objects.get(id=project_id)
     if request.user in project.members.all():
-        print(f"request.user.id {request.user.id}")
-        print(f"request.user {request.user}")
         testrun = TestRun.objects.get(id=testrun_id)
         testrun_case = TestRunCases.objects.get(testrun_id=testrun.id, id=testruncase_id)
-        print(f"testrun_case_id: {testrun_case}")
 
         testrun_tc_history = TestRunCasesHistory(
             testrun_testcase=testrun_case, run_status_id=6, triggered_by=request.user
@@ -770,3 +768,99 @@ def execute_testcase(request, project_id, testrun_id, testruncase_id):
                 )
             },
         )
+
+
+@login_required
+def testrun_history(request, project_id, testrun_id, testrun_case_id):
+    project = Project.objects.get(id=project_id)
+    testrun = TestRun.objects.get(id=testrun_id)
+
+    # testcase_run_history = TestRunCasesHistory.objects.filter(testrun_testcase_id=testrun_case_id).order_by(
+    #     "-execution_end"
+    # )
+    testcase_run_history = TestRunCasesHistory.objects.select_related("run_status", "triggered_by").filter(
+        testrun_testcase_id=testrun_case_id
+    )
+    if request.user in project.members.all():
+        return render(
+            request,
+            "testrun_history.html",
+            {
+                "testcase_run_history": testcase_run_history,
+                "project": project,
+                "testrun": testrun,
+            },
+        )
+    else:
+        return HttpResponse(
+            status=204,
+            headers={
+                "HX-Trigger": json.dumps(
+                    {
+                        "showMessage": "Permission denied to view ,please contact your project owner",
+                        "eventType": "permissiondenied",
+                    }
+                )
+            },
+        )
+
+
+@login_required
+def testrun_case_result_summary(request, project_id, testrun_id, testrun_case_id, testrun_case_history_id):
+    if TestRunCasesHistory.objects.filter(id=testrun_case_history_id).exists():
+        print("Came in if of testrun_case_result_summary")
+        testcase_run = TestRunCases.objects.get(id=testrun_case_id)
+        test_case = TestCase.objects.get(id=testcase_run.testcases_id)
+
+        try:
+            added_data = pd.read_csv(f"{testrun_case_history_id}_added.csv")
+            added_set = added_data.to_numpy()
+        except Exception as e:
+            added_data = None
+            added_set = None
+            logger.info(f"Added file not present: {e}")
+
+        try:
+            removed_data = pd.read_csv(f"{testrun_case_history_id}_removed.csv")
+            removed_set = removed_data.to_numpy()
+        except Exception as e:
+            removed_data = None
+            removed_set = None
+            logger.info(f"Removed file not present: {e}")
+        try:
+            changed_data = pd.read_csv(f"{testrun_case_history_id}_changed.csv")
+            changed_set = changed_data.to_numpy()
+        except Exception as e:
+            changed_data = None
+            changed_set = None
+            logger.info(f"Changed file not present: {e}")
+
+        return render(
+            request,
+            "testrun_history_result.html",
+            {
+                "added": added_set,
+                "added_data": added_data,
+                "removed": removed_set,
+                "removed_data": removed_data,
+                "changed": changed_set,
+                "changed_data": changed_data,
+                "test_case": test_case,
+            },
+        )
+    else:
+        print("Came in else of testrun_case_result_summary")
+
+        return render(
+            request,
+            "testrun_history_result.html",
+            {"message": "History Not Available"},
+        )
+
+
+def highlight_differences(self, value):
+    if "--->" in value:
+        color = "orange"
+    else:
+        color = "white"
+    return "color: %s" % color
