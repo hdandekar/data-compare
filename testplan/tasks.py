@@ -45,8 +45,10 @@ def execute_comparison(testrun_tc_history_id, testcase_id, testrun_case_id):
                 testruncasehist.comments = "No differences found between source and target datasets"
                 testruncasehist.save()
         except Exception as error:
-            logger.error("Some error occured")
-            logger.error(error)
+            logger.info(f"testruncasehist.comments: {error}")
+            testruncasehist.run_status_id = 5
+            testruncasehist.comments = error
+            testruncasehist.save()
     else:
         comments = ""
         if src_data["status"] == "error":
@@ -63,3 +65,4 @@ def execute_comparison(testrun_tc_history_id, testcase_id, testrun_case_id):
         testruncasehist.save()
     testrun = TestRunCases.objects.get(id=testrun_case_id)
     testrun.testcase_status = testruncasehist.run_status
+    testrun.save()

@@ -18,3 +18,7 @@
   pk: 5
   fields:
     status_value: 'Skipped'
+- model: testplan.TestCaseStatus
+  pk: 6
+  fields:
+    status_value: 'Running'
