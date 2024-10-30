@@ -15,7 +15,7 @@ from django.views.generic import CreateView, DeleteView, DetailView, ListView, U
 
 from connection.models import DbConnection
 from testplan import tasks
-from testplan.models import Module, Project, TestCase, TestRun, TestRunCases, TestRunCasesHistory
+from testplan.models import Module, Project, TestCase, TestRun, TestRunTestCase, TestRunTestCaseHistory
 
 _404_Page = "404.html"
 
@@ -508,10 +508,10 @@ class TestRunListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         context = super().get_context_data(**kwargs)
         project = get_object_or_404(Project, id=self.kwargs["project_id"])
         context["project"] = project
-        testrun_qs = TestRun.objects.prefetch_related("testruncases_set").filter(project=project)
+        testrun_qs = TestRun.objects.prefetch_related("testruntestcase_set").filter(project=project)
         context["testrun_list"] = testrun_qs
         context["testcases"] = (
-            TestRunCases.objects.filter(testrun_id__in=testrun_qs)
+            TestRunTestCase.objects.filter(testrun_id__in=testrun_qs)
             .values("testrun_id", "testcase_status__status_value")
             .annotate(status_count=Count("id"))
         )
@@ -546,11 +546,11 @@ def get_testrun_testcases(request, project_id, testrun_id):
     most_recent_testcase_runs = []
 
     if request.user in project.members.all():
-        testrun_cases = TestRunCases.objects.filter(testrun_id=testrun_id)
+        testrun_cases = TestRunTestCase.objects.filter(testrun_id=testrun_id)
 
         for rn in testrun_cases:
             try:
-                most_recent_tc_run = TestRunCasesHistory.objects.filter(testrun_testcase_id=rn.id).latest("id")
+                most_recent_tc_run = TestRunTestCaseHistory.objects.filter(testrun_testcase_id=rn.id).latest("id")
                 most_recent_testcase_runs.append(
                     {
                         "testrun_testcase": rn,
@@ -567,7 +567,7 @@ def get_testrun_testcases(request, project_id, testrun_id):
 
         for run in testrun_cases:
             try:
-                latest_testcase_run = TestRunCasesHistory.objects.filter(testrun_testcase_id=run.id).latest("id")
+                latest_testcase_run = TestRunTestCaseHistory.objects.filter(testrun_testcase_id=run.id).latest("id")
                 latest_testcase_runs.append(latest_testcase_run)
             except Exception:
                 latest_testcase_runs.append(None)
@@ -607,7 +607,7 @@ class TestRunDetails(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["testcases"] = (
-            TestRunCases.objects.filter(testrun=self.get_object())
+            TestRunTestCase.objects.filter(testrun=self.get_object())
             .values("testcase_status__status_value")
             .annotate(status_count=Count("id"))
         )
@@ -643,9 +643,9 @@ class TestRunUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         testrun = self.get_object()
         cleaned_tcs = form.cleaned_data["testcases"]
         for item in cleaned_tcs:
-            tc_run_id = TestRunCases(testrun_id=testrun.id, testcases_id=item.id)
-            if TestRunCases.objects.filter(testcases_id=item.id, testrun_id=testrun.id).count() <= 0:
-                tc_run_id.save()
+            testrun_testcase = TestRunTestCase(testrun_id=testrun.id, testcase_id=item.id)
+            if TestRunTestCase.objects.filter(testcase_id=item.id, testrun_id=testrun.id).count() <= 0:
+                testrun_testcase.save()
         return HttpResponse(
             status=204,
             headers={
@@ -668,7 +668,7 @@ class TestRunCaseDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView)
     model = TestRun
 
     def get_object(self, queryset=None):
-        testruncase = TestRunCases.objects.get(id=self.kwargs.get("testcase_id"))
+        testruncase = TestRunTestCase.objects.get(id=self.kwargs.get("testcase_id"))
         return testruncase
 
     def post(self, *args, **kwargs):
@@ -681,7 +681,7 @@ class TestRunCaseDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView)
                     "HX-Trigger": json.dumps(
                         {
                             "listChanged": None,
-                            "showMessage": f"{testruncase.testcases.tcname} deleted.",
+                            "showMessage": f"{testruncase.testcase.tcname} deleted.",
                             "eventType": "deleted",
                             "refresh": "True",
                         }
@@ -727,22 +727,25 @@ class TestRunCaseDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView)
 
 
 @login_required
-def execute_testcase(request, project_id, testrun_id, testruncase_id):
+def execute_testcase(request, project_id, testrun_id, testrun_testcase_id):
     project = Project.objects.get(id=project_id)
     if request.user in project.members.all():
         testrun = TestRun.objects.get(id=testrun_id)
-        testrun_case = TestRunCases.objects.get(testrun_id=testrun.id, id=testruncase_id)
+        testrun_testcase = TestRunTestCase.objects.get(testrun_id=testrun.id, id=testrun_testcase_id)
 
-        testrun_tc_history = TestRunCasesHistory(
-            testrun_testcase=testrun_case, run_status_id=6, triggered_by=request.user
+        testrun_tc_history = TestRunTestCaseHistory(
+            testrun_testcase=testrun_testcase,
+            testrun=testrun,
+            testcase_id=testrun_testcase.testcase_id,
+            testcase_run_status_id=6,
+            triggered_by=request.user,
         )
         testrun_tc_history.save()
         logger.info(f"Test Run TC History Save {testrun_tc_history.id}")
-        testcase = get_object_or_404(TestCase, id=testrun_case.testcases_id)
+        testcase = get_object_or_404(TestCase, id=testrun_testcase.testcase_id)
 
-        tasks.execute_comparison.delay(testrun_tc_history.id, testcase.id, testrun_case.id)
-        # dbutil.execute_comparison(testrun_tc_history.id, testcase.id, testrun_case.id)
-        print(f"Starting execution {testcase}")
+        # tasks.execute_comparison(testrun_tc_history.id, testcase.id, testrun_testcase.id)
+        tasks.execute_comparison.delay(testrun_tc_history.id, testcase.id, testrun_testcase.id)
 
         return HttpResponse(
             status=204,
@@ -771,15 +774,16 @@ def execute_testcase(request, project_id, testrun_id, testruncase_id):
 
 
 @login_required
-def testrun_history(request, project_id, testrun_id, testrun_case_id):
+def testrun_history(request, project_id, testrun_id, testrun_testcase_id):
     project = Project.objects.get(id=project_id)
     testrun = TestRun.objects.get(id=testrun_id)
+    testrun_testcase = TestRunTestCase.objects.get(id=testrun_testcase_id)
 
     # testcase_run_history = TestRunCasesHistory.objects.filter(testrun_testcase_id=testrun_case_id).order_by(
     #     "-execution_end"
     # )
-    testcase_run_history = TestRunCasesHistory.objects.select_related("run_status", "triggered_by").filter(
-        testrun_testcase_id=testrun_case_id
+    testcase_run_history = TestRunTestCaseHistory.objects.select_related("testcase_run_status", "triggered_by").filter(
+        testrun_testcase_id=testrun_testcase_id
     )
     if request.user in project.members.all():
         return render(
@@ -789,6 +793,8 @@ def testrun_history(request, project_id, testrun_id, testrun_case_id):
                 "testcase_run_history": testcase_run_history,
                 "project": project,
                 "testrun": testrun,
+                "testrun_testcase": testrun_testcase,
+                "testcase": testrun_testcase.testcase,
             },
         )
     else:
@@ -807,10 +813,12 @@ def testrun_history(request, project_id, testrun_id, testrun_case_id):
 
 @login_required
 def testrun_case_result_summary(request, project_id, testrun_id, testrun_case_id, testrun_case_history_id):
-    if TestRunCasesHistory.objects.filter(id=testrun_case_history_id).exists():
+    if TestRunTestCaseHistory.objects.filter(id=testrun_case_history_id).exists():
         print("Came in if of testrun_case_result_summary")
-        testcase_run = TestRunCases.objects.get(id=testrun_case_id)
-        test_case = TestCase.objects.get(id=testcase_run.testcases_id)
+        project = Project.objects.get(id=project_id)
+        testrun = TestRun.objects.get(id=testrun_id)
+        testrun_testcase = TestRunTestCase.objects.get(id=testrun_case_id)
+        test_case = TestCase.objects.get(id=testrun_testcase.testcase_id)
 
         try:
             added_data = pd.read_csv(f"{testrun_case_history_id}_added.csv")
@@ -846,6 +854,9 @@ def testrun_case_result_summary(request, project_id, testrun_id, testrun_case_id
                 "changed": changed_set,
                 "changed_data": changed_data,
                 "test_case": test_case,
+                "project": project,
+                "testrun": testrun,
+                "testrun_testcase": testrun_testcase,
             },
         )
     else:

@@ -94,7 +94,7 @@ class TestCaseStatus(models.Model):
 
 
 class TestRun(models.Model):
-    testcases = models.ManyToManyField(TestCase, blank=True, through="TestRunCases")
+    testcases = models.ManyToManyField(TestCase, blank=True, through="TestRunTestCase")
     project = models.ForeignKey(Project, related_name="project_testruns", on_delete=models.PROTECT)
     name = models.CharField(max_length=255)
     created_by = models.ForeignKey(
@@ -112,22 +112,26 @@ class TestRun(models.Model):
     closed_date = models.DateField(null=True)
 
 
-class TestRunCases(models.Model):
-    testcases = models.ForeignKey(TestCase, on_delete=models.CASCADE)
+class TestRunTestCase(models.Model):
+    testcase = models.ForeignKey(TestCase, on_delete=models.CASCADE)
     testrun = models.ForeignKey(TestRun, on_delete=models.CASCADE)
     testcase_status = models.ForeignKey(TestCaseStatus, null=True, default=1, on_delete=models.PROTECT)
 
 
-class TestRunCasesHistory(models.Model):
-    testrun_testcase = models.ForeignKey(TestRunCases, on_delete=models.CASCADE, related_name="testrun_case_history")
-    run_status = models.ForeignKey(TestCaseStatus, null=True, default=1, on_delete=models.PROTECT)
+class TestRunTestCaseHistory(models.Model):
+    testrun_testcase = models.ForeignKey(
+        TestRunTestCase, on_delete=models.CASCADE, related_name="testrun_testcase_history"
+    )
+    testcase_run_status = models.ForeignKey(TestCaseStatus, null=True, default=1, on_delete=models.PROTECT)
+    testrun = models.ForeignKey(TestRun, on_delete=models.CASCADE, related_name="history_test_run", blank=True)
+    testcase = models.ForeignKey(TestCase, on_delete=models.CASCADE, related_name="history_test_run", blank=True)
     execution_start = models.DateTimeField(null=True)
     execution_end = models.DateTimeField(null=True)
     task_id = models.CharField(max_length=255)
     comments = models.TextField(blank=True)
     triggered_by = models.ForeignKey(
         User,
-        related_name="testrun_history_created_by",
+        related_name="testrun_history_triggered_by",
         on_delete=models.SET(get_deleted_user_instance),
     )
 
