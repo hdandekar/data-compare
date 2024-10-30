@@ -33,7 +33,7 @@ urlpatterns = [
     path("project/<int:project_id>/testruns", views.testrun_index, name="testruns"),
     path("project/<int:project_id>/testrun/list", views.TestRunListView.as_view(), name="list_testruns"),
     path(
-        "project/<int:project_id>/testruns/<int:testrun_id>/testcaserun/<int:testcase_id>",
+        "project/<int:project_id>/testrun/<int:testrun_id>/testcase/<int:testcase_id>",
         views.TestRunCaseDeleteView.as_view(),
         name="delete_testrun_testcase",
     ),
@@ -50,17 +50,17 @@ urlpatterns = [
         name="get_testrun_testcases",
     ),
     path(
-        "project/<int:project_id>/testruns/<int:testrun_id>/testcaserun/<int:testruncase_id>/execute",
+        "project/<int:project_id>/testruns/<int:testrun_id>/testcaserun/<int:testrun_testcase_id>/execute",
         views.execute_testcase,
         name="execute_testcase",
     ),
     path(
-        "project/<int:project_id>/testruns/<int:testrun_id>/testcaseruns/<int:testrun_case_id>",
+        "project/<int:project_id>/testruns/<int:testrun_id>/testcaseruns/<int:testrun_testcase_id>",
         views.testrun_history,
         name="testrun_history",
     ),
     path(
-        "project/<int:project_id>/testruns/<int:testrun_id>/testcaseruns/<int:testrun_case_id>/history/<int:testrun_case_history_id>",
+        "project/<int:project_id>/testruns/<int:testrun_id>/testcaseruns/<int:testrun_case_id>/history/<int:testrun_case_history_id>",  # noqa: E501
         views.testrun_case_result_summary,
         name="execution_history",
     ),

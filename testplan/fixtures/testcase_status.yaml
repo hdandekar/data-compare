@@ -22,3 +22,7 @@
   pk: 6
   fields:
     status_value: 'Running'
+- model: testplan.TestCaseStatus
+  pk: 7
+  fields:
+    status_value: 'Error'

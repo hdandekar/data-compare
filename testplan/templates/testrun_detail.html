@@ -15,16 +15,6 @@
         <a href="{% url 'testruns' testrun.project.id %}">Test Runs</a>
       </li>
       <li class="breadcrumb-item active">{{ testrun.name }}</li>
-      <li class="breadcrumb-item ">
-        <a class="text-success p-xl-1"
-           title="Add New Test Run"
-           data-toggle="tooltip"
-           data-bs-placement="right"
-           hx-get="{% url 'create_testrun' testrun.project.id %}"
-           hx-target="#dialog">
-          <i class="fa fa-solid fa-plus fa-xl" aria-hidden="true"></i>
-        </a>
-      </li>
     </ol>
   </nav>
   <div hx-trigger="load, listChanged from:body"

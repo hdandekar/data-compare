@@ -1,32 +1,34 @@
+{% load testplan_extras %}
+
 <p class="smaller float-end">Details are only for latest run</p>
-<table class="table table-striped table-bordered table-xs smaller"
+<table class="table table-bordered table-xs smaller"
        aria-label="Project List">
   <thead class="thead-dark small">
     <tr>
       {% comment %} <th scope="col-1">ID</th> {% endcomment %}
-      <th class="sortable col-sm-4 text-center">Test Case Name</th>
-      <th class="sortable hidden-xs col-1 text-center">Status</th>
-      <th class="sortable hidden-xs col-1 text-center">Executed By</th>
-      <th class="hidden-xs col-sm-1 text-center">Execution Start</th>
-      <th class="hidden-xs col-sm-1 text-center">Execution End</th>
-      <th class="hidden-xs col-sm-4 text-center">Log</th>
+      <th class="sortable text-center w-25">Test Case Name</th>
+      <th class="sortable hidden-xs text-center w-10">Status</th>
+      <th class="sortable hidden-xs text-center w-10">Executed By</th>
+      <th class="hidden-xs text-center w-10">Execution Start</th>
+      <th class="hidden-xs text-center w-10">Execution End</th>
+      <th class="hidden-xs text-center w-25">Log</th>
     </tr>
   </thead>
-  <tbody>
+  <tbody class="small">
     {% for item in most_recent_testcase_runs %}
-      <tr>
-        <td class="col-sm-4">
-          <a class="px-1 link-undecorate"
+      <tr class="{% tc_status_row_class item.most_recent_testcase_run.testcase_run_status.status_value %}">
+        <td>
+          <a class="px-0 link-undecorate"
              title="Edit"
-             href="{% url 'edit_testcase' item.testrun_testcase.testcases.project.id item.testrun_testcase.testcases.id %}">
+             href="{% url 'edit_testcase' item.testrun_testcase.testcase.project.id item.testrun_testcase.testcase.id %}">
             <i class="fa fa-pen-to-square fa-fw fa-xs"></i>
           </a>
-          <a class="px-1 confirm-delete link-undecorate"
+          <a class="px-0 confirm-delete link-undecorate"
              title="Delete"
              data-bs-title="Delete Test Case"
              data-bs-toggle="tooltip"
              data-bs-placement="right"
-             hx-post="{% url 'delete_testrun_testcase' item.testrun_testcase.testcases.project.id item.testrun_testcase.testrun.id item.testrun_testcase.id %}"
+             hx-post="{% url 'delete_testrun_testcase' item.testrun_testcase.testcase.project.id item.testrun_testcase.testrun.id item.testrun_testcase.id %}"
              hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'>
             <i class="fa fa-trash fa-fw fa-xs text-danger" aria-hidden="true"></i>
           </a>
@@ -35,32 +37,32 @@
              data-bs-title="Delete Test Case"
              data-bs-toggle="tooltip"
              data-bs-placement="right"
-             hx-post="{% url 'execute_testcase' item.testrun_testcase.testcases.project.id item.testrun_testcase.testrun.id item.testrun_testcase.id %}"
+             hx-post="{% url 'execute_testcase' item.testrun_testcase.testcase.project.id item.testrun_testcase.testrun.id item.testrun_testcase.id %}"
              hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'>
             <i class="fa-solid fa-caret-right fa-xl text-success"></i>
           </a>
-          <a class="px-1 confirm-delete link-undecorate"
+          <a class="px-0 confirm-delete link-undecorate"
              title="History"
              data-bs-title="Delete Test Case"
              data-bs-toggle="tooltip"
              data-bs-placement="right"
-             href="{% url 'testrun_history' item.testrun_testcase.testcases.project.id item.testrun_testcase.testrun.id item.testrun_testcase.id %} ">
+             href="{% url 'testrun_history' item.testrun_testcase.testcase.project.id item.testrun_testcase.testrun.id item.testrun_testcase.id %} ">
             <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>
           </a>
-          {{ item.testrun_testcase.testcases.tcname }}
+          {{ item.testrun_testcase.testcase.tcname }}
         </td>
         {% if item.most_recent_testcase_run %}
-          <td class="col-sm-1 text-center">{{ item.most_recent_testcase_run.run_status.status_value }}</td>
-          <td class="col-sm-1 text-center">{{ item.most_recent_testcase_run.triggered_by }}</td>
-          <td class="col-sm-1 text-center">{{ item.most_recent_testcase_run.execution_start|date:"d-M-y H:m:s T" }}</td>
-          <td class="col-sm-1 text-center">{{ item.most_recent_testcase_run.execution_end|date:"d-M-y H:m:s T" }}</td>
-          <td class="col-sm-4 smaller">{{ item.most_recent_testcase_run.comments|truncatewords:200 }}</td>
+          <td class="text-center">{{ item.most_recent_testcase_run.testcase_run_status.status_value }}</td>
+          <td class="text-center">{{ item.most_recent_testcase_run.triggered_by }}</td>
+          <td class="text-center">{{ item.most_recent_testcase_run.execution_start|date:"d-M-y H:m:s T" }}</td>
+          <td class="text-center">{{ item.most_recent_testcase_run.execution_end|date:"d-M-y H:m:s T" }}</td>
+          <td>{{ item.most_recent_testcase_run.comments|truncatewords:200 }}</td>
         {% else %}
-          <td class="col-sm-1 text-center">Not Run</td>
-          <td class="col-sm-1 text-center"></td>
-          <td class="col-sm-1 text-center"></td>
-          <td class="col-sm-1 text-center"></td>
-          <td class="col-sm-3"></td>
+          <td class="text-center">Not Run</td>
+          <td class="text-center"></td>
+          <td class="text-center"></td>
+          <td class="text-center"></td>
+          <td></td>
         {% endif %}
       </tr>
     {% endfor %}
