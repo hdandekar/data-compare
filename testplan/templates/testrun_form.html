@@ -1,36 +1,31 @@
 {% block content %}
-  <div class="container-fluid">
-    <form hx-post="{{ request.path }}"
-          hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
-          class="modal-content">
-      <div class="modal-header">
-        <h6 class="modal-title">New Test Run</h6>
-        <button type="button"
-                class="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div class="row">
-          <div class="col-md-9">
-            <div class="form-group">
-              <label for="name" class="col-auto col-form-label-sm">Test Run Name:</label>
-              <input type="text"
-                     class="form-control form-control-sm"
-                     id="id_name"
-                     placeholder="Enter Test Run Name"
-                     name="name"
-                     value="{{ object.name }}" />
-              {% if form.tcname.errors %}<div class="form-text smaller text-danger">{{ form.tc.errors|striptags }}</div>{% endif %}
+  <div class="modal-background cancel"></div>
+  <div class="modal-content is-width-70">
+    <div class="box content">
+      <h5 class="is-2">Add New Test Run</h5>
+      <form hx-post="{{ request.path }}"
+            hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
+            class="modal-content">
+        <div class="columns">
+          <div class="column is-8">
+            <div class="field">
+              <label class="label" for="id_name">Name</label>
+              <div class="control">
+                <input value="{{ object.name }}"
+                       type="text"
+                       name="name"
+                       id="id_name"
+                       class="input"
+                       required
+                       placeholder="Connection Name" />
+              </div>
             </div>
           </div>
         </div>
-        <div class="row mt-2">
-          <div class="col">
-            <button class="btn btn-primary btn-sm" type="submit">Save</button>
-          </div>
+        <div class="buttons">
+          <button class="button is-primary is-small" name="save">Save</button>
         </div>
-      </div>
-    </form>
+      </form>
+    </div>
   </div>
 {% endblock content %}

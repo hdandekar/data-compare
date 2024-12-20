@@ -8,166 +8,164 @@
   {% endif %}
 {% endblock title %}
 {% block content %}
-  <nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-      <li class="breadcrumb-item">
-        <a href="{% url 'projects' %}">Projects</a>
+  <nav class="breadcrumb" aria-label="breadcrumbs">
+    <ul>
+      <li>
+        {% if project.name %}
+          <a href="{% url 'projects' %}">{{ project.name }}</a>
+        {% else %}
+          <a href="{% url 'projects' %}">{{ testcase.project.name }}</a>
+        {% endif %}
       </li>
-      <li class="breadcrumb-item">
+      <li>
         {% if project.name %}
           <a href="{% url 'list_testcase' project.id %}">Test Cases</a>
         {% else %}
           <a href="{% url 'list_testcase' testcase.project.id %}">Test Cases</a>
         {% endif %}
       </li>
-      <li class="breadcrumb-item active">
+      <li>
         {% if testcase %}
-          {{ testcase.tcname }}
+          <p class="pl-2">{{ testcase.tcname }}</p>
         {% else %}
-          New Test Case
+          <p class="pl-2">New Test Case</p>
         {% endif %}
       </li>
-    </ol>
+    </ul>
   </nav>
-  <form method="post" enctype="multipart/form-data" id="testcase_form">
+  <form method="post"
+        enctype="multipart/form-data"
+        id="testcase_form"
+        class="container">
     {% csrf_token %}
-    <div class="row">
-      <div class="col-md-3">
-        <div class="form-group">
-          <label for="id_project"  class="col-auto col-form-label-sm">Project:</label>
-          <input name="project"
-                 class="form-control form-control-sm"
-                 id="id_project"
-                 type="text"
-                 value="{% if testcase.project.name %}{{ testcase.project.name }} {% else %} {{ project.name }} {% endif %}"
-                 aria-label="readonly input example"
-                 disabled
-                 readonly />
+    <div class="pt-5"></div>
+    <div class="columns">
+      <div class="column is-4">
+        <div class="field">
+          <label class="label" for="id_project">Project name</label>
+          <div class="control">
+            <input name="project"
+                   class="input"
+                   id="id_project"
+                   type="text"
+                   value="{% if testcase.project.name %}{{ testcase.project.name }} {% else %} {{ project.name }} {% endif %}"
+                   aria-label="readonly input example"
+                   disabled
+                   readonly />
+          </div>
         </div>
       </div>
-      <div class="col-md-3">
-        <div class="form-group">
-          <label for="id_module"
-                 class="col-auto col-form-label-sm {% if form.module.errors %}error{% endif %}">Module:</label>
-          <select name="module"
-                  required=""
-                  id="id_module"
-                  class="form-control form-control-sm form-select form-select-sm">
-            {% for module in modules %}
-              <option value="{{ module.id }}"
-                      {% if module.id == testcase.module.id %}selected{% endif %}>{{ module.name }}</option>
-            {% endfor %}
-          </select>
-          {% if form.module.errors %}
-            <div class="form-text smaller text-danger">{{ form.module.errors|striptags }}</div>
-          {% endif %}
-        </div>
-      </div>
-      <div class="col-md-6">
-        <div class="form-group">
-          <label for="tcname" class="col-auto col-form-label-sm">
-            TC Name: <span class="form-text smaller">limit to 50 characters</span>
+      <div class="column">
+        <div class="field">
+          <label class="label" for="id_tcname">
+            Test Case Name<span class="has-text-weight-light is-size-7">(limit to 50 characters)</span>
           </label>
-          <input type="text"
-                 class="form-control form-control-sm"
-                 id="id_tcname"
-                 placeholder="Enter Test Case Name"
-                 maxlength="50"
-                 name="tcname"
-                 value="{{ testcase.tcname }}" />
-          {% if form.tcname.errors %}<div class="form-text smaller text-danger">{{ form.tc.errors|striptags }}</div>{% endif %}
+          <div class="control">
+            <input value="{{ testcase.tcname }}"
+                   type="text"
+                   name="tcname"
+                   id="id_tcname"
+                   class="input"
+                   placeholder="e.g. TC_001 Single Sign On" />
+          </div>
+        </div>
+        {% if form.tcname.errors %}<p class="help is-danger">{{ form.tcname.errors|striptags }}</p>{% endif %}
+      </div>
+    </div>
+    <div class="columns">
+      <div class="column is-4">
+        <div class="field">
+          <label class="label" for="id_module">Module name</label>
+          <div class="select is-fullwidth">
+            <select name="module" required="" id="id_module" class="select">
+              {% for module in modules %}
+                <option value="{{ module.id }}"
+                        {% if module.id == testcase.module.id %}selected{% endif %}>{{ module.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="column">
+        <div class="field">
+          <label class="label" for="id_keycolumns">
+            Key Columns
+            <span class="has-text-weight-light is-size-7">
+              Provide list of ',' separated columns to uniquely identify a row in the dataset, e.g id,emp_id,dept_id. Default is 'All'
+            </span>
+          </label>
+          <div class="control">
+            <input type="text"
+                   class="input"
+                   id="id_keycolumns"
+                   placeholder="e.g. 'emp_id,dept_id' or 'id'"
+                   value="{{ testcase.keycolumns }}"
+                   name="keycolumns"
+                   aria-describedby="keyColsHelpBlock" />
+          </div>
         </div>
       </div>
     </div>
-    <div class="row">
-      <div class="col-md-8">
-        <div class="form-group">
-          <label for="id_keycolumns" class="col-auto col-form-label-sm">Key Columns:</label>
-          <input type="text"
-                 class="form-control form-control-sm"
-                 id="id_keycolumns"
-                 placeholder="Enter Test Case Name"
-                 value="{{ testcase.keycolumns }}"
-                 name="keycolumns"
-                 aria-describedby="keyColsHelpBlock" />
-          {% if form.keycolumns.errors %}
-            <div class="form-text smaller text-danger">{{ form.keycolumns.errors|striptags }}</div>
-          {% endif %}
+    <div class="columns">
+      <div class="column is-4">
+        <div class="field">
+          <label class="label" for="id_sourcedb">Source Connection</label>
+          <div class="select is-fullwidth">
+            <select name="sourcedb" required="" id="id_sourcedb" class="select">
+              {% for connection in db_connections %}
+                <option value="{{ connection.id }}"
+                        {% if connection.id == testcase.sourcedb.id %}selected{% endif %}>
+                  {{ connection.name }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
         </div>
       </div>
-      <div class="col-md-4 d-inline-flex p-3">
-        <div id="keyColsHelpBlock" class="form-text smaller">
-          Provide list of ',' separated columns to uniquely identify a row in the dataset, e.g id,emp_id,dept_id. Default is 'All'
+      <div class="column">
+        <div class="field">
+          <label class="label" for="id_sourcesql">Source SQL</label>
+          <textarea name="sourcesql" id="id_sourcesql" class="textarea" style="height: 100px">{{ testcase.sourcesql }}
+            </textarea>
         </div>
+        {% if form.sourcesql.errors %}<p class="help is-danger">{{ form.sourcesql.errors|striptags }}</p>{% endif %}
       </div>
     </div>
-    <div class="row">
-      <div class="col-md-3">
-        <div class="form-group">
-          <label for="id_sourcedb"  class="col-auto col-form-label-sm">Source Database:</label>
-          <select name="sourcedb"
-                  required=""
-                  id="id_sourcedb"
-                  class="form-control form-control-sm form-select form-select-sm">
-            {% for connection in db_connections %}
-              <option value="{{ connection.id }}"
-                      {% if connection.id == testcase.sourcedb.id %}selected{% endif %}>{{ connection.name }}</option>
-            {% endfor %}
-          </select>
-          {% if form.sourcedbid.errors %}
-            <div class="form-text smaller text-danger">{{ form.sourcedb.errors|striptags }}</div>
-          {% endif %}
+    <div class="columns">
+      <div class="column is-4">
+        <div class="field">
+          <label class="label" for="id_sourcedb">Target Connection</label>
+          <div class="select is-fullwidth">
+            <select name="targetdb" required="" id="id_targetdb" class="select">
+              {% for connection in db_connections %}
+                <option value="{{ connection.id }}"
+                        {% if connection.id == testcase.targetdb.id %}selected{% endif %}>
+                  {{ connection.name }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
         </div>
       </div>
-      <div class="col-md-9">
-        <div class="form-group">
-          <label for="id_sourcesql"  class="col-auto col-form-label-sm">Source SQL:</label>
-          <textarea name="sourcesql"
-                    id="id_sourcesql"
-                    class="form-control form-control-sm"
-                    style="height: 100px">{{ testcase.sourcesql }}</textarea>
-          {% if form.sourcesql.errors %}
-            <div class="form-text smaller text-danger">{{ form.sourcedbid.errors|striptags }}</div>
-          {% endif %}
+      <div class="column">
+        <div class="field">
+          <label class="label" for="id_targetsql">Target SQL</label>
+          <textarea required name="targetsql" id="id_targetsql" class="textarea" style="height: 100px">{{ testcase.targetsql }}
+            </textarea>
         </div>
+        {% if form.targetsql.errors %}<p class="help is-danger">{{ form.targetsql.errors|striptags }}</p>{% endif %}
       </div>
     </div>
-    <div class="row">
-      <div class="col-md-3">
-        <div class="form-group">
-          <label for="id_targetdb"  class="col-auto col-form-label-sm">Target Database:</label>
-          <select name="targetdb"
-                  required=""
-                  id="id_targetdb"
-                  class="form-control form-control-sm form-select form-select-sm">
-            {% for connection in db_connections %}
-              <option value="{{ connection.id }}"
-                      {% if connection.id == testcase.targetdb.id %}selected{% endif %}>{{ connection.name }}</option>
-            {% endfor %}
-          </select>
-          {% if form.targetdbid.errors %}
-            <div class="form-text smaller text-danger">{{ form.targetdbid.errors|striptags }}</div>
-          {% endif %}
-        </div>
-      </div>
-      <div class="col-md-9">
-        <div class="form-group">
-          <label for="id_targetsql"  class="col-auto col-form-label-sm">Target SQL:</label>
-          <textarea name="targetsql"
-                    id="id_targetsql"
-                    class="form-control form-control-sm"
-                    style="height: 100px">{{ testcase.targetsql }}</textarea>
-          {% if form.targetsql.errors %}
-            <div class="form-text smaller text-danger">{{ form.targetsql.errors|striptags }}</div>
-          {% endif %}
-        </div>
-      </div>
-    </div>
-    <div class="form-group row pt-2">
-      <div class="col-sm-12">
-        <button type="submit"
-                class="col-sm-2 col-form-label btn btn-success float-end">Save</button>
-      </div>
+    <div class="buttons is-centered">
+      <button class="button is-primary" name="save">Save</button>
+      {% if project.name %}
+        <a href="{% url 'list_testcase' project.id %}"
+           class="button is-light"
+           name="cancel">Cancel</a>
+      {% else %}
+        <a href="{% url 'list_testcase' testcase.project.id %}"
+           class="button is-light">Cancel</a>
+      {% endif %}
     </div>
   </form>
 {% endblock content %}

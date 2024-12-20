@@ -6,53 +6,60 @@
 {% block content %}
   {% load static %}
 
-  <div class="container-fluid">
+  <div class="container">
+    <nav class="breadcrumb" aria-label="breadcrumbs">
+      <ul>
+        <li>
+          <a href="{% url 'projects' %}">{{ project.name }}</a>
+        </li>
+        <li>
+          <a href="{% url 'detail_testrun' testrun.project.id testrun.id %}">{{ testrun.name }}</a>
+        </li>
+        <li>
+          <a href="{% url 'testrun_history' project.id testrun.id testrun_testcase.id %}">{{ test_case.tcname }}</a>
+        </li>
+        <li>
+          <p class="pl-2">Log for {{ test_case.tcname }}</p>
+        </li>
+      </ul>
+    </nav>
     {% if message %}
       <p>History not available</p>
     {% else %}
-      <h5>
-        <span class="smaller">
-          <a href="{% url 'testrun_history' project.id testrun.id testrun_testcase.id %}">
-            <i class="fa-regular fa-circle-left fa-xl text-success"></i></a>
-        </span>
-        <span>log for {{ test_case.tcname }}</span>
-      </h5>
-      <p class="small">Click either of the tabs for results</p>
-      {{ message }}
-      <ul class="nav nav-tabs small" role="listitem">
-        <li class="nav-item" role="presentation">
-          <a class="nav-link active"
-             id="simple-tab-0"
-             data-bs-toggle="tab"
-             href="#added"
-             role="tab"
-             aria-controls="added"
-             aria-selected="true">Added</a>
-        </li>
-        <li class="nav-item" role="presentation">
-          <a class="nav-link"
-             id="simple-tab-1"
-             data-bs-toggle="tab"
-             href="#removed"
-             role="tab"
-             aria-controls="removed"
-             aria-selected="false">Removed</a>
-        </li>
-        <li class="nav-item" role="presentation">
-          <a class="nav-link"
-             id="simple-tab-2"
-             data-bs-toggle="tab"
-             href="#changed"
-             role="tab"
-             aria-controls="changed"
-             aria-selected="false">Changed</a>
-        </li>
-      </ul>
-      <div class="tab-content pt-5" id="tab-content">
-        <div class="tab-pane active"
-             id="added"
-             role="tabpanel"
-             aria-labelledby="simple-tab-0">
+      <!-- Tabs Navigation -->
+      <div class="tabs is-toggle pt-5">
+        <ul id="tabs">
+          <li data-tab="tab1" class="is-active is-success">
+            <a>Changed</a>
+          </li>
+          <li data-tab="tab2">
+            <a>Added</a>
+          </li>
+          <li data-tab="tab3">
+            <a>Removed</a>
+          </li>
+        </ul>
+      </div>
+      <!-- Tabs Content -->
+      <div id="tab-content">
+        <div data-content="tab1" class="tabcontent is-active">
+          <table class="table">
+            <thead>
+              {% for row in changed_data.columns %}
+                {% if row != 'index' %}<th>{{ row }}</th>{% endif %}
+              {% endfor %}
+            </thead>
+            {% for row in changed %}
+              <tr class="smaller">
+                {% for i in row %}
+                  <td class="{% if '--->' in i %} has-text-white has-background-danger {% endif %}">{{ i }}</td>
+                {% endfor %}
+
+              </tr>
+            {% endfor %}
+          </table>
+        </div>
+        <div data-content="tab2" class="tabcontent">
           <table class="table table-sm table-bordered table-responsive">
             <thead class="small">
               {% for row in added_data.columns %}
@@ -66,10 +73,7 @@
             {% endfor %}
           </table>
         </div>
-        <div class="tab-pane"
-             id="removed"
-             role="tabpanel"
-             aria-labelledby="simple-tab-1">
+        <div data-content="tab3" class="tabcontent">
           <table class="table table-sm table-bordered table-responsive">
             <thead class="small">
               {% for row in removed_data.columns %}
@@ -83,26 +87,36 @@
             {% endfor %}
           </table>
         </div>
-        <div class="tab-pane"
-             id="changed"
-             role="tabpanel"
-             aria-labelledby="simple-tab-2">
-          <table class="table table-sm table-bordered table-responsive">
-            <thead class="small">
-              {% for row in changed_data.columns %}
-                {% if row != 'index' %}<th>{{ row }}</th>{% endif %}
-              {% endfor %}
-            </thead>
-            {% for row in changed %}
-              <tr class="smaller">
-                {% for i in row %}
-                  <td class="{% if '--->' in i %} table-danger {% endif %}">{{ i }}</td>
-                {% endfor %}
-              </tr>
-            {% endfor %}
-          </table>
-        </div>
       </div>
-    </div>
-  {% endif %}
+    {% endif %}
+  </div>
 {% endblock content %}
+{% block inline_javascript %}
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var tabs = document.querySelectorAll('#tabs li');
+      var tabContents = document.querySelectorAll('#tab-content .tabcontent');
+      tabs.forEach(function(tab) {
+        tab.addEventListener('click', function() {
+          var tabId = tab.getAttribute('data-tab');
+
+          tabs.forEach(function(tab) {
+            tab.classList.remove('is-active');
+          });
+
+          tab.classList.add('is-active');
+
+          tabContents.forEach(function(content) {
+            content.classList.remove('is-active');
+          });
+
+          var activeContent = document.querySelector('[data-content="' + tabId + '"]');
+          console.log("active_content is:", activeContent)
+          if (activeContent) {
+            activeContent.classList.add('is-active');
+          }
+        });
+      });
+    });
+  </script>
+{% endblock inline_javascript %}

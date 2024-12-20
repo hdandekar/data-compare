@@ -1,21 +1,23 @@
 {% extends 'app_base.html' %}
 
 {% block title %}
-  {{ testrun.project.name }}/TestRun/TestCases
+  {{ testrun.project.name }} / TestRun / TestCases
 {% endblock title %}
 {% block content %}
   {% load static %}
 
-  <nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-      <li class="breadcrumb-item">
+  <nav class="breadcrumb" aria-label="breadcrumbs">
+    <ul>
+      <li>
         <a href="{% url 'projects' %}">{{ testrun.project.name }}</a>
       </li>
-      <li class="breadcrumb-item active">
+      <li>
         <a href="{% url 'testruns' testrun.project.id %}">Test Runs</a>
       </li>
-      <li class="breadcrumb-item active">{{ testrun.name }}</li>
-    </ol>
+      <li>
+        <p class="pl-2">{{ testrun.name }}</p>
+      </li>
+    </ul>
   </nav>
   <div hx-trigger="load, listChanged from:body"
        hx-get="{% url 'get_testrun_testcases' testrun.project.id testrun.id %}"
@@ -27,12 +29,11 @@
       </td>
     </tr>
   </div>
-  <div>
+  <div class="pt-5">
     <button hx-get="{% url 'get_project_testcases' testrun.project.id testrun.id %}"
             hx-target="#testcase_list"
             hx-swap="innerHTML"
-            class="btn btn-sm btn-dark">Add Test Cases</button>
+            class="button is-info">Add Test Cases</button>
   </div>
   <div id="testcase_list"></div>
-  <script src="{% static 'js/toast.js' %}"></script>
 {% endblock content %}

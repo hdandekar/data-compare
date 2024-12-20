@@ -17,150 +17,122 @@
     <meta name="author" content="Hiresh Dandekar" />
     <link rel="icon" href="{% static 'images/favicons/favicon.ico' %}" />
     {% block css %}
-      <!-- Latest compiled and minified Bootstrap CSS -->
-      <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" />
-      <link defer href="{% static 'css/font-awesome.min.css' %}" rel="stylesheet" />
       <!-- This file stores project-specific CSS -->
+      <link defer href="{% static 'css/bulma.min.css' %}" rel="stylesheet" />
+      <link defer href="{% static 'css/font-awesome.min.css' %}" rel="stylesheet" />
       <link href="{% static 'css/project.css' %}" rel="stylesheet" />
     {% endblock css %}
     <!-- Le javascript
     ================================================== -->
     {# Placed at the top of the document so pages load faster with defer #}
     {% block javascript %}
-      <!-- Bootstrap JS -->
-      <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
       <script src="{% static 'js/htmx.min.js' %}"></script>
       <script src="{% static 'js/project.js' %}"></script>
     {% endblock javascript %}
   </head>
   <body>
-    <div class="mb-1">
-      <nav class="navbar navbar-expand-md navbar-dark bg-dark">
-        <div class="container-fluid px-5">
-          <a class="navbar-brand" href="{% url 'home' %}">Data Match</a>
-          <button class="navbar-toggler navbar-toggler-right"
-                  type="button"
-                  data-bs-toggle="collapse"
-                  data-bs-target="#navbarSupportedContent"
-                  aria-controls="navbarSupportedContent"
-                  aria-expanded="false"
-                  aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            {% if request.user.is_authenticated %}
-              <ul class="navbar-nav ms-auto">
-                <li class="nav-item dropdown">
-                  <a class="nav-link mx-2 dropdown-toggle"
-                     href="#"
-                     id="navbarCreateMenuLink"
-                     role="button"
-                     data-bs-toggle="dropdown"
-                     aria-expanded="false">Go To</a>
-                  <ul class="dropdown-menu" aria-labelledby="navbarCreateMenuLink">
-                    <li>
-                      <a class="dropdown-item" href="{% url 'settings:connections' %}">{% translate "Connection" %}</a>
-                    </li>
-                    <li>
-                      <a class="dropdown-item" href="{% url 'projects' %}">Projects</a>
-                    </li>
-                    <li>
-                      <a class="dropdown-item" href="#">Test Set</a>
-                    </li>
-                  </ul>
-                </li>
-                <li class="nav-item dropdown">
-                  <a class="nav-link mx-2 dropdown-toggle"
-                     href="#"
-                     id="navbarAccountMenuLink"
-                     role="button"
-                     data-bs-toggle="dropdown"
-                     aria-expanded="false">
-                    {% with user_email=user.email %}{{ user.name|default:user_email }}{% endwith %}
-                    {% if request.user.avatar == '' %}
-                      <i class="fa-solid fa-user"></i>
-                    {% else %}
-                      <img alt="profile"
-                           class="img-avatar me-1 rounded-circle"
-                           src="{{ request.user.avatar.url }}" />
-                    {% endif %}
+    <!-- Start Navbar -->
+    <nav class="navbar is-dark" role="navigation" aria-label="main navigation">
+      <div class="navbar-brand">
+        <a class="navbar-item" href="{% url 'home' %}">Data Match</a>
+        <a role="button"
+           class="navbar-burger"
+           aria-label="menu"
+           aria-expanded="false"
+           data-target="navbarBasicExample">
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+        </a>
+      </div>
+      <div id="navbarBasicExample" class="navbar-menu">
+        <div class="navbar-start">
+          <a class="navbar-item" href="{% url 'help' %}">Help</a>
+          <div class="navbar-item has-dropdown is-hoverable">
+            <a class="navbar-link">More</a>
+            <div class="navbar-dropdown">
+              <a class="navbar-item">About</a>
+              <a class="navbar-item is-selected">Jobs</a>
+              <a class="navbar-item">Documentation</a>
+              <hr class="navbar-divider" />
+              <a class="navbar-item"
+                 href="https://github.com/hdandekar/data-compare/issues/new?assignees=hdandekar&labels=&projects=&template=bug_report.md&title=%5BBUG%5D">Report an issue</a>
+            </div>
+          </div>
+        </div>
+        <div class="navbar-end">
+          <div class="navbar-item">
+            {% if user.is_authenticated %}
+              <div class="navbar-item has-dropdown is-hoverable">
+                <a class="navbar-link">Go To</a>
+                <div class="navbar-dropdown is-right">
+                  <a class="navbar-item"href="{% url 'settings:connections' %}">{% translate "Connection" %}</a>
+                  <a class="navbar-item" href="{% url 'projects' %}">Projects</a>
+                  <a class="navbar-item">Components</a>
+                  <hr class="navbar-divider" />
+                  <div class="navbar-item">Version 1.0.2</div>
+                </div>
+              </div>
+              <div class="navbar-item has-dropdown is-hoverable">
+                <a class="navbar-link">
+                  {% with user_email=user.email %}{{ user.name|default:user_email }}{% endwith %}
+                  {% if request.user.avatar == '' %}
+                    <i class="fa-solid fa-user"></i>
+                  {% else %}
+                    <img alt="profile"
+                         class="img-avatar me-1 rounded-circle"
+                         src="{{ request.user.avatar.url }}" />
+                  {% endif %}
+                </a>
+                <div class="navbar-dropdown is-right">
+                  <a class="navbar-item" href="{% url 'users:detail' request.user.pk %}">{% translate "My Profile" %}</a>
+                  <a class="navbar-item">Components</a>
+                  <hr class="navbar-divider" />
+                  <!-- <a class="navbar-item" href="{% url 'account_logout' %}">{% translate "Sign Out" %}</a> -->
+                  <a class="navbar-item">
+                    <form method="post" action="{% url 'account_logout' %}">
+                      {% csrf_token %}
+                      {% if redirect_field_value %}
+                        <input type="hidden"
+                               name="{{ redirect_field_name }}"
+                               value="{{ redirect_field_value }}" />
+                      {% endif %}
+                      <button class="has-text-danger" type="submit">{% translate "Sign Out" %}</button>
+                    </form>
                   </a>
-                  <ul class="dropdown-menu" aria-labelledby="navbarAccountMenuLink">
-                    <li>
-                      <a class="dropdown-item" href="{% url 'users:detail' request.user.pk %}">{% translate "My Profile" %}</a>
-                    </li>
-                    <li>
-                      <a class="dropdown-item" href="#">Contact us</a>
-                    </li>
-                    <li>
-                      <a class="dropdown-item" href="{% url 'help' %}">Help</a>
-                    </li>
-                    <li>
-                      <a class="dropdown-item" href="{% url 'account_logout' %}">{% translate "Sign Out" %}</a>
-                    </li>
-                  </ul>
-                </li>
-              </ul>
+                </div>
+              </div>
             {% else %}
-              <ul class="navbar-nav ms-auto">
-                <li class="nav-item active">
-                  <a class="nav-link" href="{% url 'home' %}">Home <span class="visually-hidden">(current)</span></a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="{% url 'help' %}">Help</a>
-                </li>
-                {% if ACCOUNT_ALLOW_REGISTRATION %}
-                  <li class="nav-item">
-                    {# URL provided by django-allauth/account/urls.py #}
-                    <a id="sign-up-link" class="nav-link" href="{% url 'account_signup' %}">{% translate "Sign Up" %}</a>
-                  </li>
-                {% endif %}
-                <li class="nav-item">
-                  {# URL provided by django-allauth/account/urls.py #}
-                  <a id="log-in-link" class="nav-link" href="{% url 'account_login' %}">{% translate "Sign In" %}</a>
-                </li>
-              </ul>
+              <a class="button is-primary" href="{% url 'account_signup' %}">{% translate "Sign Up" %}</a>
+              <a class="button is-light" href="{% url 'account_login' %}">{% translate "Sign In" %}</a>
             {% endif %}
           </div>
         </div>
-      </nav>
-    </div>
-    <div class="container">
-      <div class="toast-container end-0">
-        <div id="toast"
-             class="toast text-white border-0"
-             role="alert"
-             aria-live="assertive"
-             aria-atomic="true">
-          <div class="d-flex">
-            <div id="toast-body" class="toast-body"></div>
-            <button type="button"
-                    class="btn-close btn-close-white me-2 m-auto"
-                    data-bs-dismiss="toast"
-                    aria-label="Close"></button>
-          </div>
-        </div>
       </div>
-      {% if messages %}
-        {% for message in messages %}
-          <div class="alert alert-dismissible {% if message.tags %}alert-{{ message.tags }}{% endif %} small">
-            {{ message }}
-            <button type="button"
-                    class="btn-close"
-                    data-bs-dismiss="alert"
-                    aria-label="Close"></button>
-          </div>
-        {% endfor %}
-      {% endif %}
-    </div>
-    <div class="container-fluid">
-      <div class="row px-3 pt-2 pb-3">
-        <div class="col-lg-12">
-          {% block content %}
-          {% endblock content %}
-        </div>
+    </nav>
+    <!-- End Navbar -->
+    <div class="container pt-2 pb-2" id="toast" hidden>
+      <div class="notification" id="notification">
+        <p id="server_message"></p>
+        <button class="delete"></button>
       </div>
     </div>
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-dismissible {% if message.tags %}alert-{{ message.tags }}{% endif %} small">
+          {{ message }}
+          <button type="button"
+                  class="btn-close"
+                  data-bs-dismiss="alert"
+                  aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+    <section class="section">
+      {% block content %}
+      {% endblock content %}
+    </section>
     {% block inline_javascript %}
       {% comment %}
     Script tags with only code, no src (defer by default). To run

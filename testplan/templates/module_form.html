@@ -1,5 +1,5 @@
 {% block content %}
-  <div class="container-fluid">
+  <div class="container">
     <form hx-post="{{ request.path }}"
           hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
           class="modal-content">

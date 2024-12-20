@@ -6,24 +6,21 @@
 {% block content %}
   {% load static %}
 
-  <div class="container-fluid">
-    <nav aria-label="breadcrumb">
-      <ol class="breadcrumb">
-        <li class="breadcrumb-item">
+  <div class="container">
+    <nav class="breadcrumb" aria-label="breadcrumbs">
+      <ul>
+        <li>
           <a href="#">Settings</a>
         </li>
-        <li class="breadcrumb-item active">Database Connections</li>
-        <li class="breadcrumb-item ">
-          <a class="text-success p-xl-1"
-             data-bs-title="Add New Connection"
-             data-bs-toggle="tooltip"
-             data-bs-placement="right"
-             hx-get="{% url 'settings:create_connection' %}"
-             hx-target="#dialog">
-            <i class="fa fa-solid fa-plus fa-xl" aria-hidden="true"></i>
+        <li>
+          <a href="#">Database Connections</a>
+        </li>
+        <li>
+          <a hx-get="{% url 'settings:create_connection' %}" hx-target="#dialog">
+            <i class="fa-solid fa-plus fa-lg has-text-success"></i>
           </a>
         </li>
-      </ol>
+      </ul>
     </nav>
     <div hx-trigger="load, listChanged from:body"
          hx-get="{% url 'settings:list_connection' 1 %}"
@@ -37,9 +34,9 @@
     </div>
   </div>
   <!-- Placeholder for the modal -->
-  <div id="modal" class="modal modal-lg fade">
+  <div id="modal" class="modal">
     <div id="dialog" class="modal-dialog" hx-target="this"></div>
   </div>
-  <script src="{% static 'js/toast.js' %}"></script>
-  <script src="{% static 'js/dialog.js' %}"></script>
+  <script src="{% static 'js1/toast.js' %}"></script>
+  <script src="{% static 'js1/dialog.js' %}"></script>
 {% endblock content %}
