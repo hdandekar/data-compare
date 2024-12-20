@@ -32,6 +32,7 @@
           <th>Database</th>
           <th>SQL</th>
         </tr>
+      </thead>
         <tbody>
           {% for tc in testcase_list %}
             <tr class="small">
@@ -59,7 +60,6 @@
             </tr>
           {% endfor %}
         </tbody>
-      </thead>
     </table>
     <!-- Pagination -->
     {% if page_obj.has_other_pages %}

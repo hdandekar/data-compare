@@ -8,6 +8,7 @@
   {% load testplan_extras %}
 
   <div class="container">
+
     <nav class="breadcrumb" aria-label="breadcrumbs">
       <ul>
         <li>
@@ -44,6 +45,7 @@
                 {% if item.testcase_run_status.status_value == "Failed" %}
                   <a class="smaller"
                      href="{% url 'execution_history' project.id item.testrun_testcase.testrun.id item.testrun_testcase.id item.id %}">
+
                     View
                   </a>
                 {% endif %}

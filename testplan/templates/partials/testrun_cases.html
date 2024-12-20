@@ -12,7 +12,7 @@
       <th class="has-text-left w-30">Log</th>
     </tr>
   </thead>
-  <tbody>
+  <tbody class="small">
     {% for item in most_recent_testcase_runs %}
       <tr class="{% tc_status_row_class item.most_recent_testcase_run.testcase_run_status.status_value %}">
         <td>

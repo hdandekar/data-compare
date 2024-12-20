@@ -851,7 +851,7 @@ def testrun_case_result_summary(request, project_id, testrun_id, testrun_case_id
                 "removed": removed_set,
                 "removed_data": removed_data,
                 "changed": changed_set,
-                "changed_data": changed_data,
+                "changed_data": changed_data,                
                 "test_case": test_case,
                 "testrun_testcase": testrun_testcase,
                 "project": project,
