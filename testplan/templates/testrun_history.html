@@ -1,28 +1,29 @@
 {% extends 'app_base.html' %}
 
 {% block title %}
-  {{ project.name }}/TestRun/TestCases/History
+  {{ project.name }}/ TestRun / TestCases / History
 {% endblock title %}
 {% block content %}
   {% load static %}
   {% load testplan_extras %}
 
   <div class="container">
-    <nav aria-label="breadcrumb">
-      <ol class="breadcrumb">
-        <li class="breadcrumb-item">
-          <a href="{% url 'projects' %}">{{ project.name }}</a>
+    <nav class="breadcrumb" aria-label="breadcrumbs">
+      <ul>
+        <li>
+          <a href="{% url 'projects' %}">{{ testrun.project.name }}</a>
         </li>
-        <li class="breadcrumb-item active">
+        <li>
           <a href="{% url 'detail_testrun' testrun.project.id testrun.id %}">{{ testrun.name }}</a>
         </li>
-        <li class="breadcrumb-item ">{{ testcase.tcname }} history</li>
-      </ol>
+        <li>
+          <p class="pl-2">{{ testcase.tcname }} History</p>
+        </li>
+      </ul>
     </nav>
     <div>
-      <table class="table table-bordered table-sm small"
-             aria-label="Execution History">
-        <thead class="thead-dark small text-center">
+      <table class="table" aria-label="Execution History">
+        <thead class="text-center">
           <tr>
             <th class="w-10" scope="col">Triggered By</th>
             <th class="w-5" scope="col">Status</th>
@@ -34,19 +35,20 @@
         </thead>
         <tbody>
           {% for item in testcase_run_history %}
-            <tr class="{% tc_status_row_class item.testcase_run_status.status_value %} small">
-              <td class="align-middle text-center">{{ item.triggered_by.email }}</td>
-              <td class="align-middle text-center">{{ item.testcase_run_status.status_value }}</td>
-              <td class="align-middle text-center">{{ item.execution_start|date:"d-M-y H:m:s T" }}</td>
-              <td class="align-middle text-center">{{ item.execution_end|date:"d-M-y H:m:s T" }}</td>
-              <td class="align-middle text-center">
+            <tr class="{% tc_status_row_class item.testcase_run_status.status_value %}">
+              <td class="smaller">{{ item.triggered_by.email }}</td>
+              <td class="smaller">{{ item.testcase_run_status.status_value }}</td>
+              <td class="smaller">{{ item.execution_start|date:"d-M-y H:m:s T" }}</td>
+              <td class="smaller">{{ item.execution_end|date:"d-M-y H:m:s T" }}</td>
+              <td>
                 {% if item.testcase_run_status.status_value == "Failed" %}
-                  <a href="{% url 'execution_history' project.id item.testrun_testcase.testrun.id item.testrun_testcase.id item.id %}">
+                  <a class="smaller"
+                     href="{% url 'execution_history' project.id item.testrun_testcase.testrun.id item.testrun_testcase.id item.id %}">
                     View
                   </a>
                 {% endif %}
               </td>
-              <td class="small">{{ item.comments }}</td>
+              <td class="smaller">{{ item.comments }}</td>
             </tr>
           {% endfor %}
         </tbody>

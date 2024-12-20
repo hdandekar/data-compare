@@ -1,5 +1,10 @@
 /* These styles are generated from project.scss. */
 
+
+html {
+  background-color: white;
+}
+
 body {
   margin: 0;
   font-family: montserrat, sans-serif;
@@ -8,7 +13,7 @@ body {
   line-height: var(--bs-body-line-height);
   color: var(--bs-body-color);
   text-align: var(--bs-body-text-align);
-  background-color: var(--bs-body-bg);
+  /* background-color: var(--bs-body-bg); */
   -webkit-tap-highlight-color: transparent;
   -moz-text-size-adjust: none !important;
   -webkit-text-size-adjust: none !important;
@@ -242,4 +247,63 @@ table td {
   --bs-table-hover-color: #000;
   color: var(--bs-table-color);
   border-color: var(--bs-table-border-color)
+}
+
+.is-width-70 {
+  width: 70% !important;
+}
+
+.is-width-50 {
+  width: 50% !important;
+}
+
+
+
+.stacked-progress {
+  background-color: #e9ecef;
+  line-height: 1rem;
+  max-height: 1rem;
+  font-size: .75rem;
+  border: 1px solid #ccc;
+  display: flex;
+  overflow: hidden;
+  text-align: center;
+  border-radius: 1rem;
+
+  .progress-bar {
+    border: none;
+    display: block;
+    height: 1rem;
+    line-height: 1rem;
+    color: #fff;
+    transition: width .6s ease;
+
+    &.is-light {
+      background-color: hsl(0, 0%, 96%);
+      color: rgba(0, 0, 0, 0.7);
+    }
+    &.is-success {
+      background-color: hsl(141, 71%, 48%);
+    }
+    &.is-warning {
+      background-color: hsl(48, 100%, 67%);
+      color: rgba(0, 0, 0, 0.7);
+    }
+    &.is-danger {
+      background-color: hsl(348, 100%, 61%);
+    }
+  }
+}
+
+.tabcontent {
+  display: none;
+}
+
+
+.tabcontent.is-active {
+  display: block;
+}
+
+.breadcrumb ul li a {
+  padding-bottom: 7px;
 }

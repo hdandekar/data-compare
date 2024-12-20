@@ -30,11 +30,12 @@ def project_index(request):
 
 class ProjectCreateView(LoginRequiredMixin, CreateView):
     model = Project
-    fields = ["name", "project_code", "description", "members", "owner"]
+    fields = ["name", "project_code", "description"]
     template_name = "project_form.html"
 
     def form_valid(self, form):
         project = form.save(commit=False)
+        project.owner = self.request.user
         project.created_by = self.request.user
         project.save()
         form.save_m2m()
@@ -58,7 +59,7 @@ class ProjectCreateView(LoginRequiredMixin, CreateView):
 
 class ProjectUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Project
-    fields = ["name", "project_code", "description", "members", "owner"]
+    fields = ["name", "project_code", "description"]
     template_name = "project_form.html"
 
     def form_valid(self, form):
@@ -126,7 +127,7 @@ class ProjectListView(LoginRequiredMixin, ListView):
         member_projects = (
             Project.objects.filter(members__id__exact=self.request.user.id).order_by("-owner").select_related("owner")
         )
-        paginator = Paginator(member_projects, per_page=20)
+        paginator = Paginator(member_projects, per_page=5)
         context["projects"] = paginator.get_page(page_num)
         return context
 
@@ -813,13 +814,11 @@ def testrun_history(request, project_id, testrun_id, testrun_testcase_id):
 
 @login_required
 def testrun_case_result_summary(request, project_id, testrun_id, testrun_case_id, testrun_case_history_id):
-    if TestRunTestCaseHistory.objects.filter(id=testrun_case_history_id).exists():
-        print("Came in if of testrun_case_result_summary")
-        project = Project.objects.get(id=project_id)
-        testrun = TestRun.objects.get(id=testrun_id)
-        testrun_testcase = TestRunTestCase.objects.get(id=testrun_case_id)
-        test_case = TestCase.objects.get(id=testrun_testcase.testcase_id)
-
+    project = Project.objects.get(id=project_id)
+    testrun = TestRun.objects.get(id=testrun_id)
+    testrun_testcase = TestRunTestCase.objects.get(id=testrun_case_id)
+    test_case = TestCase.objects.get(id=testrun_testcase.testcase_id)
+    if TestRunTestCaseHistory.objects.filter(testrun_testcase_id=testrun_case_id).exists():
         try:
             added_data = pd.read_csv(f"{testrun_case_history_id}_added.csv")
             added_set = added_data.to_numpy()
@@ -854,24 +853,22 @@ def testrun_case_result_summary(request, project_id, testrun_id, testrun_case_id
                 "changed": changed_set,
                 "changed_data": changed_data,
                 "test_case": test_case,
+                "testrun_testcase": testrun_testcase,
                 "project": project,
                 "testrun": testrun,
                 "testrun_testcase": testrun_testcase,
             },
         )
     else:
-        print("Came in else of testrun_case_result_summary")
-
         return render(
             request,
             "testrun_history_result.html",
-            {"message": "History Not Available"},
+            {
+                "message": "History Not Available",
+                "test_case": test_case,
+                "testrun_testcase": testrun_testcase,
+                "project": project,
+                "testrun": testrun,
+                "testrun_testcase": testrun_testcase,
+            },
         )
-
-
-def highlight_differences(self, value):
-    if "--->" in value:
-        color = "orange"
-    else:
-        color = "white"
-    return "color: %s" % color
