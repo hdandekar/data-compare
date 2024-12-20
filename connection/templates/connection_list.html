@@ -1,58 +1,46 @@
 {% block content %}
-  <table class="table table-striped table-bordered table-sm small table-fit"
-         aria-label="Connection List">
-    <thead class="thead-dark small">
+  <table class="table table-container is-striped is-narrow is-hoverable is-fullwidth">
+    <thead>
       <tr>
-        {% comment %} <th scope="col-1">ID</th> {% endcomment %}
-        <th scope="col-2" class="text-center">Connection Name</th>
-        <th scope="col-1" class="text-center">DB Type</th>
-        <th scope="col-2" class="text-center">Host Name</th>
-        <th scope="col-2" class="text-center">Database Name</th>
-        <th scope="col-1" class="text-center">Username</th>
-        <th scope="col-1" class="text-center">Port No</th>
-        <th scope="col-2" class="text-center">Created By</th>
+        <th></th>
+        <th>Connection Name</th>
+        <th>Database Type</th>
+        <th>Host Name</th>
+        <th>Database Name</th>
+        <th>UserID</th>
+        <th>Port No</th>
+        <th>Created By</th>
       </tr>
+      <tbody>
+        {% for conn in connections %}
+          <tr>
+            <td>
+              <a title="Edit"
+                 hx-get="{% url 'settings:edit_connection' conn.pk %}"
+                 hx-target="#dialog">
+                <i class="fa fa-pen-to-square fa-fw" aria-hidden="true"></i>
+              </a>
+              <a class="has-text-danger"
+                 title="Delete"
+                 hx-get="{% url 'settings:delete_connection' conn.pk %}"
+                 hx-target="#dialog">
+                <i class="fa fa-trash fa-fw" aria-hidden="true"></i>
+              </a>
+            </td>
+            <td>{{ conn.name }}</td>
+            <td>{{ conn.dbtype }}</td>
+            <td>{{ conn.hostname }}</td>
+            <td>{{ conn.dbname }}</td>
+            <td>{{ conn.username }}</td>
+            <td>{{ conn.portno }}</td>
+            <td data-toggle="tooltip"
+                title="{{ conn.created_by.name|default:conn.created_by.email }}">
+              {{ conn.created_by.name|default:conn.created_by|truncatechars:20 }}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
     </thead>
-    <tbody class="small table-group-divider align-middle">
-      {% for conn in connections %}
-        <tr>
-          {% comment %} <th scope="row">{{conn.pk}}</th> {% endcomment %}
-          <td class="col-2">
-            <a class="px-1 link-undecorate"
-               title="Edit"
-               data-bs-title="Edit Connection"
-               data-bs-toggle="tooltip"
-               data-bs-placement="left"
-               hx-get="{% url 'settings:edit_connection' conn.pk %}"
-               hx-target="#dialog">
-              <i class="fa fa-pen-to-square fa-fw fa-xs" aria-hidden="true"></i>
-            </a>
-            <a class="px-1 confirm-delete link-undecorate"
-               title="Delete"
-               data-bs-title="Delete Connection"
-               data-bs-toggle="tooltip"
-               data-bs-placement="right"
-               hx-get="{% url 'settings:delete_connection' conn.pk %}"
-               hx-target="#dialog">
-              <i class="fa fa-trash fa-fw fa-xs text-danger" aria-hidden="true"></i></a>
-            {{ conn.name }}
-          </td>
-          <td class="col-1">{{ conn.dbtype }}</td>
-          <td class="col-2">{{ conn.hostname }}</td>
-          <td class="col-2">{{ conn.dbname }}</td>
-          <td class="col-1">{{ conn.username }}</td>
-          {% comment %}
-          <td class="col-xs-1">{{conn.pk }}</td>
-          {% endcomment %}
-          <td class="col-1">{{ conn.portno }}</td>
-          <td class="col-2"
-              data-toggle="tooltip"
-              title="{{ conn.created_by.name|default:conn.created_by.email }}">
-            {{ conn.created_by.name|default:conn.created_by|truncatechars:20 }}
-          </td>
-        </tr>
-      {% endfor %}
-    </tbody>
   </table>
   <!-- Pagination -->
   {% if connections.has_other_pages %}

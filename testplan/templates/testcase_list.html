@@ -7,62 +7,59 @@
   {% load static %}
 
   <div class="container">
-    <nav aria-label="breadcrumb">
-      <ol class="breadcrumb">
-        <li class="breadcrumb-item">
+    <nav class="breadcrumb" aria-label="breadcrumbs">
+      <ul>
+        <li>
           <a href="{% url 'projects' %}">{{ project.name }}</a>
         </li>
-        <li class="breadcrumb-item active">Test Cases</li>
-        <li class="breadcrumb-item ">
-          <a class="text-success p-xl-1"
-             title="Add New Module"
-             data-toggle="tooltip"
-             data-bs-placement="right"
-             href="{% url 'create_testcase' project.id %}">
-            <i class="fa fa-solid fa-plus fa-xl" aria-hidden="true"></i>
+        <li>
+          <a href="#">Test Cases</a>
+        </li>
+        <li>
+          <a href="{% url 'create_testcase' project.id %}">
+            <i class="fa-solid fa-plus fa-lg has-text-success"></i>
           </a>
         </li>
-      </ol>
+      </ul>
     </nav>
-    <table class="table table-bordered table-sm small"
-           aria-label="Connection List">
-      <thead class="thead-dark small">
+    <table class="table is-narrow is-hoverable is-fullwidth">
+      <thead>
         <tr>
-          {% comment %} <th scope="col">ID</th> {% endcomment %}
-          <th scope="col" class="text-center">Test Case Title</th>
-          <th scope="col" class="text-center">Module</th>
-          <th scope="col" class="text-center">Key Columns</th>
-          <th scope="col" class="text-center">Database</th>
-          <th scope="col" class="text-center">SQL</th>
+          <th></th>
+          <th>Test Case Title</th>
+          <th>Module</th>
+          <th>Key Columns</th>
+          <th>Database</th>
+          <th>SQL</th>
         </tr>
-      </thead>
-      <tbody class="small">
-        {% for tc in testcase_list %}
-          <tr class="small">
-            <!-- This cell will take up
+        <tbody>
+          {% for tc in testcase_list %}
+            <tr class="small">
+              <!-- This cell will take up
                 space on two rows -->
-            <td rowspan="2" class="col-2 align-middle">
-              <a class="px-1 link-undecorate"
-                 title="Edit"
-                 href="{% url 'edit_testcase' project.id tc.id %}">
-                <i class="fa fa-pen-to-square fa-fw fa-xs"></i>
-              </a>
-              <a class="px-1 confirm-delete link-undecorate" title="Delete" href="#">
-                <i class="fa fa-trash fa-fw fa-xs text-danger"></i>
-              </a>
-              {{ tc.tcname }}
-            </td>
-            <td rowspan="2" class="col-1 align-middle">{{ tc.module.name }}</td>
-            <td rowspan="2" class="col-2 align-middle">{{ tc.keycolumns|truncatechars:50 }}</td>
-            <td class="col-1">{{ tc.sourcedb }}</td>
-            <td class="col-4">{{ tc.sourcesql|truncatechars:255 }}</td>
-          </tr>
-          <tr class="small">
-            <td class="col-1">{{ tc.targetdb }}</td>
-            <td class="col-4">{{ tc.targetsql|truncatechars:255 }}</td>
-          </tr>
-        {% endfor %}
-      </tbody>
+              <td rowspan="2">
+                <a class="has-text-success"
+                   title="Edit"
+                   href="{% url 'edit_testcase' project.id tc.id %}">
+                  <i class="fa fa-pen-to-square fa-fw fa-xs"></i>
+                </a>
+                <a class="has-text-danger" title="Delete" href="#">
+                  <i class="fa fa-trash fa-fw fa-xs text-danger"></i>
+                </a>
+              </td>
+              <td rowspan="2">{{ tc.tcname }}</td>
+              <td rowspan="2">{{ tc.module.name }}</td>
+              <td rowspan="2">{{ tc.keycolumns|truncatechars:50 }}</td>
+              <td class="col-1">{{ tc.sourcedb }}</td>
+              <td class="col-4">{{ tc.sourcesql|truncatechars:255 }}</td>
+            </tr>
+            <tr class="small">
+              <td class="col-1">{{ tc.targetdb }}</td>
+              <td class="col-4">{{ tc.targetsql|truncatechars:255 }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </thead>
     </table>
     <!-- Pagination -->
     {% if page_obj.has_other_pages %}

@@ -7,32 +7,27 @@
   {% load static %}
 
   <div class="container">
-    <nav aria-label="breadcrumb">
-      <ol class="breadcrumb">
-        <li class="breadcrumb-item">
+    <nav class="breadcrumb" aria-label="breadcrumbs">
+      <ul>
+        <li>
           <a href="{% url 'projects' %}">{{ project.name }}</a>
         </li>
-        <li class="breadcrumb-item active">Test Runs</li>
-        <li class="breadcrumb-item ">
-          <a class="text-success p-xl-1"
-             title="Add New Test Run"
-             data-toggle="tooltip"
-             data-bs-placement="right"
-             hx-get="{% url 'create_testrun' project.id %}"
-             hx-target="#dialog">
-            <i class="fa fa-solid fa-plus fa-xl" aria-hidden="true"></i>
+        <li>
+          <a href="#">Test Runs</a>
+        </li>
+        <li>
+          <a hx-get="{% url 'create_testrun' project.id %}" hx-target="#dialog">
+            <i class="fa-solid fa-plus fa-lg has-text-success"></i>
           </a>
         </li>
-      </ol>
+      </ul>
     </nav>
     <div hx-trigger="load, listChanged from:body"
          hx-get="{% url 'list_testruns' project.id %}"
          hx-target="this"
          id="testrun_items"></div>
   </div>
-  <div id="modal" class="modal modal-lg fade">
+  <div id="modal" class="modal">
     <div id="dialog" class="modal-dialog" hx-target="this"></div>
   </div>
-  <script src="{% static 'js/toast.js' %}"></script>
-  <script src="{% static 'js/dialog.js' %}"></script>
 {% endblock content %}

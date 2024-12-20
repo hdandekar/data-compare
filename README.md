@@ -23,3 +23,4 @@ The following details how to deploy this application.
 4. Run ```python manage.py migrate```
 5. Create a superuser using ```python manage.py createsuperuser```
 6. Launch the app using ```python manage.py runserver```
+7. Launch Celery using ```celery -A data_compare worker -l INFO```
