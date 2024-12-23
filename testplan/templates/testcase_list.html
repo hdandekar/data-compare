@@ -1,4 +1,4 @@
-{% extends 'app_base.html' %}
+{% extends "app_base.html" %}
 
 {% block title %}
   {{ project.name }} - TestCases
@@ -27,39 +27,37 @@
         <tr>
           <th></th>
           <th>Test Case Title</th>
-          <th>Module</th>
           <th>Key Columns</th>
           <th>Database</th>
           <th>SQL</th>
         </tr>
       </thead>
-        <tbody>
-          {% for tc in testcase_list %}
-            <tr class="small">
-              <!-- This cell will take up
+      <tbody>
+        {% for tc in testcase_list %}
+          <tr class="small">
+            <!-- This cell will take up
                 space on two rows -->
-              <td rowspan="2">
-                <a class="has-text-success"
-                   title="Edit"
-                   href="{% url 'edit_testcase' project.id tc.id %}">
-                  <i class="fa fa-pen-to-square fa-fw fa-xs"></i>
-                </a>
-                <a class="has-text-danger" title="Delete" href="#">
-                  <i class="fa fa-trash fa-fw fa-xs text-danger"></i>
-                </a>
-              </td>
-              <td rowspan="2">{{ tc.tcname }}</td>
-              <td rowspan="2">{{ tc.module.name }}</td>
-              <td rowspan="2">{{ tc.keycolumns|truncatechars:50 }}</td>
-              <td class="col-1">{{ tc.sourcedb }}</td>
-              <td class="col-4">{{ tc.sourcesql|truncatechars:255 }}</td>
-            </tr>
-            <tr class="small">
-              <td class="col-1">{{ tc.targetdb }}</td>
-              <td class="col-4">{{ tc.targetsql|truncatechars:255 }}</td>
-            </tr>
-          {% endfor %}
-        </tbody>
+            <td rowspan="2">
+              <a class="has-text-success"
+                 title="Edit"
+                 href="{% url 'edit_testcase' project.id tc.id %}">
+                <i class="fa fa-pen-to-square fa-fw fa-xs"></i>
+              </a>
+              <a class="has-text-danger" title="Delete" href="#">
+                <i class="fa fa-trash fa-fw fa-xs text-danger"></i>
+              </a>
+            </td>
+            <td rowspan="2">{{ tc.tcname }}</td>
+            <td rowspan="2">{{ tc.keycolumns|truncatechars:50 }}</td>
+            <td class="col-1">{{ tc.sourcedb }}</td>
+            <td class="col-4">{{ tc.sourcesql|truncatechars:255 }}</td>
+          </tr>
+          <tr class="small">
+            <td class="col-1">{{ tc.targetdb }}</td>
+            <td class="col-4">{{ tc.targetsql|truncatechars:255 }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
     </table>
     <!-- Pagination -->
     {% if page_obj.has_other_pages %}

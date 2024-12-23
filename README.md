@@ -1,6 +1,6 @@
-# Data-Match
+# DB-Diff-Insight
 
-Data Match is a Django App to compare data between 2 different data sources, it helps in identifying the differences between 2 datasets.
+DB-Diff-Insight is a Django App to compare data between 2 different data sources, it helps in identifying the differences between 2 datasets.
 
 License: MIT
 

@@ -15,7 +15,7 @@ from django.views.generic import CreateView, DeleteView, DetailView, ListView, U
 
 from connection.models import DbConnection
 from testplan import tasks
-from testplan.models import Module, Project, TestCase, TestRun, TestRunTestCase, TestRunTestCaseHistory
+from testplan.models import Project, TestCase, TestRun, TestRunTestCase, TestRunTestCaseHistory
 
 _404_Page = "404.html"
 
@@ -163,7 +163,7 @@ class ProjectDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
                     "HX-Trigger": json.dumps(
                         {
                             "listChanged": None,
-                            "showMessage": "'{}' cannot be deleted as it has {} dependent modules".format(
+                            "showMessage": "'{}' cannot be deleted as it has {} dependent records".format(
                                 project.name, len(e.args[1])
                             ),
                             "eventType": "deleted",
@@ -208,167 +208,9 @@ class ProjectDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
         return render(self.request, _404_Page)
 
 
-class ModuleCreateView(LoginRequiredMixin, CreateView):
-    model = Module
-    fields = [
-        "name",
-    ]
-    template_name = "module_form.html"
-
-    def form_valid(self, form):
-        module = form.save(commit=False)
-        module.created_by = self.request.user
-        module.project = Project.objects.get(id=self.kwargs["project_id"])
-        module.save()
-        return HttpResponse(
-            status=204,
-            headers={
-                "HX-Trigger": json.dumps(
-                    {
-                        "listChanged": None,
-                        "showMessage": f"New {module.name} added.",
-                        "eventType": "created",
-                    }
-                )
-            },
-        )
-
-    def form_invalid(self, form):
-        return self.render_to_response(self.get_context_data(form=form))
-
-
-class ModuleListView(LoginRequiredMixin, ListView):
-    model = Module
-    template_name = "module_list.html"
-    paginate_by = 20
-
-    def get_queryset(self):
-        project = get_object_or_404(Project, id=self.kwargs["project_id"])
-        return Module.objects.filter(project=project).order_by("-created_date")
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["project"] = Project.objects.get(id=self.kwargs["project_id"])
-        return context
-
-
-class ModuleUpdateView(LoginRequiredMixin, UpdateView):
-    model = Module
-    fields = [
-        "name",
-    ]
-    template_name = "module_form.html"
-
-    def form_valid(self, form):
-        module = form.save(commit=False)
-        module.modified_by = self.request.user
-        module.save()
-        return HttpResponse(
-            status=204,
-            headers={
-                "HX-Trigger": json.dumps(
-                    {
-                        "listChanged": None,
-                        "showMessage": f"'{module.name}' module updated.",
-                        "eventType": "updated",
-                    }
-                )
-            },
-        )
-
-    def form_invalid(self, form):
-        return self.render_to_response(self.get_context_data(form=form))
-
-    def get_success_message(self, cleaned_data):
-        name = cleaned_data["name"]
-        return self.success_message % dict(
-            {
-                "cleaned_data": cleaned_data,
-                "name": name,
-                "object_id": self.kwargs["module_id"],
-            }
-        )
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return context
-
-    def get_object(self, queryset=None):
-        if queryset is None:
-            queryset = self.get_queryset()
-        project_id = self.kwargs.get("project_id")
-        module_id = self.kwargs.get("module_id")
-        queryset = queryset.filter(project=project_id, id=module_id)
-        obj = queryset.get()
-        return obj
-
-
-class ModuleDeleteView(LoginRequiredMixin, DeleteView):
-    model = Module
-    template_name = "project_confirm_delete.html"
-
-    def get_object(self, queryset=None):
-        project = Module.objects.get(id=self.kwargs.get("module_id"))
-        return project
-
-    def post(self, *args, **kwargs):
-        project = self.get_object()
-        try:
-            self.get_object().delete()
-            return HttpResponse(
-                status=204,
-                headers={
-                    "HX-Trigger": json.dumps(
-                        {
-                            "listChanged": None,
-                            "showMessage": f"{project.name} deleted.",
-                            "eventType": "deleted",
-                        }
-                    )
-                },
-            )
-        except ProtectedError as e:
-            return HttpResponse(
-                status=204,
-                headers={
-                    "HX-Trigger": json.dumps(
-                        {
-                            "listChanged": None,
-                            "showMessage": "Cannot delete '{}' as there are {} modules".format(
-                                project.name, len(e.args[1])
-                            ),
-                            "eventType": "deleted",
-                        }
-                    )
-                },
-            )
-
-
-@login_required
-def module_delete(request, project_id, module_id):
-    module = Module.objects.get(id=module_id)
-
-    if request.method == "POST":
-        module.delete()
-        return HttpResponse(
-            status=204,
-            headers={
-                "HX-Trigger": json.dumps(
-                    {
-                        "listChanged": None,
-                        "showMessage": f"{module.name} deleted successfully",
-                        "eventType": "deleted",
-                    }
-                )
-            },
-        )
-
-    return render(request, "module_delete_confirm.html", {"module": module})
-
-
 class TestCaseCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = TestCase
-    fields = ["tcname", "module", "sourcedb", "sourcesql", "targetdb", "targetsql", "keycolumns"]
+    fields = ["tcname", "sourcedb", "sourcesql", "targetdb", "targetsql", "keycolumns"]
     template_name = "testcase_form.html"
 
     def form_valid(self, form):
@@ -385,7 +227,6 @@ class TestCaseCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["project"] = Project.objects.get(id=self.kwargs["project_id"])
-        context["modules"] = Module.objects.filter(project=self.kwargs["project_id"])
         context["db_connections"] = DbConnection.objects.all()
         return context
 
@@ -424,7 +265,7 @@ class TestCaseListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
 
 class TestCaseUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = TestCase
-    fields = ["tcname", "module", "sourcedb", "sourcesql", "targetdb", "targetsql", "keycolumns"]
+    fields = ["tcname", "sourcedb", "sourcesql", "targetdb", "targetsql", "keycolumns"]
     template_name = "testcase_form.html"
 
     def form_valid(self, form):
@@ -448,7 +289,6 @@ class TestCaseUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["db_connections"] = DbConnection.objects.all()
-        context["modules"] = Module.objects.filter(project=self.kwargs["project_id"])
         return context
 
     def test_func(self):
@@ -851,7 +691,7 @@ def testrun_case_result_summary(request, project_id, testrun_id, testrun_case_id
                 "removed": removed_set,
                 "removed_data": removed_data,
                 "changed": changed_set,
-                "changed_data": changed_data,                
+                "changed_data": changed_data,
                 "test_case": test_case,
                 "testrun_testcase": testrun_testcase,
                 "project": project,

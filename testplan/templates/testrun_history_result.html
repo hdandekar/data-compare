@@ -1,4 +1,4 @@
-{% extends 'app_base.html' %}
+{% extends "app_base.html" %}
 
 {% block title %}
   {{ project.name }}/TestRun/TestCases/History
@@ -54,7 +54,6 @@
                 {% for i in row %}
                   <td class="{% if '--->' in i %} has-text-white has-background-danger {% endif %}">{{ i }}</td>
                 {% endfor %}
-
               </tr>
             {% endfor %}
           </table>
@@ -111,7 +110,6 @@
           });
 
           var activeContent = document.querySelector('[data-content="' + tabId + '"]');
-          console.log("active_content is:", activeContent)
           if (activeContent) {
             activeContent.classList.add('is-active');
           }

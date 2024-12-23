@@ -6,7 +6,6 @@
       <tr>
         <th></th>
         <th class="has-text-left">Project Name</th>
-        <th class="has-text-centered">Modules</th>
         <th class="has-text-centered">Open Defects</th>
         <th class="has-text-centered">Test Runs</th>
         <th class="has-text-centered">Test Cases</th>
@@ -34,9 +33,6 @@
           </td>
           <td class="has-text-left">
             <a href="{% url 'project_details' project.id %}">{{ project.name }}</a>
-          </td>
-          <td class="has-text-centered">
-            {% with mod_total=project.modules.count %}{{ mod_total }} module{{ mod_total|pluralize }}{% endwith %}
           </td>
           <td class="has-text-centered">0</td>
           <td class="has-text-centered">

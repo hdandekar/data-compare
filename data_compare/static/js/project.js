@@ -6,7 +6,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const server_message = document.getElementById("server_message");
     // const toast = new bootstrap.Toast(toastElement, { delay: 10000 })
     htmx.on("showMessage", (e) => {
-        console.log("e is:", e)
         toast.removeAttribute("hidden");
         server_message.innerText = e.detail.value
     })
@@ -17,7 +16,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Change the toast class based on eventType
     htmx.on("eventType", (e) => {
-        console.log("eventType")
         if (['created', 'updated',].includes(e.detail.value)) {
             toastElement.classList.add("is-success");
         } else if (['deleted'].includes(e.detail.value)) {
@@ -49,7 +47,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // To close the toast messages
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("came in addEventListener")
     const button = document.querySelector('.notification .delete');
     button.addEventListener('click', () => {
         button.parentNode.parentElement.setAttribute("hidden","")
@@ -60,6 +57,30 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         })
     });
+});
+
+
+// document.addEventListener('DOMContentLoaded', () => {
+//     const button = document.querySelector('#msgClose');
+//     button.addEventListener('click', () => {
+//         button.remove();
+//     });
+// });
+
+// document.addEventListener('DOMContentLoaded', () => {
+//     const clsBtn = document.getElementById('msgClose');
+//     clsBtn.addEventListener('click', () => {
+//         cls.Btn.parentElement.remove();
+//     })
+// });
+
+document.addEventListener('DOMContentLoaded', () => {
+    const clsBtn = document.getElementById('msgClose');
+    if (clsBtn) {
+        clsBtn.addEventListener('click', () => {
+            clsBtn.parentElement.remove();
+        });
+    }
 });
 
 
