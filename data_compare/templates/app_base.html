@@ -86,7 +86,8 @@
                   {% endif %}
                 </a>
                 <div class="navbar-dropdown is-right">
-                  <a class="navbar-item" href="{% url 'users:user_detail' request.user.pk %}">{% translate "My Profile" %}</a>
+                  <a class="navbar-item"
+                     href="{% url 'users:user_detail' request.user.pk %}">{% translate "My Profile" %}</a>
                   <a class="navbar-item">Components</a>
                   <hr class="navbar-divider" />
                   <!-- <a class="navbar-item" href="{% url 'account_logout' %}">{% translate "Sign Out" %}</a> -->
@@ -121,7 +122,7 @@
     {% if messages %}
       {% for message in messages %}
         <div class="notification {% if message.tags %}is-{{ message.tags }}{% endif %} small">
-          {{ message }} 
+          {{ message }}
           <button class="delete" id="msgClose"></button>
         </div>
       {% endfor %}

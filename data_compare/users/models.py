@@ -32,7 +32,7 @@ class User(AbstractUser):
     avatar = ImageField(upload_to=user_profile_avatar_path, blank=True)
     website = URLField(blank=True)
     github_link = CharField(blank=True, max_length=50)
-    twitter_link = CharField(blank=True,  max_length=50)
+    twitter_link = CharField(blank=True, max_length=50)
     phoneNumberRegex = RegexValidator(regex=r"^\+?1?\d{8,15}$")
     mobile_number = CharField(validators=[phoneNumberRegex], max_length=16, unique=True, blank=True)
     address = CharField(blank=True, max_length=255)

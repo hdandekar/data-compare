@@ -1,85 +1,102 @@
 {% extends "account/base.html" %}
+
 {% load i18n %}
 {% load allauth account socialaccount %}
 {% load static %}
+
 {% block head_title %}
-    {% trans "Sign In" %}
+  {% trans "Sign In" %}
 {% endblock head_title %}
 {% block inner %}
   <div class="column is-4 is-offset-4">
-    <h3 class="title has-text-black">
-      {% trans "Sign In" %}
-    </h3>
+    <h3 class="title has-text-black">{% trans "Sign In" %}</h3>
     <hr class="login-hr" />
     {% if not SOCIALACCOUNT_ONLY %}
-        {% url 'account_login' as login_url %}
-        <div class="box">
-          {% if form.non_field_errors %}
-            {% for error in form.non_field_errors %}
-              <div class="has-text-danger has-text-justified" role="alert">{{ error }}</div>
-            {% endfor %}
-          {% endif %}
-          <form method="post" action="{% url 'account_login' %}" class="pb-4">
-            {% csrf_token %}
-              <div class="field">
-                <div class="control">
-                  <input id="id_login" name="login" required class="input is-normal" type="email" placeholder="Your Email" autofocus=""/>
-                </div>
-              </div>
-              <div class="field">
-                <div class="control">
-                  <input id="id_password" name="password" required class="input is-normal" type="password" placeholder="Your Password"/>
-                </div>
-                <p class="has-text-right is-size-7 pt-2 pb-2"><a href="{% url 'account_reset_password' %}">Forgot Your Password?</a></p>
-              </div>
-              <div class="field">
-                <label for="id_remember" class="checkbox">
-                  <input type="checkbox" name="remember" id="id_remember" />
-                  Remember Me:
-                </label>
-              </div>
-              <button class="button is-block is-info is-normal is-fullwidth" type="submit">Sign In</button>
-          </form>
-          <div class="is-fullwidth is-block">
-            <p>New to Data-Compare? <a href="{% url 'account_signup' %}">Sign Up</a></p>
+      {% url 'account_login' as login_url %}
+      <div class="box">
+        {% if form.non_field_errors %}
+          {% for error in form.non_field_errors %}
+            <div class="has-text-danger has-text-justified" role="alert">{{ error }}</div>
+          {% endfor %}
+        {% endif %}
+        <form method="post" action="{% url 'account_login' %}" class="pb-4">
+          {% csrf_token %}
+          <div class="field">
+            <div class="control">
+              <input id="id_login"
+                     name="login"
+                     required
+                     class="input is-normal"
+                     type="email"
+                     placeholder="Your Email"
+                     autofocus="" />
+            </div>
           </div>
+          <div class="field">
+            <div class="control">
+              <input id="id_password"
+                     name="password"
+                     required
+                     class="input is-normal"
+                     type="password"
+                     placeholder="Your Password" />
+            </div>
+            <p class="has-text-right is-size-7 pt-2 pb-2">
+              <a href="{% url 'account_reset_password' %}">Forgot Your Password?</a>
+            </p>
+          </div>
+          <div class="field">
+            <label for="id_remember" class="checkbox">
+              <input type="checkbox" name="remember" id="id_remember" />
+              Remember Me:
+            </label>
+          </div>
+          <button class="button is-block is-info is-normal is-fullwidth" type="submit">Sign In</button>
+        </form>
+        <div class="is-fullwidth is-block">
+          <p>
+            New to Data-Compare? <a href="{% url 'account_signup' %}">Sign Up</a>
+          </p>
         </div>
+      </div>
     {% endif %}
     {% if LOGIN_BY_CODE_ENABLED or PASSKEY_LOGIN_ENABLED %}
-        {% element hr %}
-        {% endelement %}
-        {% element button_group vertical=True %}
-            {% if PASSKEY_LOGIN_ENABLED %}
-                {% element button type="submit" form="mfa_login" id="passkey_login" tags="prominent,login,outline,primary" %}
-                    {% trans "Sign in with a passkey" %}
-                {% endelement %}
-            {% endif %}
-            {% if LOGIN_BY_CODE_ENABLED %}
-                {% element button href=request_login_code_url tags="prominent,login,outline,primary" %}
-                    {% trans "Mail me a sign-in code" %}
-                {% endelement %}
-            {% endif %}
-        {% endelement %}
-    {% endif %}
-    {% if SOCIALACCOUNT_ENABLED %}
-    <div class="box">
-      <div class="is-fullwidth">Or continue with</div>
-      <hr class="login-hr" />
-      <div class="buttons is-centered">
-          <a href="{% provider_login_url 'google' %}">
-            <img alt="Google Signin" src="{% static 'images/google_signin.png' %}" />
-          </a>
-        <a href="{% provider_login_url 'microsoft' %}">
-          <img alt="Microsoft Signin" src="{% static 'images/ms_signing.png' %}" class="w-40" />
-        </a>
-      </div>
+      {% element hr %}
+    {% endelement %}
+    {% element button_group vertical=True %}
+    {% if PASSKEY_LOGIN_ENABLED %}
+      {% element button type="submit" form="mfa_login" id="passkey_login" tags="prominent,login,outline,primary" %}
+      {% trans "Sign in with a passkey" %}
+    {% endelement %}
+  {% endif %}
+  {% if LOGIN_BY_CODE_ENABLED %}
+    {% element button href=request_login_code_url tags="prominent,login,outline,primary" %}
+    {% trans "Mail me a sign-in code" %}
+  {% endelement %}
+{% endif %}
+{% endelement %}
+{% endif %}
+{% if SOCIALACCOUNT_ENABLED %}
+  <div class="box">
+    <div class="is-fullwidth">Or continue with</div>
+    <hr class="login-hr" />
+    <div class="buttons is-centered">
+      <a href="{% provider_login_url 'google' %}">
+        <img alt="Google Signin" src="{% static 'images/google_signin.png' %}" />
+      </a>
+      <a href="{% provider_login_url 'microsoft' %}">
+        <img alt="Microsoft Signin"
+             src="{% static 'images/ms_signing.png' %}"
+             class="w-40" />
+      </a>
     </div>
-    {% endif %}
   </div>
+{% endif %}
+</div>
 {% endblock inner %}
 {% block extra_body %}
-    {{ block.super }}
-    {% if PASSKEY_LOGIN_ENABLED %}
-        {% include "mfa/webauthn/snippets/login_script.html" with button_id="passkey_login" %}
-    {% endif %}
+  {{ block.super }}
+  {% if PASSKEY_LOGIN_ENABLED %}
+    {% include "mfa/webauthn/snippets/login_script.html" with button_id="passkey_login" %}
+  {% endif %}
 {% endblock extra_body %}

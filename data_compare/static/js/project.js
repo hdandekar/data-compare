@@ -74,13 +74,13 @@ document.addEventListener('DOMContentLoaded', () => {
 //     })
 // });
 
-document.addEventListener('DOMContentLoaded', () => { 
-    const clsBtn = document.getElementById('msgClose'); 
-    if (clsBtn) { 
-        clsBtn.addEventListener('click', () => { 
-            clsBtn.parentElement.remove(); 
-        }); 
-    } 
+document.addEventListener('DOMContentLoaded', () => {
+    const clsBtn = document.getElementById('msgClose');
+    if (clsBtn) {
+        clsBtn.addEventListener('click', () => {
+            clsBtn.parentElement.remove();
+        });
+    }
 });
 
 

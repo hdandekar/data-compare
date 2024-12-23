@@ -1,4 +1,4 @@
-{% extends 'app_base.html' %}
+{% extends "app_base.html" %}
 
 {% block title %}
   {{ project.name }}
@@ -12,7 +12,6 @@
         <li>
           <a href="{% url 'projects' %}">{{ project.name }}</a>
         </li>
-      
       </ul>
     </nav>
   </div>

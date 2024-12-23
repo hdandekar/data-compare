@@ -26,10 +26,7 @@
             <div class="field">
               <label for="id_dbtype" class="label">Database Type</label>
               <div class="select is-fullwidth">
-                <select name="dbtype"
-                        class="select"
-                        id="id_dbtype"
-                        required >
+                <select name="dbtype" class="select" id="id_dbtype" required>
                   <option value="{{ connection.dbtype.id }}" selected>{{ connection.dbtype.dbname }}</option>
                   {% for item in dbtypes %}<option value="{{ item.id }}">{{ item.dbname }}</option>{% endfor %}
                 </select>
@@ -142,5 +139,4 @@
 </div>
 {% endblock content %}
 {% block inline_javascript %}
-
 {% endblock inline_javascript %}
