@@ -1,76 +1,101 @@
 {% extends "account/base.html" %}
 
-{% load i18n %}
-{% load crispy_forms_tags %}
+{% load i18n allauth socialaccount static %}
 
 {% block head_title %}
   {% translate "Signup" %}
 {% endblock head_title %}
 {% block inner %}
-  <h5>{% translate "Sign Up" %}</h5>
-  <p>
-    {% blocktranslate %}Already have an account, please <a href="{{ login_url }}">Login</a> here.{% endblocktranslate %}
-  </p>
-  <form class="signup"
-        id="signup_form"
-        method="post"
-        action="{% url 'account_signup' %}">
-    {% csrf_token %}
-    <!-- {{ form|crispy }} -->
-    <div id="div_id_email" class="mb-3">
-      <label for="id_email" class="form-label requiredField">
-        Email
-        <span class="asteriskField">*</span>
-      </label>
-      <input type="email"
-             name="email"
-             placeholder="Email address"
-             autocomplete="email"
-             maxlength="320"
-             class="textinput form-control form-control-sm"
-             required=""
-             id="id_email"
-             hx-post="{% url 'users:check-username' %}"
-             hx-swap="outerhtml"
-             hx-trigger="change"
-             hx-target="#username-error" />
-      {{ form.email.errors }}
-      <div id="username-error"></div>
-    </div>
-    <div id="div_id_password1" class="mb-3">
-      <label for="id_password1" class="form-label requiredField">
-        Password
-        <span class="asteriskField">*</span>
-      </label>
-      <input type="password"
-             name="password1"
-             placeholder="Password"
-             autocomplete="new-password"
-             class="passwordinput form-control form-control-sm"
-             required=""
-             aria-describedby="id_password1_helptext"
-             id="id_password1" />
-      {{ form.password1.errors }}
-    </div>
-    <div id="div_id_password2" class="mb-3">
-      <label for="id_password2" class="form-label requiredField">
-        Password (again)
-        <span class="asteriskField">*</span>
-      </label>
-      <input type="password"
-             name="password2"
-             placeholder="Password (again)"
-             autocomplete="new-password"
-             class="passwordinput form-control form-control-sm"
-             required=""
-             id="id_password2" />
-      {{ form.password2.errors }}
-    </div>
-    {% if redirect_field_value %}
-      <input type="hidden"
-             name="{{ redirect_field_name }}"
-             value="{{ redirect_field_value }}" />
+  <div class="column is-4 is-offset-4">
+    <h3 class="title has-text-black">
+      {% trans "Sign Up" %}
+    </h3>
+    <div class="box">
+      {% if not SOCIALACCOUNT_ONLY %}
+        {% if form.non_field_errors %}
+          {% for error in form.non_field_errors %}
+            <div class="has-text-danger has-text-justified" role="alert">{{ error }}</div>
+          {% endfor %}
+        {% endif %}
+        <form class="pb-4" method="post" action="{% url 'account_signup' %}">
+          {% csrf_token %}
+
+          <div class="field">
+            <div class="control">
+              <input 
+              class="input" type="email" name="email" 
+              placeholder="Email address" 
+              autocomplete="email" maxlength="320" 
+              required 
+              id="id_email"
+              hx-post="{% url 'users:check-username' %}"
+              hx-swap="outerhtml"
+              hx-trigger="change"
+              hx-target="#username-error"/>
+              {% for error in form.email.errors %}
+                <p class="has-text-danger smaller has-text-left">{{ error }}</p>
+              {% endfor %}
+            </div>
+            <div id="username-error"></div>
+          </div>
+          <div class="field">
+            <div class="helptext has-text-left content"  id="id_password1_helptext">
+              <ul class="is-size-7">
+                <li>Your password can’t be too similar to your other personal information.</li>
+                <li>Your password must contain at least 8 characters.</li>
+                <li>Your password can’t be a commonly used password.</li>
+                <li>Your password can’t be entirely numeric.</li>
+              </ul>
+            </div>
+            <div class="control">
+              <input class="input is-normal" type="password" name="password1" placeholder="New Password" autocomplete="new-password" required="" aria-describedby="id_password1_helptext" id="id_password1" />
+              {% for error in form.password1.errors %}
+                <p class="has-text-danger smaller has-text-left">{{ error }}</p>
+              {% endfor %}
+            </div>
+          </div>
+          <div class="field">
+            <div class="control">
+              <input class="input is-normal" type="password" name="password2" placeholder="New Password (again)" autocomplete="new-password" required="" id="id_password2" />
+              <ul class="has-text-left">
+              {% for error in form.password2.errors %}
+                <p class="has-text-danger smaller has-text-left">{{ error }}</p>
+              {% endfor %}
+              </ul>
+            </div>
+          </div>
+          {% if redirect_field_value %}
+            <input type="hidden"
+                  name="{{ redirect_field_name }}"
+                  value="{{ redirect_field_value }}" />
+          {% endif %}
+          <button class="button is-block is-info is-normal is-fullwidth" type="submit">{% trans "Sign Up" %}</button>
+        </form>
+        <div class="is-fullwidth is-block">
+          <p>New to Data-Compare? <a href="{% url 'account_login' %}">Sign Up</a></p>
+        </div>
+      {% endif %}
+      {% if PASSKEY_SIGNUP_ENABLED %}
+          {% element hr %}
+          {% endelement %}
+          {% element button href=signup_by_passkey_url tags="prominent,signup,outline,primary" %}
+              {% trans "Sign up using a passkey" %}
+          {% endelement %}
+      {% endif %}
+      </div>
+    {% if SOCIALACCOUNT_ENABLED %}
+      <div class="box">
+        <div class="is-fullwidth">Or continue with</div>
+        <hr class="login-hr" />
+        <div class="buttons is-centered">
+            <a href="{% provider_login_url 'google' %}">
+              <img alt="Google Signin" src="{% static 'images/google_signin.png' %}" />
+            </a>
+          <a href="{% provider_login_url 'microsoft' %}">
+            <img alt="Microsoft Signin" src="{% static 'images/ms_signing.png' %}" class="w-40" />
+          </a>
+        </div>
+      </div>
     {% endif %}
-    <button class="btn btn-primary btn-sm" type="submit">{% translate "Sign Up" %}</button>
-  </form>
+  </div>
 {% endblock inner %}

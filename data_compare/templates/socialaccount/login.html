@@ -1,0 +1,37 @@
+{% extends "account/base.html" %}
+
+{% load i18n %}
+{% load allauth static %}
+{% block head_title %}
+    {% trans "Sign In" %}
+{% endblock head_title %}
+{% block inner %}
+<div class="column is-4 is-offset-4">
+    {% if process == "connect" %}
+        {% element h1 %}
+            {% blocktrans with provider.name as provider %}Connect {{ provider }}{% endblocktrans %}
+        {% endelement %}
+        {% element p %}
+            {% blocktrans with provider.name as provider %}You are about to connect a new third-party account from {{ provider }}.{% endblocktrans %}
+        {% endelement %}
+    {% else %}
+    <h5 class="subtitle has-text-black">
+        {% blocktrans with provider.name as provider %}Sign In Via {{ provider }}{% endblocktrans %}
+    </h5>
+    <hr class="login-hr" />
+    <p class="is-size-6 has-text-black">
+        {% blocktrans with provider.name as provider %}
+            You are about to sign in using a third-party account from.{% endblocktrans %}
+        <img src="{{ STATIC_URL }}images/{{ provider }}.png" alt={{ provider }} />
+    </p>
+    {% endif %}
+    {% element form method="post" no_visible_fields=True %}
+        {% slot actions %}
+            {% csrf_token %}
+            <button type="submit" class="button is-primary">
+                {% trans "Continue" %}
+            </button>
+        {% endslot %}
+    {% endelement %}
+</div>
+{% endblock inner %}

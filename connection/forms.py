@@ -14,6 +14,5 @@ class ConnectionForm(forms.ModelForm):
             "username",
             "password",
             "portno",
-            "warehouse_name",
             "schema_name",
         ]

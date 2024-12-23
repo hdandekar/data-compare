@@ -12,26 +12,9 @@
         <li>
           <a href="{% url 'projects' %}">{{ project.name }}</a>
         </li>
-        <li>
-          <a href="#">Modules</a>
-        </li>
-        <li>
-          <a href="#">
-            <i class="fa-solid fa-plus fa-lg has-text-success"></i>
-          </a>
-        </li>
+      
       </ul>
     </nav>
-    <div hx-trigger="load, listChanged from:body"
-         hx-get="{% url 'list_module' project.id 1 %}"
-         hx-target="this"
-         id="module_items">
-      <tr class="text-center">
-        <td class="spinner-border" role="button">
-          <span class="visually-hidden text-center">Loading...</span>
-        </td>
-      </tr>
-    </div>
   </div>
   <!-- Placeholder for the modal -->
   <div id="modal" class="modal modal-lg fade">

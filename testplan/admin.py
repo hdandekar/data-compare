@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Module, Project, TestCase, TestCaseStatus
+from .models import Project, TestCase, TestCaseStatus
 
 
 @admin.register(Project)
@@ -21,17 +21,11 @@ class ProjectAdmin(admin.ModelAdmin):
         return [project.email for project in obj.members.all()]
 
 
-@admin.register(Module)
-class ModuleAdmin(admin.ModelAdmin):
-    list_display = ["project", "name", "created_date", "updated_date", "created_by", "modified_by"]
-
-
 @admin.register(TestCase)
 class TestCaseAdmin(admin.ModelAdmin):
     list_display = [
         "tcname",
         "project",
-        "module",
         "sourcedb",
         "sourcesql",
         "targetdb",

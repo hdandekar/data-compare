@@ -58,14 +58,14 @@ def check_username(request):
     email = request.POST.get("email")
     login_url = reverse("account_login")
     email_registered_response = """
-                <div class='smaller text-danger-emphasis' id='username-error'>
+                <div class='smaller text-danger-emphasis has-text-left' id='username-error'>
                     This email address is already registered, please
                     <a xlass='small' href='{url}'>Login</a>
                 </div>""".format(
         url=login_url
     )
     email_absent_response = """
-                <div class='smaller text-success' id='username-error'>
+                <div class='smaller has-text-success has-text-left' id='username-error'>
                     This email address is not registered yet,
                 </div>""".format()
     if get_user_model().objects.filter(email=email).exists():

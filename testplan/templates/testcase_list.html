@@ -27,7 +27,6 @@
         <tr>
           <th></th>
           <th>Test Case Title</th>
-          <th>Module</th>
           <th>Key Columns</th>
           <th>Database</th>
           <th>SQL</th>
@@ -49,7 +48,6 @@
                 </a>
               </td>
               <td rowspan="2">{{ tc.tcname }}</td>
-              <td rowspan="2">{{ tc.module.name }}</td>
               <td rowspan="2">{{ tc.keycolumns|truncatechars:50 }}</td>
               <td class="col-1">{{ tc.sourcedb }}</td>
               <td class="col-4">{{ tc.sourcesql|truncatechars:255 }}</td>

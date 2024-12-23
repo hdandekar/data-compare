@@ -1,0 +1,22 @@
+{% extends "account/base.html" %}
+
+{% load i18n %}
+{% load allauth static %}
+{% block head_title %}
+    {% trans "Sign In" %}
+{% endblock head_title %}
+{% block inner %}
+    <div class="column is-6 is-offset-3">
+        <h3 class="title has-text-black">
+            {% trans "Login Cancelled" %}
+        </h3>
+        <p class="has-text-justified">
+            {% url 'account_login' as login_url %}
+            {% blocktrans %}
+                You decided to cancel logging in to our site using one of your existing accounts. 
+                If this was a mistake, please proceed to 
+                <a href="{{ login_url }}">sign in</a>.
+            {% endblocktrans %}
+        </p>
+    </div>
+{% endblock inner %}

@@ -73,19 +73,6 @@
       </div>
     </div>
     <div class="columns">
-      <div class="column is-4">
-        <div class="field">
-          <label class="label" for="id_module">Module name</label>
-          <div class="select is-fullwidth">
-            <select name="module" required="" id="id_module" class="select">
-              {% for module in modules %}
-                <option value="{{ module.id }}"
-                        {% if module.id == testcase.module.id %}selected{% endif %}>{{ module.name }}</option>
-              {% endfor %}
-            </select>
-          </div>
-        </div>
-      </div>
       <div class="column">
         <div class="field">
           <label class="label" for="id_keycolumns">

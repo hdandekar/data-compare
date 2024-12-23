@@ -29,8 +29,7 @@
                 <select name="dbtype"
                         class="select"
                         id="id_dbtype"
-                        required
-                        onChange="check_db_type()">
+                        required >
                   <option value="{{ connection.dbtype.id }}" selected>{{ connection.dbtype.dbname }}</option>
                   {% for item in dbtypes %}<option value="{{ item.id }}">{{ item.dbname }}</option>{% endfor %}
                 </select>
@@ -143,24 +142,5 @@
 </div>
 {% endblock content %}
 {% block inline_javascript %}
-  <script type="text/javascript">
-    function check_db_type() {
-      let dbType = document.getElementById('id_dbtype');
-      console.log(dbType.selectedOptions[0].innerHTML.toLowerCase())
-      let isRDBMS = ['postgres', 'mssql', 'mysql'].includes(dbType.selectedOptions[0].innerHTML.toLowerCase())
-      if (dbType.selectedOptions[0].innerHTML.toLowerCase() === 'snowflake') {
-        console.log("Snowflake selected");
-        document.getElementById('snowflake_details').removeAttribute("hidden");
-        document.getElementById('id_hostname').removeAttribute("required", "true");
-        document.getElementById('id_portno').removeAttribute("required", "true");
-        document.getElementById('id_schema_name').removeAttribute("required", "true");
-        document.getElementById('id_warehouse_name').setAttribute("required", "true");
-        document.getElementById('id_sf_account_name').setAttribute("required", "true");
-      } else if (isRDBMS) {
-        console.log("RDBMS selected");
-      } else {
-        console.log("Something Else selected");
-      }
-    }
-  </script>
+
 {% endblock inline_javascript %}
