@@ -14,7 +14,7 @@ urlpatterns = [
     path("users/", include("data_compare.users.urls", namespace="users")),
     path("accounts/", include("allauth.urls")),
     # App Urls
-    path("settings/", include("connection.urls"), name="connection"),
+    path("project/", include("project.urls"), name="project"),
     path("", include("testplan.urls"), name="project"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

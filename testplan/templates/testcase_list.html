@@ -34,7 +34,7 @@
       </thead>
       <tbody>
         {% for tc in testcase_list %}
-          <tr class="small">
+          <tr class="is-size-6">
             <!-- This cell will take up
                 space on two rows -->
             <td rowspan="2">
@@ -52,7 +52,7 @@
             <td class="col-1">{{ tc.sourcedb }}</td>
             <td class="col-4">{{ tc.sourcesql|truncatechars:255 }}</td>
           </tr>
-          <tr class="small">
+          <tr>
             <td class="col-1">{{ tc.targetdb }}</td>
             <td class="col-4">{{ tc.targetsql|truncatechars:255 }}</td>
           </tr>

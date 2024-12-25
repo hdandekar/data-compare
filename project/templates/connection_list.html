@@ -1,28 +1,26 @@
 {% block content %}
-  <table class="table table-container is-striped is-narrow is-hoverable is-fullwidth">
+  <table class="table smaller is-striped is-narrow is-hoverable is-fullwidth">
     <thead>
       <tr>
         <th></th>
-        <th>Connection Name</th>
-        <th>Database Type</th>
-        <th>Host Name</th>
-        <th>Database Name</th>
-        <th>UserID</th>
-        <th>Port No</th>
-        <th>Created By</th>
+        <th class="has-text-centered">Name</th>
+        <th class="has-text-centered">Type</th>
+        <th class="has-text-centered">Host</th>
+        <th class="has-text-centered">DB Name</th>
+        <th class="has-text-centered">UserID</th>
       </tr>
       <tbody>
         {% for conn in connections %}
           <tr>
             <td>
               <a title="Edit"
-                 hx-get="{% url 'settings:edit_connection' conn.pk %}"
+                 hx-get="{% url 'edit_connection' project.id conn.pk %}"
                  hx-target="#dialog">
                 <i class="fa fa-pen-to-square fa-fw" aria-hidden="true"></i>
               </a>
               <a class="has-text-danger"
                  title="Delete"
-                 hx-get="{% url 'settings:delete_connection' conn.pk %}"
+                 hx-get="{% url 'delete_connection' project.id conn.pk %}"
                  hx-target="#dialog">
                 <i class="fa fa-trash fa-fw" aria-hidden="true"></i>
               </a>
@@ -32,11 +30,6 @@
             <td>{{ conn.hostname }}</td>
             <td>{{ conn.dbname }}</td>
             <td>{{ conn.username }}</td>
-            <td>{{ conn.portno }}</td>
-            <td data-toggle="tooltip"
-                title="{{ conn.created_by.name|default:conn.created_by.email }}">
-              {{ conn.created_by.name|default:conn.created_by|truncatechars:20 }}
-            </td>
           </tr>
         {% endfor %}
       </tbody>
@@ -49,7 +42,7 @@
         {% if connections.has_previous %}
           <li>
             <a class="page-link"
-               hx-get="{% url 'settings:list_connection' connections.previous_page_number %}"
+               hx-get="{% url 'list_connection' project.id connections.previous_page_number %}"
                hx-target="#connection_items"
                hx-swap="outerhtml"><i class="fa-solid fa-angles-left"></i></a>
           </li>
@@ -70,7 +63,7 @@
               <li class="page-item">
                 {% with pg_no=i %}
                   <a class="page-link"
-                     hx-get="{% url 'settings:list_connection' pg_no %}"
+                     hx-get="{% url 'list_connection' project.id pg_no %}"
                      hx-target="#connection_items"
                      hx-swap="outerhtml">{{ i }}</a>
                 {% endwith %}
@@ -81,7 +74,7 @@
         {% if connections.has_next %}
           <li>
             <a class="page-link"
-               hx-get="{% url 'settings:list_connection' connections.next_page_number %}"
+               hx-get="{% url 'list_connection' project.id connections.next_page_number %}"
                hx-target="#connection_items"
                hx-swap="outerhtml"><i class="fa-solid fa-angles-right"></i></a>
           </li>

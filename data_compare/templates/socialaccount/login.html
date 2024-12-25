@@ -1,3 +1,4 @@
+{# djlint:off H025 #}
 {% extends "account/base.html" %}
 
 {% load i18n %}
@@ -30,7 +31,7 @@
 {% element form method="post" no_visible_fields=True %}
 {% slot actions %}
 {% csrf_token %}
-<button class="button is-block is-info is-normal is-fullwidth" type="submit">{% trans "Continue" %}</button>
+<button class="button is-block is-info is-normal is-fullwidth" type="submit">{% trans 'Continue' %}</button>
 {% endslot %}
 {% endelement %}
 </div>

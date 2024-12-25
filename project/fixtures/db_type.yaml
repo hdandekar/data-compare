@@ -1,0 +1,8 @@
+- model: project.DbType
+  pk: 1
+  fields:
+    dbname: 'PostgreSQL'
+- model: project.dbtype
+  pk: 2
+  fields:
+    dbname: 'MySQL'

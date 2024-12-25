@@ -62,7 +62,6 @@ DJANGO_APPS = [
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
-    "django.contrib.sites",
     "django.contrib.messages",
     "django.contrib.staticfiles",
     # "django.contrib.humanize", # Handy template tags
@@ -81,7 +80,7 @@ THIRD_PARTY_APPS = [
 LOCAL_APPS = [
     "data_compare.users",
     # Your stuff: custom apps go here
-    "connection",
+    "project",
     "testplan",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps

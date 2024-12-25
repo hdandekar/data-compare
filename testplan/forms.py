@@ -9,7 +9,6 @@ class TestRunForm(forms.ModelForm):
         fields = ("testcases", "project", "name")
 
     def __init__(self, *args, **kwargs):
-        print("kwargs:", kwargs)
         proj_id = kwargs["project"]
         self.request = kwargs.pop("project")
         super().__init__(*args, **kwargs)

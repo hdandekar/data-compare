@@ -98,7 +98,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
             else {
-                console.error('Modal background not found after swap.');
+                modal.classList.add('is-active');
+                // console.error('Modal background not found after swap.');
             }
         }
     });
