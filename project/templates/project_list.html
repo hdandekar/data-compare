@@ -19,9 +19,7 @@
         <tr>
           <td>
             {% if request.user.id == project.owner.id %}
-              <a title="Edit"
-                 hx-get="{% url 'edit_project' project.id %}"
-                 hx-target="#dialog">
+              <a title="Edit" href="{% url 'project_details' project.id %}">
                 <i class="fa fa-pen-to-square fa-fw" aria-hidden="true"></i>
               </a>
               <a class="has-text-danger"
@@ -47,7 +45,8 @@
           </td>
           <td class="has-text-centered"></td>
           <td class="has-text-centered">
-            <a class="project-name" href="{% url 'users:detail' project.owner.id %}">
+            <a class="project-name"
+               href="{% url 'users:user_detail' project.owner.id %}">
               {% if project.owner.avatar %}
                 <img alt="{{ project.owner.email }}"
                      title="{{ project.owner.email }}"
@@ -64,7 +63,7 @@
           <td class="has-text-centered">
             {% for member in project.members.all %}
               {% if member.id != project.owner.id %}
-                <a class="project-name" href="{% url 'users:detail' member.id %}">
+                <a class="project-name" href="{% url 'users:user_detail' member.id %}">
                   {% if member.avatar %}
                     <img alt="{{ member.email }}"
                          title="{{ member.email }}"

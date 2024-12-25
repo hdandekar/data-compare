@@ -2,7 +2,13 @@
   <div class="modal-background cancel"></div>
   <div class="modal-content is-width-70">
     <div class="box content">
-      <h5 class="is-2">Add New Project</h5>
+      <h5 class="is-size-4">
+        {% if object.name %}
+          {{ object.name }} project
+        {% else %}
+          Add New Project
+        {% endif %}
+      </h5>
       <form hx-post="{{ request.path }}"
             hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'>
         <div class="box">

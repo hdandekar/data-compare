@@ -1,0 +1,55 @@
+{% block inner %}
+  <h3 class="is-size-4">{{ object.name }} project</h3>
+  <form>
+    <div>
+    </br />
+    <div class="columns">
+      <div class="column is-8">
+        <div class="field">
+          <label class="label" for="id_name">Project name</label>
+          <div class="control">
+            <input value="{{ object.name }}"
+                   type="text"
+                   name="name"
+                   id="id_name"
+                   class="input is-small"
+                   required
+                   placeholder="Project Name"
+                   autocomplete="off" />
+          </div>
+        </div>
+      </div>
+      <div class="column">
+        <div class="field">
+          <label class="label" for="id_project_code">Project Code</label>
+          <div class="control">
+            <input value="{{ object.project_code }}"
+                   type="text"
+                   name="project_code"
+                   id="id_project_code"
+                   class="input is-small"
+                   required
+                   placeholder="Project Code" />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="columns">
+      <div class="column">
+        <div class="field">
+          <label class="label" for="id_description">Project Description</label>
+          <textarea id="id_description"
+                    name="description"
+                    class="textarea is-small"
+                    placeholder="e.g. Describe briefly about the project...">{{ object.description }}</textarea>
+        </div>
+        {% if form.description.errors %}<p class="help is-danger">{{ form.description.errors|striptags }}</p>{% endif %}
+      </div>
+    </div>
+    <div class="buttons">
+      <button class="button is-primary" name="save">Save</button>
+    </div>
+  </div>
+  {% include 'partials/project_delete.html' %}
+</form>
+{% endblock inner %}

@@ -11,7 +11,6 @@ from data_compare.users.managers import UserManager
 
 class User(AbstractUser):
     def user_profile_avatar_path(self, instance):
-        print("deleting file", self.avatar.delete)
         ext = instance.split(".")[-1]
         return f"{self.id}/avatars/profile.{ext}"
 
@@ -34,7 +33,7 @@ class User(AbstractUser):
     github_link = CharField(blank=True, max_length=50)
     twitter_link = CharField(blank=True, max_length=50)
     phoneNumberRegex = RegexValidator(regex=r"^\+?1?\d{8,15}$")
-    mobile_number = CharField(validators=[phoneNumberRegex], max_length=16, unique=True, blank=True)
+    mobile_number = CharField(validators=[phoneNumberRegex], max_length=16, blank=True)
     address = CharField(blank=True, max_length=255)
 
     USERNAME_FIELD = "email"

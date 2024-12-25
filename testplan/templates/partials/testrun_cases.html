@@ -12,7 +12,7 @@
       <th class="has-text-left w-30">Log</th>
     </tr>
   </thead>
-  <tbody class="small">
+  <tbody class="is-size-7">
     {% for item in most_recent_testcase_runs %}
       <tr class="{% tc_status_row_class item.most_recent_testcase_run.testcase_run_status.status_value %}">
         <td>
@@ -42,11 +42,11 @@
           {{ item.testrun_testcase.testcase.tcname }}
         </td>
         {% if item.most_recent_testcase_run %}
-          <td class="text-center smaller">{{ item.most_recent_testcase_run.testcase_run_status.status_value }}</td>
-          <td class="text-center smaller">{{ item.most_recent_testcase_run.triggered_by }}</td>
-          <td class="text-center smaller">{{ item.most_recent_testcase_run.execution_start|date:"d-M-y H:m:s T" }}</td>
-          <td class="text-center smaller">{{ item.most_recent_testcase_run.execution_end|date:"d-M-y H:m:s T" }}</td>
-          <td class="smaller">{{ item.most_recent_testcase_run.comments|truncatewords:200 }}</td>
+          <td class="text-center">{{ item.most_recent_testcase_run.testcase_run_status.status_value }}</td>
+          <td class="text-center">{{ item.most_recent_testcase_run.triggered_by }}</td>
+          <td class="text-center">{{ item.most_recent_testcase_run.execution_start|date:"d-M-y H:m:s T" }}</td>
+          <td class="text-center">{{ item.most_recent_testcase_run.execution_end|date:"d-M-y H:m:s T" }}</td>
+          <td>{{ item.most_recent_testcase_run.comments|truncatewords:200 }}</td>
         {% else %}
           <td class="text-center">Not Run</td>
           <td class="text-center"></td>

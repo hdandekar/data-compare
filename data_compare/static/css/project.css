@@ -33,7 +33,7 @@ body {
 }
 
 .smaller {
-  font-size: .75em;
+  font-size: .80em;
 }
 
 .text-danger-emphasis {
@@ -443,4 +443,53 @@ img.w-40{
   padding-right: 0;
   padding-top:0;
 
+}
+.menu-list {
+  line-height: var(--bulma-menu-list-line-height);
+  font-size: small;
+}
+
+.is-small.input, .is-small.textarea {
+  border-radius: var(--bulma-radius-small);
+  font-size: 0.80rem;
+}
+
+.small {
+  font-size: 0.80rem;
+}
+
+.notification.is-error {
+  --bulma-notification-h: var(--bulma-danger-h);
+  --bulma-notification-s: var(--bulma-danger-s);
+  --bulma-notification-background-l: var(--bulma-danger-l);
+  --bulma-notification-color-l: var(--bulma-danger-invert-l);
+}
+
+#toast{
+  animation: hideAnimation 0s ease-in 5s;
+  animation-fill-mode: forwards;
+}
+
+@keyframes hideAnimation {
+  to {
+    visibility: hidden;
+    width: 0;
+    height: 0;
+  }
+}
+
+tr.htmx-swapping td {
+  opacity: 0;
+  transition: opacity 1s ease-out;
+}
+
+.htmx-indicator{opacity:0}
+ .htmx-request .htmx-indicator{
+  opacity:1;
+  transition: opacity 200ms ease-in;
+}
+
+.htmx-request.htmx-indicator{
+  opacity:1;
+  transition: opacity 200ms ease-in;
 }
