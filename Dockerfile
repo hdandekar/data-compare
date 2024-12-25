@@ -24,19 +24,23 @@ WORKDIR /app
 COPY --from=builder /app/venv venv
 # COPY config config
 COPY . .
+COPY run.sh /run.sh
+RUN chmod +x /run.sh
+
 ENV DJANGO_SECRET_KEY='#a*(l02@96-k=ft*+90rf$)dz$@&$h==7nqhl2(pd^sz-2_8y='
 ENV POSTGRES_HOST=''
 ENV POSTGRES_USER=''
 ENV POSTGRES_DB=''
 ENV POSTGRES_PASSWORD=''
-ENV REDIS_URL=''
 ENV DJANGO_ADMIN_URL=''
 ENV DJANGO_ALLOWED_HOSTS=''
 ENV TRUSTED_ORIGINS=''
 ENV REDIS_URL=''
+ENV C_BROKER_URL=''
+ENV C_RESULT_BACKEND=''
 
 RUN python manage.py collectstatic --settings=config.settings.production
 
 EXPOSE ${PORT}
 
-CMD gunicorn --bind :${PORT} --workers 2 config.wsgi
+CMD ["/run.sh"]
