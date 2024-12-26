@@ -1,18 +1,20 @@
+<!-- Manage Project Template - project/manage_project.html -->
 {% block inner %}
-  <h3 class="is-size-4">{{ object.name }} project</h3>
-  <form>
-    <div>
-    </br />
+  <form hx-post="{% url 'manage_project' project.id %}"
+        hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
+        hx-target="#config_content">
+    <!-- Form fields -->
     <div class="columns">
       <div class="column is-8">
         <div class="field">
           <label class="label" for="id_name">Project name</label>
           <div class="control">
-            <input value="{{ object.name }}"
+            <input value="{{ project.name }}"
                    type="text"
                    name="name"
                    id="id_name"
                    class="input is-small"
+                   {% if not is_project_admin %}disabled{% endif %}
                    required
                    placeholder="Project Name"
                    autocomplete="off" />
@@ -23,11 +25,12 @@
         <div class="field">
           <label class="label" for="id_project_code">Project Code</label>
           <div class="control">
-            <input value="{{ object.project_code }}"
+            <input value="{{ project.project_code }}"
                    type="text"
                    name="project_code"
                    id="id_project_code"
                    class="input is-small"
+                   {% if not is_project_admin %}disabled{% endif %}
                    required
                    placeholder="Project Code" />
           </div>
@@ -41,15 +44,17 @@
           <textarea id="id_description"
                     name="description"
                     class="textarea is-small"
-                    placeholder="e.g. Describe briefly about the project...">{{ object.description }}</textarea>
+                    {% if not is_project_admin %}readonly{% endif %}
+                    placeholder="e.g. Describe briefly about the project...">{{ project.description }}</textarea>
         </div>
         {% if form.description.errors %}<p class="help is-danger">{{ form.description.errors|striptags }}</p>{% endif %}
       </div>
     </div>
     <div class="buttons">
-      <button class="button is-primary" name="save">Save</button>
+      {% if is_project_admin %}<button class="button is-primary" name="save">Save</button>{% endif %}
     </div>
-  </div>
-  {% include 'partials/project_delete.html' %}
-</form>
+    {% if is_project_admin %}
+      {% include 'project/partials/project_delete.html' %}
+    {% endif %}
+  </form>
 {% endblock inner %}

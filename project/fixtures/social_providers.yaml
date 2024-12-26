@@ -1,0 +1,15 @@
+- model: 'socialaccount.socialapp'
+  pk: 1
+  fields:
+    provider: 'google'
+    name: 'Google'
+    client_id: 'client_id'
+    secret: 'client_secret'
+
+- model: 'socialaccount.socialapp'
+  pk: 2
+  fields:
+    provider: 'microsoft'
+    name: 'Microsoft'
+    client_id: 'client_id'
+    secret: 'client_secret'

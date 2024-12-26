@@ -26,7 +26,6 @@ COPY --from=builder /app/venv venv
 COPY . .
 COPY run.sh /run.sh
 RUN chmod +x /run.sh
-RUN cat /run.sh
 
 ENV DJANGO_SECRET_KEY='#a*(l02@96-k=ft*+90rf$)dz$@&$h==7nqhl2(pd^sz-2_8y='
 ENV POSTGRES_HOST=''

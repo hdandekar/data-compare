@@ -17,7 +17,7 @@
     <tbody>
       {% for project in projects %}
         <tr>
-          <td>
+          <td class="is-vcentered">
             {% if request.user.id == project.owner.id %}
               <a title="Edit" href="{% url 'project_details' project.id %}">
                 <i class="fa fa-pen-to-square fa-fw" aria-hidden="true"></i>
@@ -29,23 +29,23 @@
               </a>
             {% endif %}
           </td>
-          <td class="has-text-left">
+          <td class="has-text-left is-vcentered">
             <a href="{% url 'project_details' project.id %}">{{ project.name }}</a>
           </td>
-          <td class="has-text-centered">0</td>
-          <td class="has-text-centered">
+          <td class="has-text-centered is-vcentered">0</td>
+          <td class="has-text-centered is-vcentered">
             <a href="{% url 'testruns' project.id %}">
               {% with testrun_total=project.project_testruns.count %}{{ testrun_total|default:0 }}{% endwith %}
             </a>
           </td>
-          <td class="has-text-centered">
+          <td class="has-text-centered is-vcentered">
             <a href="{% url 'list_testcase' project.id %}">
               {% with tc_total=project.project_testcases.count %}{{ tc_total|default:0 }}{% endwith %}
             </a>
           </td>
-          <td class="has-text-centered"></td>
-          <td class="has-text-centered">
-            <a class="project-name"
+          <td class="has-text-centered is-vcentered"></td>
+          <td class="has-text-centered is-vcentered">
+            <a class="project-name is-vcentered"
                href="{% url 'users:user_detail' project.owner.id %}">
               {% if project.owner.avatar %}
                 <img alt="{{ project.owner.email }}"
@@ -60,25 +60,7 @@
               {% endif %}
             </a>
           </td>
-          <td class="has-text-centered">
-            {% for member in project.members.all %}
-              {% if member.id != project.owner.id %}
-                <a class="project-name" href="{% url 'users:user_detail' member.id %}">
-                  {% if member.avatar %}
-                    <img alt="{{ member.email }}"
-                         title="{{ member.email }}"
-                         class="img-avatar rounded"
-                         src="{{ member.avatar.url }}" />
-                  {% else %}
-                    <img alt="{{ member.email }}"
-                         title="{{ member.email }}"
-                         class="img-avatar rounded"
-                         src="{% static 'images/default_avatar.jpg' %}" />
-                  {% endif %}
-                </a>
-              {% endif %}
-            {% endfor %}
-          </td>
+          <td class="has-text-centered is-vcentered">{{ project.projectmember_set.all.count }}</td>
         </tr>
       {% endfor %}
     </tbody>
