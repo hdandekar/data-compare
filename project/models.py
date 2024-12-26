@@ -18,7 +18,7 @@ class Project(models.Model):
         related_name="project_created_by",
         on_delete=models.PROTECT,
     )
-    members = models.ManyToManyField(User, related_name="projects", blank=True)
+    members = models.ManyToManyField(User, related_name="projects", blank=True, through="ProjectMember")
 
     class Meta:
         ordering = ["-updated_date"]
@@ -33,6 +33,22 @@ class Project(models.Model):
         slug_value = self.name
         self.project_slug = slugify(slug_value, allow_unicode=True)
         super().save(*args, **kwargs)
+
+    def is_admin(self, user):
+        """Check if the given user is an admin of the project."""
+        try:
+            project_member = self.projectmember_set.get(user=user)
+            return project_member.role == "admin"
+        except ProjectMember.DoesNotExist:
+            return False
+
+    def is_member(self, user):
+        """Check if the given user is an admin of the project."""
+        try:
+            project_member = self.projectmember_set.get(user=user)
+            return project_member.role == "member"
+        except ProjectMember.DoesNotExist:
+            return False
 
 
 class DbType(models.Model):
@@ -56,7 +72,7 @@ class DbConnection(models.Model):
     portno = models.IntegerField()
     schema_name = models.CharField(max_length=100, blank=True)
     created_by = models.ForeignKey(User, related_name="connection", on_delete=models.PROTECT)
-    create_dt = models.DateTimeField(auto_now=True)
+    created_dt = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
@@ -64,3 +80,13 @@ class DbConnection(models.Model):
     class Meta:
         verbose_name = "DB Connection"
         ordering = ["-id"]
+
+
+PROJECT_MEMBER_ROLE_CHOICES = [("member", "Member"), ("admin", "Admin"), ("guest", "Guest")]
+
+
+class ProjectMember(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    date_joined = models.DateTimeField(auto_now=True)
+    role = models.CharField(max_length=50, choices=PROJECT_MEMBER_ROLE_CHOICES, default="member")

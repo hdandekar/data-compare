@@ -5,7 +5,7 @@ from .models import DbConnection, DbType
 
 @admin.register(DbConnection)
 class ConnectionAdmin(admin.ModelAdmin):
-    list_display = ["id", "name", "hostname", "dbtype", "username", "password", "portno", "create_dt"]
+    list_display = ["id", "name", "hostname", "dbtype", "username", "password", "portno", "created_dt"]
 
 
 @admin.register(DbType)

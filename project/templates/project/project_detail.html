@@ -1,0 +1,70 @@
+{% extends "app_base.html" %}
+
+{% block title %}
+  {{ project.name }}
+{% endblock title %}
+{% block content %}
+  {% load static %}
+
+  <div class="container">
+    <nav class="breadcrumb" aria-label="breadcrumbs">
+      <ul>
+        <li>
+          <a class="pl-3 has-text-weight-bold is-size-5 has-text-dark"
+             href="{% url 'project_details' project.id %}">{{ project.name }} Configurations</a>
+        </li>
+      </ul>
+    </nav>
+    <div class="columns">
+      <div class="column is-3">
+        <ul class="menu menu-list">
+          <li>
+            <a class="has-text-weight-bold is-active"
+               hx-get="{% url 'manage_project' project.id %}"
+               hx-target="#config_content"
+               hx-swap="innerHTML"
+               hx-on:click="setActive(this)">General</a>
+          </li>
+          <li>
+            <a class="has-text-weight-bold"
+               hx-get="{% url 'project_members' project.id %}"
+               hx-target="#config_content"
+               hx-swap="innerHTML"
+               hx-on:click="setActive(this)">Members</a>
+          </li>
+          <li>
+            <a class="has-text-weight-bold"
+               hx-get="{% url 'connections' project.id %}"
+               hx-target="#config_content"
+               hx-swap="innerHTML"
+               hx-on:click="setActive(this)">Connection Settings</a>
+          </li>
+        </ul>
+      </div>
+      <div class="column is-9" id="side-view">
+        <div id="config_content">
+          <div hx-get="{% url 'manage_project' project.id %}"
+               hx-target="#config_content"
+               hx-swap="innerHTML"
+               hx-on:click="setActive(this)"
+               hx-trigger="load">
+            <span class="visually-hidden text-center">Loading...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Placeholder for the modal -->
+  <div id="modal" class="modal modal-lg fade">
+    <div id="dialog" class="modal-dialog" hx-target="this"></div>
+  </div>
+{% endblock content %}
+{% block inline_javascript %}
+  <script>
+    function setActive(element) {
+      document.querySelectorAll('a').forEach(link =>
+        link.classList.remove('is-active'));
+      element.classList.add('is-active');
+    }
+  </script>
+{% endblock inline_javascript %}

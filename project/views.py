@@ -13,11 +13,12 @@ from django.middleware.csrf import get_token
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
+from django_htmx.http import HttpResponseClientRedirect
 
 from data_compare.users.models import User
 
 from .forms import ConnectionForm
-from .models import DbConnection, DbType, Project
+from .models import PROJECT_MEMBER_ROLE_CHOICES, DbConnection, DbType, Project, ProjectMember
 from .util import check_db_connection
 
 CONNECTION_LIST_VIEW = "connection:list"
@@ -52,7 +53,7 @@ def connection_create(request, project_id):
                     },
                 )
             else:
-                return render(request, "connection_form.html", {"form": form, "dbtypes": dbtypes})
+                return render(request, "connection/connection_form.html", {"form": form, "dbtypes": dbtypes})
         if "test" in request.POST:
             get_dbtype = DbType.objects.get(id=request.POST["dbtype"]).__str__()
             db_hostname = request.POST["hostname"]
@@ -92,7 +93,7 @@ def connection_create(request, project_id):
 
     else:
         form = ConnectionForm()
-    return render(request, "connection_form.html", {"form": form, "dbtypes": dbtypes})
+    return render(request, "connection/connection_form.html", {"form": form, "dbtypes": dbtypes})
 
 
 @login_required
@@ -113,7 +114,7 @@ def connection_list(request, project_id, page=1):
         page_range = paginator.get_elided_page_range(number=page)
     return render(
         request,
-        "connection_list.html",
+        "connection/connection_list.html",
         {
             "project": project,
             "connections": connections,
@@ -155,16 +156,20 @@ def connection_edit(request, project_id, pk):
             form = ConnectionForm(data=request.GET)
             # return HttpResponse(status=400, headers={"HX-Trigger": json.dumps({"errors": form.errors})})
             return render(
-                request, "connection_form.html", {"form": form, "connection": connection, "dbtypes": dbtypes}
+                request,
+                "connection/connection_form.html",
+                {"form": form, "connection": connection, "dbtypes": dbtypes},
             )
     else:
         form = ConnectionForm(instance=connection)
-    return render(request, "connection_form.html", {"form": form, "connection": connection, "dbtypes": dbtypes})
+    return render(
+        request, "connection/connection_form.html", {"form": form, "connection": connection, "dbtypes": dbtypes}
+    )
 
 
 @login_required
 def index(request, project_id):
-    return render(request, "connection_index.html", {"project": Project.objects.get(id=project_id)})
+    return render(request, "connection/connection_index.html", {"project": Project.objects.get(id=project_id)})
 
 
 @login_required
@@ -188,21 +193,20 @@ def connection_delete(request, project_id, pk):
 @login_required
 def project_index(request):
     logger.info("Rendering Project Index")
-    return render(request, "project_index.html")
+    return render(request, "project/project_index.html")
 
 
 class ProjectCreateView(LoginRequiredMixin, CreateView):
     model = Project
     fields = ["name", "project_code", "description"]
-    template_name = "project_form.html"
+    template_name = "project/project_form.html"
 
     def form_valid(self, form):
         project = form.save(commit=False)
         project.owner = self.request.user
         project.created_by = self.request.user
         project.save()
-        form.save_m2m()
-        project.members.add(self.request.user.id)
+        ProjectMember.objects.create(project=project, user=self.request.user, role="admin")
         return HttpResponse(
             status=204,
             headers={
@@ -223,9 +227,40 @@ class ProjectCreateView(LoginRequiredMixin, CreateView):
 class ProjectUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Project
     fields = ["name", "project_code", "description"]
-    template_name = "configure_edit_project.html"
+    template_name = "project/manage_project.html"
+    project_object = None
+
+    def dispatch(self, request, *args, **kwargs):
+        self.project_object = self.get_object()
+        if not self.project_object.is_member(self.request.user) and not self.project_object.is_admin(
+            self.request.user
+        ):
+            return self.handle_no_permission()
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["project"] = self.project_object
+        context["is_project_admin"] = self.project_object.is_admin(self.request.user)
+        try:
+            context["project_member"] = ProjectMember.objects.get(project=self.project_object, user=self.request.user)
+        except ProjectMember.DoesNotExist:
+            context["project_member"] = None
+            context["PROJECT_MEMBER_ROLE_CHOICES"] = PROJECT_MEMBER_ROLE_CHOICES
+        return context
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        if not self.project_object.is_admin(self.request.user):
+            for field_name, field in form.fields.items():
+                field.widget.attrs["disabled"] = "disabled"
+        return form
 
     def form_valid(self, form):
+        if not self.project_object.is_admin(self.request.user):
+            messages.error(self.request, "You do not have permission to submit this form.")
+            return self.form_invalid(form)
+        # form = super().form_valid(form)
         project = form.save(commit=False)
         project.modified_by = self.request.user
         project.save()
@@ -281,8 +316,14 @@ class ProjectUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
 def project_members(request, project_id):
     project = Project.objects.get(id=project_id)
+    project_members = project.projectmember_set.all().select_related("user")
+    is_project_admin = project.is_admin(request.user)
     if request.method == "GET":
-        return render(request, "partials/project_members.html", {"members": project.members.all(), "project": project})
+        return render(
+            request,
+            "project/partials/project_members.html",
+            {"members": project_members, "project": project, "is_project_admin": is_project_admin},
+        )
     elif request.method == "POST":
         action = request.GET.get("action")
         if action == "add":
@@ -355,7 +396,7 @@ def project_members(request, project_id):
 
 class ProjectListView(LoginRequiredMixin, ListView):
     model = Project
-    template_name = "project_list.html"
+    template_name = "project/project_list.html"
 
     def get_context_data(self, **kwargs):
         logger.info("Came in ProjectListView.get_context_data")
@@ -372,7 +413,7 @@ class ProjectListView(LoginRequiredMixin, ListView):
 
 class ProjectDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Project
-    template_name = "project_confirm_delete.html"
+    # template_name = "project/project_confirm_delete.html"
 
     def get_object(self, queryset=None):
         project = Project.objects.get(id=self.kwargs.get("pk"))
@@ -382,8 +423,6 @@ class ProjectDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         project = self.get_object()
         try:
             self.get_object().delete()
-            from django_htmx.http import HttpResponseClientRedirect
-
             messages.error(self.request, f"Successfully deleted {project.name}!")
             return HttpResponseClientRedirect(reverse("projects"))
         except ProtectedError as e:
@@ -427,7 +466,7 @@ class ProjectDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
 class ProjectDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     model = Project
-    template_name = "project_detail.html"
+    template_name = "project/project_detail.html"
 
     def test_func(self):
         if self.request.user in self.get_object().members.all():
