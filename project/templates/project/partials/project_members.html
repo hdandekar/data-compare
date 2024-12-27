@@ -55,9 +55,9 @@
               {% if is_project_admin %}
                 <td class="has-text-danger is-vcentered has-text-centered">
                   <button class="has-text-danger"
-                          hx-post="/project/{{ project.id }}/project_members?action=remove&user_id={{ member.id }}"
+                          hx-post="/project/{{ project.id }}/project_members?action=remove&user_id={{ member.user.id }}"
                           hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
-                          hx-target="#member-{{ member.id }}"
+                          hx-target="#member-{{ member.user.id }}"
                           hx-confirm="Are you sure about removing your member: '{{ member.email }}?'"
                           hx-swap="outerHTML:remove">
                     <i class="fa-solid fa-trash"></i>

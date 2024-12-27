@@ -8,7 +8,9 @@ def check_db_connection(dbtype, dbname, username, password, portno, **kwargs):
         connection_status = check_pgsql(dbname, username, password, hostname, portno)
         return connection_status
     if dbtype.lower() == "mysql":
-        connection_status = check_mysql_conn(dbname, username, password, hostname, portno)
+        connection_status = check_mysql_conn(
+            dbname, username, password, hostname, portno
+        )
         return connection_status
 
 
@@ -28,7 +30,9 @@ def check_pgsql(dbname, uname, pwd, hostname, portno):
 
 def check_mysql_conn(dbname, uname, pwd, hostname, portno):
     try:
-        cnx = mysql_connector.connect(host=hostname, database=dbname, user=uname, password=pwd, port=portno)
+        cnx = mysql_connector.connect(
+            host=hostname, database=dbname, user=uname, password=pwd, port=portno
+        )
         if cnx.is_connected:
             return {"connected": True}
     except mysql_connector.Error as err:

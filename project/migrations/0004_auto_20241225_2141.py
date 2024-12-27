@@ -4,15 +4,13 @@ import datetime
 from django.db import migrations
 
 
-def create_through_relations(apps,schema_editor):
-    Project = apps.get_model('project','Project')
-    ProjectMember = apps.get_model('project','ProjectMember')
+def create_through_relations(apps, schema_editor):
+    Project = apps.get_model("project", "Project")
+    ProjectMember = apps.get_model("project", "ProjectMember")
     for project in Project.objects.all():
         for member in project.members.all():
             ProjectMember(
-                project = project,
-                user = member,
-                date_joined = datetime.datetime.now()
+                project=project, user=member, date_joined=datetime.datetime.now()
             ).save()
 
 
@@ -23,5 +21,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(create_through_relations, reverse_code=migrations.RunPython.noop),
-]
+        migrations.RunPython(
+            create_through_relations, reverse_code=migrations.RunPython.noop
+        ),
+    ]

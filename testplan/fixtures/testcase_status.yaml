@@ -1,28 +1,28 @@
 - model: testplan.TestCaseStatus
   pk: 1
   fields:
-    status_value: 'Not Run'
+    status_value: "Not Run"
 - model: testplan.TestCaseStatus
   pk: 2
   fields:
-    status_value: 'Passed'
+    status_value: "Passed"
 - model: testplan.TestCaseStatus
   pk: 3
   fields:
-    status_value: 'Failed'
+    status_value: "Failed"
 - model: testplan.TestCaseStatus
   pk: 4
   fields:
-    status_value: 'Blocked'
+    status_value: "Blocked"
 - model: testplan.TestCaseStatus
   pk: 5
   fields:
-    status_value: 'Skipped'
+    status_value: "Skipped"
 - model: testplan.TestCaseStatus
   pk: 6
   fields:
-    status_value: 'Running'
+    status_value: "Running"
 - model: testplan.TestCaseStatus
   pk: 7
   fields:
-    status_value: 'Error'
+    status_value: "Error"

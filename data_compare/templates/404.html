@@ -1,22 +1,20 @@
-{% extends "app_base.html" %}
-
-{% block title %}
-  Page not found
-{% endblock title %}
+{% if not request.META.HTTP_HX_REQUEST %}
+  {% include 'app_base.html' %}
+{% endif %}
 {% block content %}
   <p>
     <div id="notfound">
       <div class="notfound">
+        <div class="notfound-404">
+          <h1>Oops!</h1>
+          <h2>404 - The Page can't be found</h2>
+        </div>
+        <a href="{% url 'home' %}">Go TO Homepage</a>
         {% if exception %}
           {{ exception }}
         {% else %}
-          <div class="notfound-404">
-            <h1>Oops!</h1>
-            <h2>404 - The Page can't be found</h2>
-          </div>
-          <a href="{% url 'home' %}">Go TO Homepage</a>
-        </div>
+        {% endif %}
       </div>
-    {% endif %}
+    </div>
   </p>
 {% endblock content %}

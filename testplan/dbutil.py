@@ -87,12 +87,16 @@ def diff_pd(old_df, new_df, idx_col):
 
         common_keys = np.intersect1d(old_keys, new_keys, assume_unique=True)
 
-        common_columns = np.intersect1d(old_df.columns, new_df.columns, assume_unique=True)
+        common_columns = np.intersect1d(
+            old_df.columns, new_df.columns, assume_unique=True
+        )
 
         new_common = new_df.loc[common_keys, common_columns].map(strip)
         old_common = old_df.loc[common_keys, common_columns].map(strip)
 
-        common_data = pd.concat([old_common.reset_index(), new_common.reset_index()], sort=True)
+        common_data = pd.concat(
+            [old_common.reset_index(), new_common.reset_index()], sort=True
+        )
 
         # logger.info("common_data: {}".format(common_data))
 
@@ -103,10 +107,14 @@ def diff_pd(old_df, new_df, idx_col):
             changed_keys = changed_keys.drop_duplicates().set_index(idx_col).index
 
         df_all_changes = pd.concat(
-            [old_common.loc[changed_keys], new_common.loc[changed_keys]], axis="columns", keys=["old", "new"]
+            [old_common.loc[changed_keys], new_common.loc[changed_keys]],
+            axis="columns",
+            keys=["old", "new"],
         ).swaplevel(axis="columns")
 
-        df_changed = df_all_changes.T.groupby(level=0).apply(lambda frame: frame.apply(report_diff))
+        df_changed = df_all_changes.T.groupby(level=0).apply(
+            lambda frame: frame.apply(report_diff)
+        )
 
         df_changed = df_changed.transpose()
         if not df_changed.empty:

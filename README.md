@@ -4,7 +4,6 @@ DB-Diff-Insight is a Django App to compare data between 2 different data sources
 
 License: MIT
 
-
 ## Development
 
 ### Type checks
@@ -18,9 +17,9 @@ Running type checks with mypy:
 The following details how to deploy this application.
 
 1. Clone the github Repo
-2. Run ```pip install -r requirements\production.txt```
-3. Configure database(postgres for production usage) and add details in ```config/settings/production.py```
-4. Run ```python manage.py migrate```
-5. Create a superuser using ```python manage.py createsuperuser```
-6. Launch the app using ```python manage.py runserver```
-7. Launch Celery using ```celery -A data_compare worker -l INFO```
+2. Run `pip install -r requirements\production.txt`
+3. Configure database(postgres for production usage) and add details in `config/settings/production.py`
+4. Run `python manage.py migrate`
+5. Create a superuser using `python manage.py createsuperuser`
+6. Launch the app using `python manage.py runserver`
+7. Launch Celery using `celery -A data_compare worker -l INFO`

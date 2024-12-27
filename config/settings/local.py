@@ -26,7 +26,9 @@ CACHES = {
 # EMAIL
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
-EMAIL_BACKEND = env("DJANGO_EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend")
+EMAIL_BACKEND = env(
+    "DJANGO_EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend"
+)
 
 # WhiteNoise
 # ------------------------------------------------------------------------------
@@ -93,7 +95,11 @@ LOGGING = {
             "level": "INFO",
             "propagate": False,
         },
-        "testplan": {"handlers": ["console", "file"], "level": "INFO", "propogate": False},
+        "testplan": {
+            "handlers": ["console", "file"],
+            "level": "INFO",
+            "propogate": False,
+        },
     },
 }
 

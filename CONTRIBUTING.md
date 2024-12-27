@@ -7,11 +7,11 @@ Thank you for considering contributing to our project! We welcome your contribut
 1. **Issues**: If you find a bug, have a feature request, or want to suggest an improvement, please open an issue. Provide a clear description and any relevant details.
 
 2. **Pull Requests (PRs)**:
+
    - Fork the repository and create a new branch for your feature or bug fix.
    - Make your changes and ensure they follow our coding standards.
    - Write clear commit messages.
    - Submit a PR to the `main` branch.
-
 
 3. **Testing and Documentation**:
    - Ensure your code is well-tested.

@@ -12,13 +12,15 @@ from django.http.response import HttpResponseRedirect
 from django.middleware.csrf import get_token
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
+from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
+                                  UpdateView)
 from django_htmx.http import HttpResponseClientRedirect
 
 from data_compare.users.models import User
 
 from .forms import ConnectionForm
-from .models import PROJECT_MEMBER_ROLE_CHOICES, DbConnection, DbType, Project, ProjectMember
+from .models import (PROJECT_MEMBER_ROLE_CHOICES, DbConnection, DbType,
+                     Project, ProjectMember)
 from .util import check_db_connection
 
 CONNECTION_LIST_VIEW = "connection:list"
@@ -53,7 +55,11 @@ def connection_create(request, project_id):
                     },
                 )
             else:
-                return render(request, "connection/connection_form.html", {"form": form, "dbtypes": dbtypes})
+                return render(
+                    request,
+                    "connection/connection_form.html",
+                    {"form": form, "dbtypes": dbtypes},
+                )
         if "test" in request.POST:
             get_dbtype = DbType.objects.get(id=request.POST["dbtype"]).__str__()
             db_hostname = request.POST["hostname"]
@@ -93,7 +99,9 @@ def connection_create(request, project_id):
 
     else:
         form = ConnectionForm()
-    return render(request, "connection/connection_form.html", {"form": form, "dbtypes": dbtypes})
+    return render(
+        request, "connection/connection_form.html", {"form": form, "dbtypes": dbtypes}
+    )
 
 
 @login_required
@@ -163,13 +171,19 @@ def connection_edit(request, project_id, pk):
     else:
         form = ConnectionForm(instance=connection)
     return render(
-        request, "connection/connection_form.html", {"form": form, "connection": connection, "dbtypes": dbtypes}
+        request,
+        "connection/connection_form.html",
+        {"form": form, "connection": connection, "dbtypes": dbtypes},
     )
 
 
 @login_required
 def index(request, project_id):
-    return render(request, "connection/connection_index.html", {"project": Project.objects.get(id=project_id)})
+    return render(
+        request,
+        "connection/connection_index.html",
+        {"project": Project.objects.get(id=project_id)},
+    )
 
 
 @login_required
@@ -206,7 +220,9 @@ class ProjectCreateView(LoginRequiredMixin, CreateView):
         project.owner = self.request.user
         project.created_by = self.request.user
         project.save()
-        ProjectMember.objects.create(project=project, user=self.request.user, role="admin")
+        ProjectMember.objects.create(
+            project=project, user=self.request.user, role="admin"
+        )
         return HttpResponse(
             status=204,
             headers={
@@ -224,7 +240,7 @@ class ProjectCreateView(LoginRequiredMixin, CreateView):
         return self.render_to_response(self.get_context_data(form=form))
 
 
-class ProjectUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+class ProjectUpdateView(LoginRequiredMixin, UpdateView):
     model = Project
     fields = ["name", "project_code", "description"]
     template_name = "project/manage_project.html"
@@ -232,9 +248,9 @@ class ProjectUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
     def dispatch(self, request, *args, **kwargs):
         self.project_object = self.get_object()
-        if not self.project_object.is_member(self.request.user) and not self.project_object.is_admin(
+        if not self.project_object.is_member(
             self.request.user
-        ):
+        ) and not self.project_object.is_admin(self.request.user):
             return self.handle_no_permission()
         return super().dispatch(request, *args, **kwargs)
 
@@ -243,7 +259,9 @@ class ProjectUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         context["project"] = self.project_object
         context["is_project_admin"] = self.project_object.is_admin(self.request.user)
         try:
-            context["project_member"] = ProjectMember.objects.get(project=self.project_object, user=self.request.user)
+            context["project_member"] = ProjectMember.objects.get(
+                project=self.project_object, user=self.request.user
+            )
         except ProjectMember.DoesNotExist:
             context["project_member"] = None
             context["PROJECT_MEMBER_ROLE_CHOICES"] = PROJECT_MEMBER_ROLE_CHOICES
@@ -258,7 +276,9 @@ class ProjectUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
     def form_valid(self, form):
         if not self.project_object.is_admin(self.request.user):
-            messages.error(self.request, "You do not have permission to submit this form.")
+            messages.error(
+                self.request, "You do not have permission to submit this form."
+            )
             return self.form_invalid(form)
         # form = super().form_valid(form)
         project = form.save(commit=False)
@@ -322,22 +342,25 @@ def project_members(request, project_id):
         return render(
             request,
             "project/partials/project_members.html",
-            {"members": project_members, "project": project, "is_project_admin": is_project_admin},
+            {
+                "members": project_members,
+                "project": project,
+                "is_project_admin": is_project_admin,
+            },
         )
     elif request.method == "POST":
         action = request.GET.get("action")
         if action == "add":
             email = request.POST.get("email")
-            print("email_value is:", email)
             user, created = User.objects.get_or_create(email=email)
             project.members.add(user.id)
             csrf_token = get_token(request)
             conn_html = """
                         <tr class="small" id="member-{userid}">
-                            <td class="is-vcentered">{username}</td>
-                            <td class="is-vcentered">{useremail}</td>
-                            <td class="is-vcentered">{userdatejoined}</td>
-                            <td class="is-vcentered">
+                            <td class="is-vcentered has-text-centered">{username}</td>
+                            <td class="is-vcentered has-text-centered">{useremail}</td>
+                            <td class="is-vcentered has-text-centered">{userdatejoined}</td>
+                            <td class="is-vcentered has-text-centered">
                             <div class="select">
                                 <select class="is-small">
                                 <option>Member</option>
@@ -345,7 +368,7 @@ def project_members(request, project_id):
                                 </select>
                             </div>
                             </td>
-                            <td class="has-text-danger is-vcentered">
+                            <td class="has-text-danger is-vcentered has-text-centered">
                             <button class="has-text-danger"
                                 hx-post="/project/{projectid}/project_members?action=remove&user_id={userid}"
                                 hx-headers='{{"X-CSRFToken":"{csrf_token}"}}'
@@ -399,11 +422,12 @@ class ProjectListView(LoginRequiredMixin, ListView):
     template_name = "project/project_list.html"
 
     def get_context_data(self, **kwargs):
-        logger.info("Came in ProjectListView.get_context_data")
         context = super().get_context_data(**kwargs)
         page_num = self.kwargs.get("page")
         member_projects = (
-            Project.objects.filter(members__id__exact=self.request.user.id).order_by("-owner").select_related("owner")
+            Project.objects.filter(members__id__exact=self.request.user.id)
+            .order_by("-owner")
+            .select_related("owner")
         )
         paginator = Paginator(member_projects, per_page=5)
         context["projects"] = paginator.get_page(page_num)
@@ -413,7 +437,6 @@ class ProjectListView(LoginRequiredMixin, ListView):
 
 class ProjectDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Project
-    # template_name = "project/project_confirm_delete.html"
 
     def get_object(self, queryset=None):
         project = Project.objects.get(id=self.kwargs.get("pk"))

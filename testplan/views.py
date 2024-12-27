@@ -2,26 +2,31 @@ import json
 import logging
 
 import pandas as pd
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.db.models.aggregates import Count
 from django.db.models.deletion import ProtectedError
 from django.http import HttpResponse
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
-from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
+from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
+                                  UpdateView)
 
 from project.models import DbConnection
 from testplan import tasks
-from testplan.models import Project, TestCase, TestRun, TestRunTestCase, TestRunTestCaseHistory
+from testplan.decorators import user_is_member
+from testplan.mixins import AdminPermissionMixin, MemberPermissionMixin
+from testplan.models import (Project, TestCase, TestRun, TestRunTestCase,
+                             TestRunTestCaseHistory)
 
 _404_Page = "404.html"
 
 logger = logging.getLogger(__name__)
 
 
-class TestCaseCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+class TestCaseCreateView(LoginRequiredMixin, MemberPermissionMixin, CreateView):
     model = TestCase
     fields = ["tcname", "sourcedb", "sourcesql", "targetdb", "targetsql", "keycolumns"]
     template_name = "testcase_form.html"
@@ -43,6 +48,13 @@ class TestCaseCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         context["db_connections"] = DbConnection.objects.all()
         return context
 
+    def get_initial(self):
+        initial = super().get_initial()
+        project_id = self.kwargs.get("project_id")
+        project = Project.objects.get(id=project_id)
+        initial["project"] = project
+        return initial
+
     def test_func(self):
         project = Project.objects.get(id=self.kwargs["project_id"])
         if self.request.user in project.members.all():
@@ -53,7 +65,7 @@ class TestCaseCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         return render(self.request, _404_Page)
 
 
-class TestCaseListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+class TestCaseListView(LoginRequiredMixin, MemberPermissionMixin, ListView):
     model = TestCase
     template_name = "testcase_list.html"
     paginate_by = 10
@@ -66,17 +78,11 @@ class TestCaseListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         context["project"] = Project.objects.get(id=self.kwargs["project_id"])
         return context
 
-    def test_func(self):
-        project = Project.objects.get(id=self.kwargs["project_id"])
-        if self.request.user in project.members.all():
-            return True
-        return False
-
     def handle_no_permission(self) -> HttpResponseRedirect:
         return render(self.request, _404_Page)
 
 
-class TestCaseUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+class TestCaseUpdateView(LoginRequiredMixin, MemberPermissionMixin, UpdateView):
     model = TestCase
     fields = ["tcname", "sourcedb", "sourcesql", "targetdb", "targetsql", "keycolumns"]
     template_name = "testcase_form.html"
@@ -104,17 +110,11 @@ class TestCaseUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         context["db_connections"] = DbConnection.objects.all()
         return context
 
-    def test_func(self):
-        project = Project.objects.get(id=self.kwargs["project_id"])
-        if self.request.user in project.members.all():
-            return True
-        return False
-
     def handle_no_permission(self) -> HttpResponseRedirect:
         return render(self.request, _404_Page)
 
 
-class TestRunCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+class TestRunCreateView(LoginRequiredMixin, MemberPermissionMixin, CreateView):
     model = TestRun
     template_name = "testrun_form.html"
     fields = ["name"]
@@ -141,20 +141,24 @@ class TestRunCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     def form_invalid(self, form):
         return self.render_to_response(self.get_context_data(form=form))
 
-    def test_func(self):
-        try:
-            project = Project.objects.get(id=self.kwargs["project_id"])
-            if self.request.user in project.members.all():
-                return True
-            return False
-        except Project.DoesNotExist:
-            return redirect(_404_Page)
+    # def test_func(self):
+    #     try:
+    #         project = Project.objects.get(id=self.kwargs["project_id"])
+    #         if self.request.user in project.members.all():
+    #             return True
+    #         return False
+    #     except Project.DoesNotExist:
+    #         return redirect(_404_Page)
 
     def handle_no_permission(self) -> HttpResponseRedirect:
         return render(self.request, _404_Page)
 
 
-class TestRunListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+class TestRunListView(LoginRequiredMixin, MemberPermissionMixin, ListView):
+    """
+    List of Test Runs for a Project
+    """
+
     model = TestRun
     template_name = "testrun_list.html"
 
@@ -162,7 +166,9 @@ class TestRunListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         context = super().get_context_data(**kwargs)
         project = get_object_or_404(Project, id=self.kwargs["project_id"])
         context["project"] = project
-        testrun_qs = TestRun.objects.prefetch_related("testruntestcase_set").filter(project=project)
+        testrun_qs = TestRun.objects.prefetch_related("testruntestcase_set").filter(
+            project=project
+        )
         context["testrun_list"] = testrun_qs
         context["testcases"] = (
             TestRunTestCase.objects.filter(testrun_id__in=testrun_qs)
@@ -171,30 +177,29 @@ class TestRunListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         )
         return context
 
-    def test_func(self):
-        try:
-            project = Project.objects.get(id=self.kwargs["project_id"])
-            if self.request.user in project.members.all():
-                return True
-            return False
-        except Project.DoesNotExist:
-            return False
-
     def handle_no_permission(self) -> HttpResponseRedirect:
         return render(self.request, _404_Page)
 
 
 @login_required
+@user_is_member
 def testrun_index(request, project_id):
+    """
+    Test Run Index Page which in turn calls TestRunListView to render the list of testruns.
+    """
     project = Project.objects.get(id=project_id)
     if request.user in project.members.all():
-        return render(request, "testruns.html", {"project": project})
+        return render(request, "testruns_index.html", {"project": project})
     else:
         return render(request, _404_Page)
 
 
 @login_required
+@user_is_member
 def get_testrun_testcases(request, project_id, testrun_id):
+    """
+    Get Test Run Test Cases for a Test Run
+    """
     project = Project.objects.get(id=project_id)
     latest_testcase_runs = []
     most_recent_testcase_runs = []
@@ -204,7 +209,9 @@ def get_testrun_testcases(request, project_id, testrun_id):
 
         for rn in testrun_cases:
             try:
-                most_recent_tc_run = TestRunTestCaseHistory.objects.filter(testrun_testcase_id=rn.id).latest("id")
+                most_recent_tc_run = TestRunTestCaseHistory.objects.filter(
+                    testrun_testcase_id=rn.id
+                ).latest("id")
                 most_recent_testcase_runs.append(
                     {
                         "testrun_testcase": rn,
@@ -221,7 +228,9 @@ def get_testrun_testcases(request, project_id, testrun_id):
 
         for run in testrun_cases:
             try:
-                latest_testcase_run = TestRunTestCaseHistory.objects.filter(testrun_testcase_id=run.id).latest("id")
+                latest_testcase_run = TestRunTestCaseHistory.objects.filter(
+                    testrun_testcase_id=run.id
+                ).latest("id")
                 latest_testcase_runs.append(latest_testcase_run)
             except Exception:
                 latest_testcase_runs.append(None)
@@ -239,23 +248,30 @@ def get_testrun_testcases(request, project_id, testrun_id):
 
 
 @login_required
+@user_is_member
 def get_project_testcases(request, project_id, testrun_id):
     project = Project.objects.get(id=project_id)
     testrun = TestRun.objects.get(id=testrun_id)
-    testcases = TestCase.objects.filter(project_id=project_id).exclude(id__in=testrun.testcases.all())
+    testcases = TestCase.objects.filter(project_id=project_id).exclude(
+        id__in=testrun.testcases.all()
+    )
 
     return render(
-        request, "partials/select_test_cases.html", {"testcases": testcases, "project": project, "testrun": testrun}
+        request,
+        "partials/select_test_cases.html",
+        {"testcases": testcases, "project": project, "testrun": testrun},
     )
 
 
-class TestRunDetails(LoginRequiredMixin, UserPassesTestMixin, DetailView):
+class TestRunDetails(LoginRequiredMixin, MemberPermissionMixin, DetailView):
     model = TestRun
     template_name = "testrun_detail.html"
 
     def get_object(self, queryset=None):
         project = get_object_or_404(Project, id=self.kwargs["project_id"])
-        testrun = get_object_or_404(TestRun, id=self.kwargs["testrun_id"], project_id=project.id)
+        testrun = get_object_or_404(
+            TestRun, id=self.kwargs["testrun_id"], project_id=project.id
+        )
         return testrun
 
     def get_context_data(self, **kwargs):
@@ -267,18 +283,15 @@ class TestRunDetails(LoginRequiredMixin, UserPassesTestMixin, DetailView):
         )
         return context
 
-    def test_func(self):
-        testrun_testcase = self.get_object()
-        project = testrun_testcase.project
-        if self.request.user in project.members.all():
-            return True
-        return False
-
     def handle_no_permission(self) -> HttpResponseRedirect:
         return render(self.request, _404_Page)
 
 
-class TestRunUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+class TestRunUpdateView(LoginRequiredMixin, MemberPermissionMixin, UpdateView):
+    """
+    Update the Test Run by including more Test Cases.
+    """
+
     model = TestRun
     fields = ["testcases"]
 
@@ -286,19 +299,19 @@ class TestRunUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         testrun = TestRun.objects.get(id=self.kwargs["testrun_id"])
         return testrun
 
-    def test_func(self):
-        testrun = self.get_object()
-        project = testrun.project
-        if self.request.user in project.members.all():
-            return True
-        return False
-
     def form_valid(self, form):
         testrun = self.get_object()
         cleaned_tcs = form.cleaned_data["testcases"]
         for item in cleaned_tcs:
-            testrun_testcase = TestRunTestCase(testrun_id=testrun.id, testcase_id=item.id)
-            if TestRunTestCase.objects.filter(testcase_id=item.id, testrun_id=testrun.id).count() <= 0:
+            testrun_testcase = TestRunTestCase(
+                testrun_id=testrun.id, testcase_id=item.id
+            )
+            if (
+                TestRunTestCase.objects.filter(
+                    testcase_id=item.id, testrun_id=testrun.id
+                ).count()
+                <= 0
+            ):
                 testrun_testcase.save()
         return HttpResponse(
             status=204,
@@ -318,7 +331,12 @@ class TestRunUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return super().form_invalid(form)
 
 
-class TestRunCaseDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+class TestRunCaseDeleteView(LoginRequiredMixin, AdminPermissionMixin, DeleteView):
+    """
+    Delete a Test Case from the Test Run, in case of AdminPermission returning False
+    then PermissionDenied message is sent as response to the client.
+    """
+
     model = TestRun
 
     def get_object(self, queryset=None):
@@ -356,15 +374,8 @@ class TestRunCaseDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView)
                 },
             )
 
-    def test_func(self):
-        testrun_testcase = self.get_object()
-        project = testrun_testcase.testrun.project
-        if self.request.user in project.members.all():
-            return True
-        return False
-
     def handle_no_permission(self):
-        project = self.get_object()
+        testrun_testcase = self.get_object()
         if self.raise_exception:
             raise PermissionDenied(self.get_permission_denied_message())
         return HttpResponse(
@@ -372,7 +383,7 @@ class TestRunCaseDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView)
             headers={
                 "HX-Trigger": json.dumps(
                     {
-                        "showMessage": f"You do not have permission to delete '{project.name}'",
+                        "showMessage": f"You do not have permission to delete '{testrun_testcase.testcase.tcname}'",
                         "eventType": "permissiondenied",
                     }
                 )
@@ -382,10 +393,16 @@ class TestRunCaseDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView)
 
 @login_required
 def execute_testcase(request, project_id, testrun_id, testrun_testcase_id):
+    """
+    Initiates execution of the test case in a test run, not adding decorator to check  `user_is_member`
+    as permissionDenied message is sent as response to the client.
+    """
     project = Project.objects.get(id=project_id)
     if request.user in project.members.all():
         testrun = TestRun.objects.get(id=testrun_id)
-        testrun_testcase = TestRunTestCase.objects.get(testrun_id=testrun.id, id=testrun_testcase_id)
+        testrun_testcase = TestRunTestCase.objects.get(
+            testrun_id=testrun.id, id=testrun_testcase_id
+        )
 
         testrun_tc_history = TestRunTestCaseHistory(
             testrun_testcase=testrun_testcase,
@@ -399,7 +416,9 @@ def execute_testcase(request, project_id, testrun_id, testrun_testcase_id):
         testcase = get_object_or_404(TestCase, id=testrun_testcase.testcase_id)
 
         # tasks.execute_comparison(testrun_tc_history.id, testcase.id, testrun_testcase.id)
-        tasks.execute_comparison.delay(testrun_tc_history.id, testcase.id, testrun_testcase.id)
+        tasks.execute_comparison.delay(
+            testrun_tc_history.id, testcase.id, testrun_testcase.id
+        )
 
         return HttpResponse(
             status=204,
@@ -428,21 +447,20 @@ def execute_testcase(request, project_id, testrun_id, testrun_testcase_id):
 
 
 @login_required
-def testrun_history(request, project_id, testrun_id, testrun_testcase_id):
+def testrun_testcase_history_list(request, project_id, testrun_id, testrun_testcase_id):
+    """
+    Lists testcases history for a testrun
+    """
     project = Project.objects.get(id=project_id)
     testrun = TestRun.objects.get(id=testrun_id)
     testrun_testcase = TestRunTestCase.objects.get(id=testrun_testcase_id)
-
-    # testcase_run_history = TestRunCasesHistory.objects.filter(testrun_testcase_id=testrun_case_id).order_by(
-    #     "-execution_end"
-    # )
-    testcase_run_history = TestRunTestCaseHistory.objects.select_related("testcase_run_status", "triggered_by").filter(
-        testrun_testcase_id=testrun_testcase_id
-    )
+    testcase_run_history = TestRunTestCaseHistory.objects.select_related(
+        "testcase_run_status", "triggered_by"
+    ).filter(testrun_testcase_id=testrun_testcase_id)
     if request.user in project.members.all():
         return render(
             request,
-            "testrun_history.html",
+            "testrun_testcase_history_list.html",
             {
                 "testcase_run_history": testcase_run_history,
                 "project": project,
@@ -452,26 +470,24 @@ def testrun_history(request, project_id, testrun_id, testrun_testcase_id):
             },
         )
     else:
-        return HttpResponse(
-            status=204,
-            headers={
-                "HX-Trigger": json.dumps(
-                    {
-                        "showMessage": "Permission denied to view ,please contact your project owner",
-                        "eventType": "permissiondenied",
-                    }
-                )
-            },
+        messages.error(
+            request, "Permission denied to view ,please contact your project owner"
         )
+        return redirect("testrun_detail", project_id=project_id, testrun_id=testrun_id)
 
 
 @login_required
-def testrun_case_result_summary(request, project_id, testrun_id, testrun_case_id, testrun_case_history_id):
+@user_is_member
+def testrun_case_result_summary(
+    request, project_id, testrun_id, testrun_case_id, testrun_case_history_id
+):
     project = Project.objects.get(id=project_id)
     testrun = TestRun.objects.get(id=testrun_id)
     testrun_testcase = TestRunTestCase.objects.get(id=testrun_case_id)
     test_case = TestCase.objects.get(id=testrun_testcase.testcase_id)
-    if TestRunTestCaseHistory.objects.filter(testrun_testcase_id=testrun_case_id).exists():
+    if TestRunTestCaseHistory.objects.filter(
+        testrun_testcase_id=testrun_case_id
+    ).exists():
         try:
             added_data = pd.read_csv(f"{testrun_case_history_id}_added.csv")
             added_set = added_data.to_numpy()
@@ -497,7 +513,7 @@ def testrun_case_result_summary(request, project_id, testrun_id, testrun_case_id
 
         return render(
             request,
-            "testrun_history_result.html",
+            "testrun_testcase_history_testcase_result.html",
             {
                 "added": added_set,
                 "added_data": added_data,
@@ -515,7 +531,7 @@ def testrun_case_result_summary(request, project_id, testrun_id, testrun_case_id
     else:
         return render(
             request,
-            "testrun_history_result.html",
+            "testrun_testcase_history_testcase_result.html",
             {
                 "message": "History Not Available",
                 "test_case": test_case,

@@ -9,31 +9,31 @@
         <th class="has-text-centered">DB Name</th>
         <th class="has-text-centered">UserID</th>
       </tr>
-      <tbody>
-        {% for conn in connections %}
-          <tr>
-            <td>
-              <a title="Edit"
-                 hx-get="{% url 'edit_connection' project.id conn.pk %}"
-                 hx-target="#dialog">
-                <i class="fa fa-pen-to-square fa-fw" aria-hidden="true"></i>
-              </a>
-              <a class="has-text-danger"
-                 title="Delete"
-                 hx-get="{% url 'delete_connection' project.id conn.pk %}"
-                 hx-target="#dialog">
-                <i class="fa fa-trash fa-fw" aria-hidden="true"></i>
-              </a>
-            </td>
-            <td>{{ conn.name }}</td>
-            <td>{{ conn.dbtype }}</td>
-            <td>{{ conn.hostname }}</td>
-            <td>{{ conn.dbname }}</td>
-            <td>{{ conn.username }}</td>
-          </tr>
-        {% endfor %}
-      </tbody>
     </thead>
+    <tbody>
+      {% for conn in connections %}
+        <tr>
+          <td>
+            <a title="Edit"
+               hx-get="{% url 'edit_connection' project.id conn.pk %}"
+               hx-target="#dialog">
+              <i class="fa fa-pen-to-square fa-fw" aria-hidden="true"></i>
+            </a>
+            <a class="has-text-danger"
+               title="Delete"
+               hx-get="{% url 'delete_connection' project.id conn.pk %}"
+               hx-target="#dialog">
+              <i class="fa fa-trash fa-fw" aria-hidden="true"></i>
+            </a>
+          </td>
+          <td>{{ conn.name }}</td>
+          <td>{{ conn.dbtype }}</td>
+          <td>{{ conn.hostname }}</td>
+          <td>{{ conn.dbname }}</td>
+          <td>{{ conn.username }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
   </table>
   <!-- Pagination -->
   {% if connections.has_other_pages %}
