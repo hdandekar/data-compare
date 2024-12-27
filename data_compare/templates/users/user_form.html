@@ -22,189 +22,189 @@
               </p>
             </header>
             <div class="card-content">
+              <hr />
+              <div class="field is-horizontal">
+                <div class="field-label is-normal">
+                  <label class="label" for="id_name">Full Name</label>
+                </div>
+                <div class="field-body">
+                  <div class="field">
+                    <div class="control">
+                      <input value="{{ user.name }}"
+                             class="input"
+                             type="text"
+                             name="name"
+                             id="id_name"
+                             autofocus="" />
+                    </div>
+                    <p class="help">{{ form.user.errors }}</p>
+                  </div>
+                </div>
+              </div>
+              <div class="field is-horizontal">
+                <div class="field-label is-normal">
+                  <label class="label">E-mail</label>
+                </div>
+                <div class="field-body">
+                  <div class="field">
+                    <div class="control">
+                      <input value="{{ user.email }}"
+                             class="input"
+                             type="email"
+                             name="email"
+                             id="id_email"
+                             autofocus="" />
+                    </div>
+                    <p class="help">{{ form.email.errors }}</p>
+                  </div>
+                </div>
+              </div>
+              <div class="field is-horizontal">
+                <div class="field-label is-normal">
+                  <label class="label" for="id_mobile_number">Mobile</label>
+                </div>
+                <div class="field-body">
+                  <div class="field">
+                    <div class="control">
+                      <input value="{{ user.mobile_number }}"
+                             class="input"
+                             type="text"
+                             name="mobile_number"
+                             id="id_mobile_number"
+                             autofocus="" />
+                    </div>
+                    <p>{{ form.mobile_number.errors }}</p>
+                    <span class="smaller">(min 8 digits, max 15 digits)</span>
+                  </div>
+                </div>
+              </div>
+              <div class="field is-horizontal">
+                <div class="field-label is-normal">
+                  <label class="label" for="id_address">Location</label>
+                </div>
+                <div class="field-body">
+                  <div class="field">
+                    <div class="control">
+                      <input value="{{ user.address }}"
+                             class="input"
+                             type="text"
+                             name="address"
+                             id="id_address"
+                             autofocus="" />
+                    </div>
+                    <p>{{ form.address.errors }}</p>
+                  </div>
+                </div>
+              </div>
+              <div class="field is-horizontal">
+                <div class="field-label is-normal">
+                  <label class="label" for="id_designation">Designation</label>
+                </div>
+                <div class="field-body">
+                  <div class="field">
+                    <div class="control">
+                      <input value="{{ user.designation }}"
+                             class="input"
+                             type="text"
+                             name="designation"
+                             id="id_designation"
+                             autofocus="" />
+                    </div>
+                    <p>{{ form.designation.errors }}</p>
+                  </div>
+                </div>
+              </div>
             </hr />
+          </div>
+        </div>
+      </div>
+      <div class="tile is-parent">
+        <div class="card tile is-child">
+          <header class="card-header">
+            <p class="card-header-title">
+              <span class="icon"><i class="mdi mdi-account default"></i></span>
+              Social Profile
+            </p>
+          </header>
+          <div class="card-content">
+            {% if user.avatar %}
+              <div class="is-user-avatar image has-max-width is-aligned-center pb-2">
+                <img src="{{ user.avatar.url }}" alt="{{ user.name }}" />
+              </div>
+            {% endif %}
             <div class="field is-horizontal">
               <div class="field-label is-normal">
-                <label class="label" for="id_name">Full Name</label>
+                <label class="label" for="id_website">Avatar</label>
               </div>
               <div class="field-body">
-                <div class="field">
-                  <div class="control">
-                    <input value="{{ user.name }}"
-                           class="input"
-                           type="text"
-                           name="name"
-                           id="id_name"
-                           autofocus="" />
+                <div class="control">
+                  <div class="file is-small has-name">
+                    <label class="file-label">
+                      <input type="file" name="avatar" value="" />
+                    </label>
                   </div>
-                  <p class="help">{{ form.user.errors }}</p>
-                </div>
-              </div>
-            </div>
-            <div class="field is-horizontal">
-              <div class="field-label is-normal">
-                <label class="label">E-mail</label>
-              </div>
-              <div class="field-body">
-                <div class="field">
-                  <div class="control">
-                    <input value="{{ user.email }}"
-                           class="input"
-                           type="email"
-                           name="email"
-                           id="id_email"
-                           autofocus="" />
-                  </div>
-                  <p class="help">{{ form.email.errors }}</p>
-                </div>
-              </div>
-            </div>
-            <div class="field is-horizontal">
-              <div class="field-label is-normal">
-                <label class="label" for="id_mobile_number">Mobile</label>
-              </div>
-              <div class="field-body">
-                <div class="field">
-                  <div class="control">
-                    <input value="{{ user.mobile_number }}"
-                           class="input"
-                           type="text"
-                           name="mobile_number"
-                           id="id_mobile_number"
-                           autofocus="" />
-                  </div>
-                  <p>{{ form.mobile_number.errors }}</p>
-                  <span class="smaller">(min 8 digits, max 15 digits)</span>
-                </div>
-              </div>
-            </div>
-            <div class="field is-horizontal">
-              <div class="field-label is-normal">
-                <label class="label" for="id_address">Location</label>
-              </div>
-              <div class="field-body">
-                <div class="field">
-                  <div class="control">
-                    <input value="{{ user.address }}"
-                           class="input"
-                           type="text"
-                           name="address"
-                           id="id_address"
-                           autofocus="" />
-                  </div>
-                  <p>{{ form.address.errors }}</p>
-                </div>
-              </div>
-            </div>
-            <div class="field is-horizontal">
-              <div class="field-label is-normal">
-                <label class="label" for="id_designation">Designation</label>
-              </div>
-              <div class="field-body">
-                <div class="field">
-                  <div class="control">
-                    <input value="{{ user.designation }}"
-                           class="input"
-                           type="text"
-                           name="designation"
-                           id="id_designation"
-                           autofocus="" />
-                  </div>
-                  <p>{{ form.designation.errors }}</p>
                 </div>
               </div>
             </div>
           </hr />
-        </div>
-      </div>
-    </div>
-    <div class="tile is-parent">
-      <div class="card tile is-child">
-        <header class="card-header">
-          <p class="card-header-title">
-            <span class="icon"><i class="mdi mdi-account default"></i></span>
-            Social Profile
-          </p>
-        </header>
-        <div class="card-content">
-          {% if user.avatar %}
-            <div class="is-user-avatar image has-max-width is-aligned-center pb-2">
-              <img src="{{ user.avatar.url }}" alt="{{ user.name }}" />
-            </div>
-          {% endif %}
           <div class="field is-horizontal">
             <div class="field-label is-normal">
-              <label class="label" for="id_website">Avatar</label>
+              <label class="label" for="id_website">Website</label>
             </div>
             <div class="field-body">
-              <div class="control">
-                <div class="file is-small has-name">
-                  <label class="file-label">
-                    <input type="file" name="avatar" value="" />
-                  </label>
+              <div class="field">
+                <div class="control">
+                  <input value="{{ user.website }}"
+                         class="input"
+                         type="text"
+                         name="website"
+                         id="id_website"
+                         autofocus="" />
                 </div>
+                <p>{{ form.website.errors }}</p>
               </div>
             </div>
           </div>
         </hr />
         <div class="field is-horizontal">
           <div class="field-label is-normal">
-            <label class="label" for="id_website">Website</label>
+            <label class="label" for="id_twitter_link">Twitter</label>
           </div>
           <div class="field-body">
             <div class="field">
               <div class="control">
-                <input value="{{ user.website }}"
+                <input value="{{ user.twitter_link }}"
                        class="input"
                        type="text"
-                       name="website"
-                       id="id_website"
+                       name="twitter_link"
+                       id="id_twitter_link"
                        autofocus="" />
               </div>
-              <p>{{ form.website.errors }}</p>
+              <p>{{ form.twitter_link.errors }}</p>
             </div>
           </div>
         </div>
-      </hr />
-      <div class="field is-horizontal">
-        <div class="field-label is-normal">
-          <label class="label" for="id_twitter_link">Twitter</label>
-        </div>
-        <div class="field-body">
-          <div class="field">
-            <div class="control">
-              <input value="{{ user.twitter_link }}"
-                     class="input"
-                     type="text"
-                     name="twitter_link"
-                     id="id_twitter_link"
-                     autofocus="" />
-            </div>
-            <p>{{ form.twitter_link.errors }}</p>
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label" for="id_github_link">Github</label>
           </div>
-        </div>
-      </div>
-      <div class="field is-horizontal">
-        <div class="field-label is-normal">
-          <label class="label" for="id_github_link">Github</label>
-        </div>
-        <div class="field-body">
-          <div class="field">
-            <div class="control">
-              <input value="{{ user.github_link }}"
-                     class="input"
-                     type="text"
-                     name="github_link"
-                     id="id_github_link"
-                     autofocus="" />
+          <div class="field-body">
+            <div class="field">
+              <div class="control">
+                <input value="{{ user.github_link }}"
+                       class="input"
+                       type="text"
+                       name="github_link"
+                       id="id_github_link"
+                       autofocus="" />
+              </div>
+              <p>{{ form.github_link.errors }}</p>
             </div>
-            <p>{{ form.github_link.errors }}</p>
           </div>
         </div>
       </div>
     </div>
   </div>
-</div>
 </div>
 <div class="buttons is-centered">
   <button type="submit" class="button is-primary is-centered">Save</button>

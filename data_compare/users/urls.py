@@ -1,6 +1,7 @@
 from django.urls import path
 
-from data_compare.users.views import check_username, user_detail_view, user_redirect_view, user_update_view
+from data_compare.users.views import (check_username, user_detail_view,
+                                      user_redirect_view, user_update_view)
 
 app_name = "users"
 urlpatterns = [

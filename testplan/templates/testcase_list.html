@@ -70,31 +70,31 @@
           {% endif %}
           {% for i in page_range|default_if_none:page_obj.paginator.get_elided_page_range %}
             {% if page_obj.number == i %}
-              <li class="active page-item">
-                <span class="page-link">{{ i }}
-                  <span class="sr-only">(current)</span>
-                </span>
+            <li class="active page-item">
+              <span class="page-link">{{ i }}
+                <span class="sr-only">(current)</span>
+              </span>
+            </li>
+          {% else %}
+            {% if i == page_obj.paginator.ELLIPSIS %}
+              <li class="page-item">
+                <span class="page-link">{{ i }}</span>
               </li>
             {% else %}
-              {% if i == page_obj.paginator.ELLIPSIS %}
-                <li class="page-item">
-                  <span class="page-link">{{ i }}</span>
-                </li>
-              {% else %}
-                <li class="page-item">
-                  <a class="page-link" href="?page={{ i }}">{{ i }}</a>
-                </li>
-              {% endif %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+              </li>
             {% endif %}
-          {% endfor %}
-          {% if page_obj.has_next %}
-            <li>
-              <a class="page-link" href="?page={{ page_obj.next_page_number }}"><i class="fa-solid fa-angles-right"></i></a>
-            </li>
           {% endif %}
-        </ul>
-      </nav>
-    {% endif %}
-    <!-- end Pagination -->
-  </div>
+        {% endfor %}
+        {% if page_obj.has_next %}
+          <li>
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}"><i class="fa-solid fa-angles-right"></i></a>
+          </li>
+        {% endif %}
+      </ul>
+    </nav>
+  {% endif %}
+  <!-- end Pagination -->
+</div>
 {% endblock content %}

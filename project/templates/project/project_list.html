@@ -35,12 +35,16 @@
           <td class="has-text-centered is-vcentered">0</td>
           <td class="has-text-centered is-vcentered">
             <a href="{% url 'testruns' project.id %}">
-              {% with testrun_total=project.project_testruns.count %}{{ testrun_total|default:0 }}{% endwith %}
+              {% with testrun_total=project.project_testruns.count %}
+                {{ testrun_total|default:0 }}
+              {% endwith %}
             </a>
           </td>
           <td class="has-text-centered is-vcentered">
             <a href="{% url 'list_testcase' project.id %}">
-              {% with tc_total=project.project_testcases.count %}{{ tc_total|default:0 }}{% endwith %}
+              {% with tc_total=project.project_testcases.count %}
+                {{ tc_total|default:0 }}
+              {% endwith %}
             </a>
           </td>
           <td class="has-text-centered is-vcentered"></td>

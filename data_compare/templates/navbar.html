@@ -1,0 +1,77 @@
+{% load static i18n %}
+
+<nav class="navbar is-dark" role="navigation" aria-label="main navigation">
+  <div class="navbar-brand">
+    <a class="navbar-item" href="{% url 'home' %}">Data Match</a>
+    <a role="button"
+       class="navbar-burger"
+       aria-label="menu"
+       aria-expanded="false"
+       data-target="navbarBasicExample">
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+    </a>
+  </div>
+  <div id="navbarBasicExample" class="navbar-menu">
+    <div class="navbar-start">
+      <a class="navbar-item" href="{% url 'help' %}">Help</a>
+      <div class="navbar-item has-dropdown is-hoverable">
+        <a class="navbar-link">More</a>
+        <div class="navbar-dropdown">
+          <a class="navbar-item is-selected" href="{% url 'about' %}">About</a>
+          <hr class="navbar-divider" />
+          <a class="navbar-item"
+             href="https://github.com/hdandekar/data-compare/issues/new?assignees=hdandekar&labels=&projects=&template=bug_report.md&title=%5BBUG%5D">Report an issue</a>
+        </div>
+      </div>
+    </div>
+    <div class="navbar-end">
+      <div class="navbar-item">
+        {% if user.is_authenticated %}
+          <div class="navbar-item has-dropdown is-hoverable">
+            <a class="navbar-link">Go To</a>
+            <div class="navbar-dropdown is-right">
+              <a class="navbar-item" href="{% url 'projects' %}">Projects</a>
+              <hr class="navbar-divider" />
+              <div class="navbar-item">Version 0.1.0</div>
+            </div>
+          </div>
+          <div class="navbar-item has-dropdown is-hoverable">
+            <a class="navbar-link">
+              {% with user_email=user.email %}{{ user.name|default:user_email }}{% endwith %}
+              {% if request.user.avatar == '' %}
+                <i class="fa-solid fa-user"></i>
+              {% else %}
+                <img alt="profile"
+                     class="img-avatar me-1 rounded-circle"
+                     src="{{ request.user.avatar.url }}" />
+              {% endif %}
+            </a>
+            <div class="navbar-dropdown is-right">
+              <a class="navbar-item"
+                 href="{% url 'users:user_detail' request.user.pk %}">{% translate "My Profile" %}</a>
+              <a class="navbar-item">Components</a>
+              <hr class="navbar-divider" />
+              <a class="navbar-item">
+                <form method="post" action="{% url 'account_logout' %}">
+                  {% csrf_token %}
+                  {% if redirect_field_value %}
+                    <input type="hidden"
+                           name="{{ redirect_field_name }}"
+                           value="{{ redirect_field_value }}" />
+                  {% endif %}
+                  <button class="has-text-danger" type="submit">{% translate "Sign Out" %}</button>
+                </form>
+              </a>
+            </div>
+          </div>
+        {% else %}
+          <a class="button is-primary" href="{% url 'account_signup' %}">{% translate "Sign Up" %}</a>
+          <a class="button is-light" href="{% url 'account_login' %}">{% translate "Sign In" %}</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</nav>

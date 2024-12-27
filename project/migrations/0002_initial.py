@@ -19,20 +19,27 @@ class Migration(migrations.Migration):
             model_name="dbconnection",
             name="created_by",
             field=models.ForeignKey(
-                on_delete=django.db.models.deletion.PROTECT, related_name="connection", to=settings.AUTH_USER_MODEL
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="connection",
+                to=settings.AUTH_USER_MODEL,
             ),
         ),
         migrations.AddField(
             model_name="dbconnection",
             name="dbtype",
             field=models.ForeignKey(
-                null=True, on_delete=django.db.models.deletion.PROTECT, related_name="dbtype", to="project.dbtype"
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="dbtype",
+                to="project.dbtype",
             ),
         ),
         migrations.AddField(
             model_name="project",
             name="members",
-            field=models.ManyToManyField(blank=True, related_name="projects", to=settings.AUTH_USER_MODEL),
+            field=models.ManyToManyField(
+                blank=True, related_name="projects", to=settings.AUTH_USER_MODEL
+            ),
         ),
         migrations.AddField(
             model_name="project",
@@ -47,7 +54,9 @@ class Migration(migrations.Migration):
             model_name="dbconnection",
             name="project",
             field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE, related_name="project", to="project.project"
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="project",
+                to="project.project",
             ),
         ),
     ]

@@ -2,9 +2,11 @@
 
 {% block title %}
   {% if project.name %}
-    {{ project.name }} - New Test Case
+    {{
+    project.name }} - New Test Case
   {% else %}
-    {{ testcase.project.name }} - {{ testcase.tcname }}
+    {{ testcase.project.name }} - {{
+    testcase.tcname }}
   {% endif %}
 {% endblock title %}
 {% block content %}
@@ -78,7 +80,8 @@
           <label class="label" for="id_keycolumns">
             Key Columns
             <span class="has-text-weight-light is-size-7">
-              Provide list of ',' separated columns to uniquely identify a row in the dataset, e.g id,emp_id,dept_id. Default is 'All'
+              Provide list of ',' separated columns to uniquely identify a row in
+              the dataset, e.g id,emp_id,dept_id. Default is 'All'
             </span>
           </label>
           <div class="control">
@@ -99,10 +102,9 @@
           <label class="label" for="id_sourcedb">Source Connection</label>
           <div class="select is-fullwidth">
             <select name="sourcedb" required="" id="id_sourcedb" class="select">
-              {% for connection in db_connections %}
+              {% for connection in db_connections %}    
                 <option value="{{ connection.id }}"
-                        {% if connection.id == testcase.sourcedb.id %}selected{% endif %}>
-                  {{ connection.name }}
+                  {% if connection.id == testcase.sourcedb.id %}selected{% endif %}>{{ connection.name }}
                 </option>
               {% endfor %}
             </select>
@@ -112,8 +114,7 @@
       <div class="column">
         <div class="field">
           <label class="label" for="id_sourcesql">Source SQL</label>
-          <textarea name="sourcesql" id="id_sourcesql" class="textarea" style="height: 100px">{{ testcase.sourcesql }}
-            </textarea>
+          <textarea name="sourcesql" id="id_sourcesql" class="textarea" style="height: 100px">{{ testcase.sourcesql }}</textarea>
         </div>
         {% if form.sourcesql.errors %}<p class="help is-danger">{{ form.sourcesql.errors|striptags }}</p>{% endif %}
       </div>
@@ -126,8 +127,7 @@
             <select name="targetdb" required="" id="id_targetdb" class="select">
               {% for connection in db_connections %}
                 <option value="{{ connection.id }}"
-                        {% if connection.id == testcase.targetdb.id %}selected{% endif %}>
-                  {{ connection.name }}
+                  {% if connection.id == testcase.targetdb.id %}selected{% endif %}>{{ connection.name }}
                 </option>
               {% endfor %}
             </select>
@@ -137,8 +137,7 @@
       <div class="column">
         <div class="field">
           <label class="label" for="id_targetsql">Target SQL</label>
-          <textarea required name="targetsql" id="id_targetsql" class="textarea" style="height: 100px">{{ testcase.targetsql }}
-            </textarea>
+          <textarea required name="targetsql" id="id_targetsql" class="textarea" style="height: 100px">{{ testcase.targetsql }}</textarea>
         </div>
         {% if form.targetsql.errors %}<p class="help is-danger">{{ form.targetsql.errors|striptags }}</p>{% endif %}
       </div>

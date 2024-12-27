@@ -62,9 +62,10 @@
 {% block inline_javascript %}
   <script>
     function setActive(element) {
-      document.querySelectorAll('a').forEach(link =>
-        link.classList.remove('is-active'));
-      element.classList.add('is-active');
+      document
+        .querySelectorAll("a")
+        .forEach((link) => link.classList.remove("is-active"));
+      element.classList.add("is-active");
     }
   </script>
 {% endblock inline_javascript %}

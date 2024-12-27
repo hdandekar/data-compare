@@ -11,10 +11,16 @@ def get_deleted_user_instance():
 
 class TestCase(models.Model):
     tcname = models.CharField(max_length=50, blank=False, null=False)
-    project = models.ForeignKey(Project, related_name="project_testcases", on_delete=models.PROTECT)
-    sourcedb = models.ForeignKey(DbConnection, null=True, on_delete=models.PROTECT, related_name="sourcedb")
+    project = models.ForeignKey(
+        Project, related_name="project_testcases", on_delete=models.PROTECT
+    )
+    sourcedb = models.ForeignKey(
+        DbConnection, null=True, on_delete=models.PROTECT, related_name="sourcedb"
+    )
     sourcesql = models.TextField(max_length=None, null=False, blank=False)
-    targetdb = models.ForeignKey(DbConnection, null=True, on_delete=models.PROTECT, related_name="targetdb")
+    targetdb = models.ForeignKey(
+        DbConnection, null=True, on_delete=models.PROTECT, related_name="targetdb"
+    )
     targetsql = models.TextField(max_length=None, null=False, blank=False)
     keycolumns = models.TextField(max_length=None, default="All")
     created_date = models.DateTimeField(auto_now_add=True)
@@ -31,6 +37,14 @@ class TestCase(models.Model):
         on_delete=models.SET(get_deleted_user_instance),
     )
 
+    class Meta:
+        permissions = [
+            ("can_edit_testcase", "Can edit test case"),
+            ("can_view_testcase", "Can view test case"),
+            ("can_delete_testcase", "Can delete test case"),
+            ("can_create_testcase", "Can create test case"),
+        ]
+
     def __str__(self):
         return str(self.id)
 
@@ -41,7 +55,9 @@ class TestCaseStatus(models.Model):
 
 class TestRun(models.Model):
     testcases = models.ManyToManyField(TestCase, blank=True, through="TestRunTestCase")
-    project = models.ForeignKey(Project, related_name="project_testruns", on_delete=models.PROTECT)
+    project = models.ForeignKey(
+        Project, related_name="project_testruns", on_delete=models.PROTECT
+    )
     name = models.CharField(max_length=255)
     created_by = models.ForeignKey(
         User,
@@ -61,16 +77,26 @@ class TestRun(models.Model):
 class TestRunTestCase(models.Model):
     testcase = models.ForeignKey(TestCase, on_delete=models.CASCADE)
     testrun = models.ForeignKey(TestRun, on_delete=models.CASCADE)
-    testcase_status = models.ForeignKey(TestCaseStatus, null=True, default=1, on_delete=models.PROTECT)
+    testcase_status = models.ForeignKey(
+        TestCaseStatus, null=True, default=1, on_delete=models.PROTECT
+    )
 
 
 class TestRunTestCaseHistory(models.Model):
     testrun_testcase = models.ForeignKey(
-        TestRunTestCase, on_delete=models.CASCADE, related_name="testrun_testcase_history"
+        TestRunTestCase,
+        on_delete=models.CASCADE,
+        related_name="testrun_testcase_history",
     )
-    testcase_run_status = models.ForeignKey(TestCaseStatus, null=True, default=1, on_delete=models.PROTECT)
-    testrun = models.ForeignKey(TestRun, on_delete=models.CASCADE, related_name="history_test_run", blank=True)
-    testcase = models.ForeignKey(TestCase, on_delete=models.CASCADE, related_name="history_test_run", blank=True)
+    testcase_run_status = models.ForeignKey(
+        TestCaseStatus, null=True, default=1, on_delete=models.PROTECT
+    )
+    testrun = models.ForeignKey(
+        TestRun, on_delete=models.CASCADE, related_name="history_test_run", blank=True
+    )
+    testcase = models.ForeignKey(
+        TestCase, on_delete=models.CASCADE, related_name="history_test_run", blank=True
+    )
     execution_start = models.DateTimeField(null=True)
     execution_end = models.DateTimeField(null=True)
     task_id = models.CharField(max_length=255)
@@ -82,4 +108,4 @@ class TestRunTestCaseHistory(models.Model):
     )
 
     class Meta:
-        ordering = ["-execution_end"]
+        ordering = ["-id"]

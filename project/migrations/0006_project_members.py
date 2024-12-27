@@ -16,7 +16,10 @@ class Migration(migrations.Migration):
             model_name="project",
             name="members",
             field=models.ManyToManyField(
-                blank=True, related_name="projects", through="project.ProjectMember", to=settings.AUTH_USER_MODEL
+                blank=True,
+                related_name="projects",
+                through="project.ProjectMember",
+                to=settings.AUTH_USER_MODEL,
             ),
         ),
     ]

@@ -13,10 +13,10 @@
           <a href="{% url 'projects' %}">{{ project.name }}</a>
         </li>
         <li>
-          <a href="{% url 'detail_testrun' testrun.project.id testrun.id %}">{{ testrun.name }}</a>
+          <a href="{% url 'testrun_detail' testrun.project.id testrun.id %}">{{ testrun.name }}</a>
         </li>
         <li>
-          <a href="{% url 'testrun_history' project.id testrun.id testrun_testcase.id %}">{{ test_case.tcname }}</a>
+          <a href="{% url 'testrun_testcase_history_list' project.id testrun.id testrun_testcase.id %}">{{ test_case.tcname }}</a>
         </li>
         <li>
           <p class="pl-2">Log for {{ test_case.tcname }}</p>
@@ -92,26 +92,28 @@
 {% endblock content %}
 {% block inline_javascript %}
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      var tabs = document.querySelectorAll('#tabs li');
-      var tabContents = document.querySelectorAll('#tab-content .tabcontent');
+    document.addEventListener("DOMContentLoaded", function() {
+      var tabs = document.querySelectorAll("#tabs li");
+      var tabContents = document.querySelectorAll("#tab-content .tabcontent");
       tabs.forEach(function(tab) {
-        tab.addEventListener('click', function() {
-          var tabId = tab.getAttribute('data-tab');
+        tab.addEventListener("click", function() {
+          var tabId = tab.getAttribute("data-tab");
 
           tabs.forEach(function(tab) {
-            tab.classList.remove('is-active');
+            tab.classList.remove("is-active");
           });
 
-          tab.classList.add('is-active');
+          tab.classList.add("is-active");
 
           tabContents.forEach(function(content) {
-            content.classList.remove('is-active');
+            content.classList.remove("is-active");
           });
 
-          var activeContent = document.querySelector('[data-content="' + tabId + '"]');
+          var activeContent = document.querySelector(
+            '[data-content="' + tabId + '"]',
+          );
           if (activeContent) {
-            activeContent.classList.add('is-active');
+            activeContent.classList.add("is-active");
           }
         });
       });

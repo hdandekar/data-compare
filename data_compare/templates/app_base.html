@@ -32,119 +32,42 @@
   </head>
   <body>
     <!-- Start Navbar -->
-    <nav class="navbar is-dark" role="navigation" aria-label="main navigation">
-      <div class="navbar-brand">
-        <a class="navbar-item" href="{% url 'home' %}">Data Match</a>
-        <a role="button"
-           class="navbar-burger"
-           aria-label="menu"
-           aria-expanded="false"
-           data-target="navbarBasicExample">
-          <span aria-hidden="true"></span>
-          <span aria-hidden="true"></span>
-          <span aria-hidden="true"></span>
-          <span aria-hidden="true"></span>
-        </a>
-      </div>
-      <div id="navbarBasicExample" class="navbar-menu">
-        <div class="navbar-start">
-          <a class="navbar-item" href="{% url 'help' %}">Help</a>
-          <div class="navbar-item has-dropdown is-hoverable">
-            <a class="navbar-link">More</a>
-            <div class="navbar-dropdown">
-              <a class="navbar-item">About</a>
-              <a class="navbar-item is-selected">Jobs</a>
-              <a class="navbar-item">Documentation</a>
-              <hr class="navbar-divider" />
-              <a class="navbar-item"
-                 href="https://github.com/hdandekar/data-compare/issues/new?assignees=hdandekar&labels=&projects=&template=bug_report.md&title=%5BBUG%5D">Report an issue</a>
-            </div>
-          </div>
-        </div>
-        <div class="navbar-end">
-          <div class="navbar-item">
-            {% if user.is_authenticated %}
-              <div class="navbar-item has-dropdown is-hoverable">
-                <a class="navbar-link">Go To</a>
-                <div class="navbar-dropdown is-right">
-                  <a class="navbar-item" href="{% url 'projects' %}">Projects</a>
-                  <a class="navbar-item">Components</a>
-                  <hr class="navbar-divider" />
-                  <div class="navbar-item">Version 1.0.2</div>
-                </div>
-              </div>
-              <div class="navbar-item has-dropdown is-hoverable">
-                <a class="navbar-link">
-                  {% with user_email=user.email %}{{ user.name|default:user_email }}{% endwith %}
-                  {% if request.user.avatar == '' %}
-                    <i class="fa-solid fa-user"></i>
-                  {% else %}
-                    <img alt="profile"
-                         class="img-avatar me-1 rounded-circle"
-                         src="{{ request.user.avatar.url }}" />
-                  {% endif %}
-                </a>
-                <div class="navbar-dropdown is-right">
-                  <a class="navbar-item"
-                     href="{% url 'users:user_detail' request.user.pk %}">{% translate "My Profile" %}</a>
-                  <a class="navbar-item">Components</a>
-                  <hr class="navbar-divider" />
-                  <!-- <a class="navbar-item" href="{% url 'account_logout' %}">{% translate "Sign Out" %}</a> -->
-                  <a class="navbar-item">
-                    <form method="post" action="{% url 'account_logout' %}">
-                      {% csrf_token %}
-                      {% if redirect_field_value %}
-                        <input type="hidden"
-                               name="{{ redirect_field_name }}"
-                               value="{{ redirect_field_value }}" />
-                      {% endif %}
-                      <button class="has-text-danger" type="submit">{% translate "Sign Out" %}</button>
-                    </form>
-                  </a>
-                </div>
-              </div>
-            {% else %}
-              <a class="button is-primary" href="{% url 'account_signup' %}">{% translate "Sign Up" %}</a>
-              <a class="button is-light" href="{% url 'account_login' %}">{% translate "Sign In" %}</a>
-            {% endif %}
-          </div>
-        </div>
-      </div>
-    </nav>
+    {% include 'navbar.html' %}
     <!-- End Navbar -->
+    {% if messages %} {% for message in messages %}
+    <div class="container pt-2 pb-2">
+      <div
+        class="notification {% if message.tags %}is-{{ message.tags }}{% endif %}"
+      >
+        {{ message }}
+        <button class="delete" id="msgClose"></button>
+      </div>
+    </div>
+    {% endfor %} {% else %}
     <div class="container pt-2 pb-2" id="toast" hidden>
       <div class="notification" id="notification">
         <p id="server_message"></p>
         <button class="delete"></button>
       </div>
     </div>
-    {% if messages %}
-      {% for message in messages %}
-        <div class="notification {% if message.tags %}is-{{ message.tags }}{% endif %} small">
-          {{ message }}
-          <button class="delete" id="msgClose"></button>
-        </div>
-      {% endfor %}
     {% endif %}
     <section class="section">
-      {% block content %}
-      {% endblock content %}
+      {% block content %} {% endblock content %}
     </section>
     {% block inline_javascript %}
-      {% comment %}
-    Script tags with only code, no src (defer by default). To run
-    with a "defer" so that you run inline code:
+      {% comment %} Script tags with only code, no
+    src (defer by default). To run with a "defer" so that you run inline code:
     <script>
-      window.addEventListener('DOMContentLoaded', () => {
+      window.addEventListener("DOMContentLoaded", () => {
         /* Run whatever you want */
       });
-      document.body.addEventListener('htmx:configRequest', (event) => {
-        event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
+      document.body.addEventListener("htmx:configRequest", (event) => {
+        event.detail.headers["X-CSRFToken"] = "{{ csrf_token }}";
       });
 
       $(function() {
-        $('[data-toggle="tooltip"]').tooltip()
-      })
+        $('[data-toggle="tooltip"]').tooltip();
+      });
     </script>
       {% endcomment %}
     {% endblock inline_javascript %}

@@ -1,3 +1,4 @@
+<!-- lists down the executed test cases with the most recent execution result. -->
 {% load testplan_extras %}
 
 <p class="has-text-right has-text-warning is-italic">* Details are only for latest run</p>
@@ -12,7 +13,7 @@
       <th class="has-text-left w-30">Log</th>
     </tr>
   </thead>
-  <tbody class="is-size-7">
+  <tbody class="is-size-6">
     {% for item in most_recent_testcase_runs %}
       <tr class="{% tc_status_row_class item.most_recent_testcase_run.testcase_run_status.status_value %}">
         <td>
@@ -36,8 +37,8 @@
           </a>
           <a class="has-text-info"
              title="History"
-             href="{% url 'testrun_history' item.testrun_testcase.testcase.project.id item.testrun_testcase.testrun.id item.testrun_testcase.id %} ">
-            <i class="fa-solid fa-clock-rotate-left fa-xs"  aria-hidden="true"></i>
+             href="{% url 'testrun_testcase_history_list' item.testrun_testcase.testcase.project.id item.testrun_testcase.testrun.id item.testrun_testcase.id %} ">
+            <i class="fa-solid fa-clock-rotate-left fa-xs" aria-hidden="true"></i>
           </a>
           {{ item.testrun_testcase.testcase.tcname }}
         </td>

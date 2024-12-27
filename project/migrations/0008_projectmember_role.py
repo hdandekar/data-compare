@@ -14,7 +14,9 @@ class Migration(migrations.Migration):
             model_name="projectmember",
             name="role",
             field=models.CharField(
-                choices=[("member", "Member"), ("admin", "Admin"), ("guest", "Guest")], default="member", max_length=50
+                choices=[("member", "Member"), ("admin", "Admin"), ("guest", "Guest")],
+                default="member",
+                max_length=50,
             ),
         ),
     ]

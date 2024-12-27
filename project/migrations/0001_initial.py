@@ -13,7 +13,15 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="DbConnection",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
                 ("name", models.CharField(max_length=50)),
                 ("dbname", models.CharField(max_length=200)),
                 ("hostname", models.CharField(max_length=200)),
@@ -31,7 +39,15 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="DbType",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
                 ("dbname", models.CharField(max_length=50)),
             ],
             options={
@@ -41,10 +57,21 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="Project",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
                 ("name", models.CharField(max_length=255)),
                 ("description", models.TextField()),
-                ("project_slug", models.SlugField(blank=True, max_length=100, null=True)),
+                (
+                    "project_slug",
+                    models.SlugField(blank=True, max_length=100, null=True),
+                ),
                 ("project_code", models.CharField(max_length=6)),
                 ("created_date", models.DateTimeField(auto_now_add=True)),
                 ("updated_date", models.DateTimeField(auto_now=True)),

@@ -18,7 +18,9 @@ class Project(models.Model):
         related_name="project_created_by",
         on_delete=models.PROTECT,
     )
-    members = models.ManyToManyField(User, related_name="projects", blank=True, through="ProjectMember")
+    members = models.ManyToManyField(
+        User, related_name="projects", blank=True, through="ProjectMember"
+    )
 
     class Meta:
         ordering = ["-updated_date"]
@@ -63,15 +65,21 @@ class DbType(models.Model):
 
 class DbConnection(models.Model):
     name = models.CharField(max_length=50)
-    dbtype = models.ForeignKey(DbType, related_name="dbtype", on_delete=models.PROTECT, null=True)
-    project = models.ForeignKey(Project, related_name="project", on_delete=models.CASCADE)
+    dbtype = models.ForeignKey(
+        DbType, related_name="dbtype", on_delete=models.PROTECT, null=True
+    )
+    project = models.ForeignKey(
+        Project, related_name="project", on_delete=models.CASCADE
+    )
     dbname = models.CharField(max_length=200)
     hostname = models.CharField(max_length=200)
     username = models.CharField(max_length=100)
     password = models.CharField(max_length=100)
     portno = models.IntegerField()
     schema_name = models.CharField(max_length=100, blank=True)
-    created_by = models.ForeignKey(User, related_name="connection", on_delete=models.PROTECT)
+    created_by = models.ForeignKey(
+        User, related_name="connection", on_delete=models.PROTECT
+    )
     created_dt = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -82,11 +90,17 @@ class DbConnection(models.Model):
         ordering = ["-id"]
 
 
-PROJECT_MEMBER_ROLE_CHOICES = [("member", "Member"), ("admin", "Admin"), ("guest", "Guest")]
+PROJECT_MEMBER_ROLE_CHOICES = [
+    ("member", "Member"),
+    ("admin", "Admin"),
+    ("guest", "Guest"),
+]
 
 
 class ProjectMember(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     date_joined = models.DateTimeField(auto_now=True)
-    role = models.CharField(max_length=50, choices=PROJECT_MEMBER_ROLE_CHOICES, default="member")
+    role = models.CharField(
+        max_length=50, choices=PROJECT_MEMBER_ROLE_CHOICES, default="member"
+    )

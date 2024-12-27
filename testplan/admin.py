@@ -1,24 +1,6 @@
 from django.contrib import admin
 
-from .models import Project, TestCase, TestCaseStatus
-
-
-@admin.register(Project)
-class ProjectAdmin(admin.ModelAdmin):
-    list_display = [
-        "name",
-        "description",
-        "project_slug",
-        "project_code",
-        "created_date",
-        "updated_date",
-        "owner",
-        "get_members",
-    ]
-
-    @admin.display(description="members")
-    def get_members(self, obj):
-        return [project.email for project in obj.members.all()]
+from .models import TestCase, TestCaseStatus
 
 
 @admin.register(TestCase)

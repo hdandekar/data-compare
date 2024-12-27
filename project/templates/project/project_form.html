@@ -1,30 +1,30 @@
 {% block content %}
-  <div class="modal-background cancel"></div>
-  <div class="modal-content is-width-70">
-    <div class="box content">
-      <h5 class="is-size-4">
-        {% if object.name %}
-          {{ object.name }} project
-        {% else %}
-          Add New Project
-        {% endif %}
-      </h5>
-      <form hx-post="{{ request.path }}"
-            hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'>
-        <div class="box">
-        </br />
+<div class="modal-background cancel"></div>
+<div class="modal-content is-width-70">
+  <div class="box content">
+    <h5 class="is-size-4">
+      {% if object.name %} {{ object.name }} project {% else %} Add New Project
+      {% endif %}
+    </h5>
+    <form
+      hx-post="{{ request.path }}"
+      hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'>
+      <div class="box">
+        <br />
         <div class="columns">
           <div class="column is-8">
             <div class="field">
               <label class="label" for="id_name">Project name</label>
               <div class="control">
-                <input value="{{ object.name }}"
-                       type="text"
-                       name="name"
-                       id="id_name"
-                       class="input"
-                       required
-                       placeholder="Project Name" />
+              <input
+                  value="{{ object.name }}"
+                  type="text"
+                  name="name"
+                  id="id_name"
+                  class="input"
+                  required
+                  placeholder="Project Name"
+                />
               </div>
             </div>
           </div>
@@ -32,13 +32,15 @@
             <div class="field">
               <label class="label" for="id_project_code">Project Code</label>
               <div class="control">
-                <input value="{{ object.project_code }}"
-                       type="text"
-                       name="project_code"
-                       id="id_project_code"
-                       class="input"
-                       required
-                       placeholder="Project Code" />
+                <input
+                  value="{{ object.project_code }}"
+                  type="text"
+                  name="project_code"
+                  id="id_project_code"
+                  class="input"
+                  required
+                  placeholder="Project Code"
+                />
               </div>
             </div>
           </div>
@@ -47,12 +49,13 @@
           <div class="column">
             <div class="field">
               <label class="label" for="id_description">Project Description</label>
-              <textarea id="id_description"
-                        name="description"
-                        class="textarea"
-                        placeholder="e.g. Describe briefly about the project...">{{ object.description }}</textarea>
+              <textarea  id="id_description" name="description" class="textarea" placeholder="e.g. Describe briefly about the project...">{{ object.description }}</textarea>
             </div>
-            {% if form.description.errors %}<p class="help is-danger">{{ form.description.errors|striptags }}</p>{% endif %}
+            {% if form.description.errors %}
+            <p class="help is-danger">
+              {{ form.description.errors|striptags }}
+            </p>
+            {% endif %}
           </div>
         </div>
         <div class="buttons">

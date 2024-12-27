@@ -4,34 +4,34 @@
   Projects
 {% endblock title %}
 {% block content %}
-  {% load static %}
+{% load static %}
 
-  <div class="container">
-    <nav class="breadcrumb" aria-label="breadcrumbs">
-      <ul>
-        <li>
-          <a href="#">Projects</a>
-        </li>
-        <li>
-          <a hx-get="{% url 'create_project' %}"  hx-target="#dialog">
-            <i class="fa-solid fa-plus fa-lg has-text-success"></i>
-          </a>
-        </li>
-      </ul>
-    </nav>
-    <div hx-trigger="load, listChanged from:body"
-         hx-get="{% url 'list_project' 1 %}"
-         hx-target="this"
-         id="project_items">
-      <tr class="text-center">
-        <td class="spinner-border" role="status">
-          <span class="visually-hidden text-center">Loading...</span>
-        </td>
-      </tr>
-    </div>
+<div class="container">
+  <nav class="breadcrumb" aria-label="breadcrumbs">
+    <ul>
+      <li>
+        <a href="#">Projects</a>
+      </li>
+      <li>
+        <a hx-get="{% url 'create_project' %}" hx-target="#dialog">
+          <i class="fa-solid fa-plus fa-lg has-text-success"></i>
+        </a>
+      </li>
+    </ul>
+  </nav>
+  <div hx-trigger="load, listChanged from:body"
+       hx-get="{% url 'list_project' 1 %}"
+       hx-target="this"
+       id="project_items">
+    <tr class="text-center">
+      <td class="spinner-border" role="status">
+        <span class="visually-hidden text-center">Loading...</span>
+      </td>
+    </tr>
   </div>
-  <!-- Placeholder for the modal -->
-  <div id="modal" class="modal">
-    <div id="dialog" hx-target="this" class="is-width-70"></div>
-  </div>
+</div>
+<!-- Placeholder for the modal -->
+<div id="modal" class="modal">
+  <div id="dialog" hx-target="this" class="is-width-70"></div>
+</div>
 {% endblock content %}

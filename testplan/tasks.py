@@ -12,7 +12,9 @@ logger = logging.getLogger(__name__)
 
 @shared_task
 def execute_comparison(testrun_tc_history_id, testcase_id, testrun_case_id):
-    testruncasehist = get_object_or_404(TestRunTestCaseHistory, id=testrun_tc_history_id)
+    testruncasehist = get_object_or_404(
+        TestRunTestCaseHistory, id=testrun_tc_history_id
+    )
     testruncasehist.execution_start = timezone.localtime()
     testcase = get_object_or_404(TestCase, id=testcase_id)
 
@@ -25,7 +27,10 @@ def execute_comparison(testrun_tc_history_id, testcase_id, testrun_case_id):
     if src_data["status"] == "success" and tgt_data["status"] == "success":
         try:
             compare_results = dbutil.compare_data(
-                src_data["message"], tgt_data["message"], testcase.keycolumns.lower(), testruncasehist.id
+                src_data["message"],
+                tgt_data["message"],
+                testcase.keycolumns.lower(),
+                testruncasehist.id,
             )
             testruncasehist.execution_end = timezone.localtime()
             testruncasehist.save()
@@ -33,14 +38,18 @@ def execute_comparison(testrun_tc_history_id, testcase_id, testrun_case_id):
                 logger.info("Test Case Failed")
                 # Update testcase_run_status_id = Failed(3)
                 testruncasehist.testcase_run_status_id = 3
-                testruncasehist.comments = "Differences found between source and target datasets"
+                testruncasehist.comments = (
+                    "Differences found between source and target datasets"
+                )
                 testruncasehist.save()
 
             if compare_results["status"] == "Pass":
                 logger.info("Test Case Passed")
                 # Update testcase_run_status_id = Passed(2)
                 testruncasehist.testcase_run_status_id = 2
-                testruncasehist.comments = "No differences found between source and target datasets"
+                testruncasehist.comments = (
+                    "No differences found between source and target datasets"
+                )
                 testruncasehist.save()
 
             if compare_results["status"] == "Skipped":

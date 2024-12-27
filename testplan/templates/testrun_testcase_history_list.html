@@ -1,7 +1,7 @@
 {% extends "app_base.html" %}
 
 {% block title %}
-  {{ project.name }}/ TestRun / TestCases / History
+  {{ project.name }} / TestRun / TestCases / History
 {% endblock title %}
 {% block content %}
   {% load static %}
@@ -14,7 +14,7 @@
           <a href="{% url 'projects' %}">{{ testrun.project.name }}</a>
         </li>
         <li>
-          <a href="{% url 'detail_testrun' testrun.project.id testrun.id %}">{{ testrun.name }}</a>
+          <a href="{% url 'testrun_detail' testrun.project.id testrun.id %}">{{ testrun.name }}</a>
         </li>
         <li>
           <p class="pl-2">{{ testcase.tcname }} History</p>
@@ -25,30 +25,29 @@
       <table class="table" aria-label="Execution History">
         <thead class="text-center">
           <tr>
-            <th class="w-10" scope="col">Triggered By</th>
+            <th class="w-20" scope="col">Triggered By</th>
             <th class="w-5" scope="col">Status</th>
-            <th class="w-10" scope="col">Execution Start</th>
-            <th class="w-10" scope="col">Execution End</th>
+            <th class="w-15" scope="col">Execution Start</th>
+            <th class="w-15" scope="col">Execution End</th>
             <th class="w-5" scope="col">Result</th>
-            <th class="w-40" scope="col">Log</th>
+            <th class="w-30" scope="col">Log</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody class="is-size-6">
           {% for item in testcase_run_history %}
             <tr class="{% tc_status_row_class item.testcase_run_status.status_value %}">
-              <td class="smaller">{{ item.triggered_by.email }}</td>
-              <td class="smaller">{{ item.testcase_run_status.status_value }}</td>
-              <td class="smaller">{{ item.execution_start|date:"d-M-y H:m:s T" }}</td>
-              <td class="smaller">{{ item.execution_end|date:"d-M-y H:m:s T" }}</td>
+              <td>{{ item.triggered_by.email }}</td>
+              <td>{{ item.testcase_run_status.status_value }}</td>
+              <td>{{ item.execution_start|date:"d-M-y H:m:s T" }}</td>
+              <td>{{ item.execution_end|date:"d-M-y H:m:s T" }}</td>
               <td>
                 {% if item.testcase_run_status.status_value == "Failed" %}
-                  <a class="smaller"
-                     href="{% url 'execution_history' project.id item.testrun_testcase.testrun.id item.testrun_testcase.id item.id %}">
+                  <a href="{% url 'execution_history' project.id item.testrun_testcase.testrun.id item.testrun_testcase.id item.id %}">
                     View
                   </a>
                 {% endif %}
               </td>
-              <td class="smaller">{{ item.comments }}</td>
+              <td>{{ item.comments }}</td>
             </tr>
           {% endfor %}
         </tbody>

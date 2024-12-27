@@ -8,6 +8,10 @@ from django.views.generic import TemplateView
 urlpatterns = [
     path("", TemplateView.as_view(template_name="pages/home.html"), name="home"),
     path("help/", TemplateView.as_view(template_name="pages/help.html"), name="help"),
+    path(
+        "about/", TemplateView.as_view(template_name="pages/about.html"), name="about"
+    ),
+    path("404.html", TemplateView.as_view(template_name="404.html"), name="404_page"),
     # Django Admin, use {% url 'admin:index' %}
     path(settings.ADMIN_URL, admin.site.urls),
     # User management
@@ -15,7 +19,7 @@ urlpatterns = [
     path("accounts/", include("allauth.urls")),
     # App Urls
     path("project/", include("project.urls"), name="project"),
-    path("", include("testplan.urls"), name="project"),
+    path("", include("testplan.urls"), name="testplan"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

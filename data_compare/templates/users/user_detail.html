@@ -107,52 +107,52 @@
                 </div>
               </div>
             </div>
+            <hr />
+            <div class="field is-horizontal p-0">
+              <div class="field-label is-normal">
+                <label class="label" for="id_twitter_link">
+                  <i class="fa-brands fa-twitter"></i>
+                </label>
+              </div>
+              <div class="field-body">
+                <div class="field">
+                  <div class="control">
+                    <input value="{{ user.twitter_link }}"
+                           class="input is-static"
+                           readonly
+                           type="text"
+                           name="twitter_link"
+                           id="id_twitter_link"
+                           autofocus="" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="field is-horizontal p-0">
+              <div class="field-label is-normal">
+                <label class="label" for="id_github_link">
+                  <i class="fa-brands fa-github"></i>
+                </label>
+              </div>
+              <div class="field-body">
+                <div class="field">
+                  <div class="control">
+                    <input value="{{ user.github_link }}"
+                           class="input is-static"
+                           readonly
+                           type="text"
+                           name="github_link"
+                           id="id_github_link"
+                           autofocus="" />
+                  </div>
+                </div>
+              </div>
+            </div>
           </hr />
-          <div class="field is-horizontal p-0">
-            <div class="field-label is-normal">
-              <label class="label" for="id_twitter_link">
-                <i class="fa-brands fa-twitter"></i>
-              </label>
-            </div>
-            <div class="field-body">
-              <div class="field">
-                <div class="control">
-                  <input value="{{ user.twitter_link }}"
-                         class="input is-static"
-                         readonly
-                         type="text"
-                         name="twitter_link"
-                         id="id_twitter_link"
-                         autofocus="" />
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="field is-horizontal p-0">
-            <div class="field-label is-normal">
-              <label class="label" for="id_github_link">
-                <i class="fa-brands fa-github"></i>
-              </label>
-            </div>
-            <div class="field-body">
-              <div class="field">
-                <div class="control">
-                  <input value="{{ user.github_link }}"
-                         class="input is-static"
-                         readonly
-                         type="text"
-                         name="github_link"
-                         id="id_github_link"
-                         autofocus="" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </hr />
+        </div>
       </div>
     </div>
+    <div class="column"></div>
   </div>
-  <div class="column"></div>
-</div>
 </section>
 {% endblock content %}
