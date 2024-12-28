@@ -19,6 +19,11 @@ urlpatterns = [
         views.TestCaseUpdateView.as_view(),
         name="edit_testcase",
     ),
+    path(
+        "project/<int:project_id>/testcase/<int:testcase_id>/delete",
+        views.TestCaseDeleteView.as_view(),
+        name="delete_testcase",
+    ),
     # Test Run URLs
     path(
         "project/<int:project_id>/testrun/create",

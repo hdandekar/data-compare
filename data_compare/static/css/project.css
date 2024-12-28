@@ -486,3 +486,8 @@ tr.htmx-swapping td {
   opacity: 1;
   transition: opacity 200ms ease-in;
 }
+
+
+.is-bordered {
+  border-bottom: 1px solid #ddd;
+}

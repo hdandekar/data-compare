@@ -141,17 +141,57 @@ class TestRunCreateView(LoginRequiredMixin, MemberPermissionMixin, CreateView):
     def form_invalid(self, form):
         return self.render_to_response(self.get_context_data(form=form))
 
-    # def test_func(self):
-    #     try:
-    #         project = Project.objects.get(id=self.kwargs["project_id"])
-    #         if self.request.user in project.members.all():
-    #             return True
-    #         return False
-    #     except Project.DoesNotExist:
-    #         return redirect(_404_Page)
-
     def handle_no_permission(self) -> HttpResponseRedirect:
         return render(self.request, _404_Page)
+
+
+class TestCaseDeleteView(LoginRequiredMixin, MemberPermissionMixin, DeleteView):
+    model = TestCase
+
+    def post(self, *args, **kwargs):
+        testcase = TestCase.objects.get(id=self.kwargs["testcase_id"])
+        try:
+            testcase.delete()
+            return HttpResponse(
+                status=200,
+                headers={
+                    "HX-Trigger": json.dumps(
+                        {
+                            "showMessage": f"'{testcase.tcname}' deleted successfully",
+                            "eventType": "deleted",
+                        }
+                    ),
+                },
+            )
+            return
+        except ProtectedError as e:
+            logger.error(f"Cannot delete {testcase.tcname} due to {e}")
+            return HttpResponse(
+                status=204,
+                headers={
+                    "HX-Trigger": json.dumps(
+                        {
+                            "listChanged": None,
+                            "showMessage": f"'{testcase.tcname}' cannot be deleted",
+                            "eventType": "deleted",
+                        }
+                    )
+                },
+            )
+
+    def handle_no_permission(self):
+        testcase = TestCase.objects.get(id=self.kwargs["testcase_id"])
+        return HttpResponse(
+            status=204,
+            headers={
+                "HX-Trigger": json.dumps(
+                    {
+                        "showMessage": f"You do not have permission to delete '{testcase.tcname}'",
+                        "eventType": "permissionDenied",
+                    }
+                )
+            },
+        )
 
 
 class TestRunListView(LoginRequiredMixin, MemberPermissionMixin, ListView):
@@ -522,7 +562,6 @@ def testrun_case_result_summary(
                 "changed": changed_set,
                 "changed_data": changed_data,
                 "test_case": test_case,
-                "testrun_testcase": testrun_testcase,
                 "project": project,
                 "testrun": testrun,
                 "testrun_testcase": testrun_testcase,
@@ -535,7 +574,6 @@ def testrun_case_result_summary(
             {
                 "message": "History Not Available",
                 "test_case": test_case,
-                "testrun_testcase": testrun_testcase,
                 "project": project,
                 "testrun": testrun,
                 "testrun_testcase": testrun_testcase,

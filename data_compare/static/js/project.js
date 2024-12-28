@@ -15,13 +15,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Change the toast class based on eventType
   htmx.on("eventType", (e) => {
+    let value = e.detail.value;
     if (["created", "updated"].includes(e.detail.value)) {
       toastElement.classList.add("is-success");
-    } else if (["deleted", "permissiondenied"].includes(e.detail.value)) {
+    } else if (["deleted", "permissiondenied"].includes(value.toLowerCase())) {
       toastElement.classList.add("is-danger");
     } else if (["triggerd"].includes(e.detail.value)) {
       toastElement.classList.remove("is-danger", "is-success", "is-warning");
       toastElement.classList.add("is-warning");
+    } else {
+      console.log("Event Type is", (value.toLowerCase()));
     }
   });
 
@@ -47,19 +50,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-// document.addEventListener('DOMContentLoaded', () => {
-//     const button = document.querySelector('#msgClose');
-//     button.addEventListener('click', () => {
-//         button.remove();
-//     });
-// });
-
-// document.addEventListener('DOMContentLoaded', () => {
-//     const clsBtn = document.getElementById('msgClose');
-//     clsBtn.addEventListener('click', () => {
-//         cls.Btn.parentElement.remove();
-//     })
-// });
 
 document.addEventListener("DOMContentLoaded", () => {
   const clsBtn = document.getElementById("msgClose");
@@ -84,7 +74,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       } else {
         modal.classList.add("is-active");
-        // console.error('Modal background not found after swap.');
       }
     }
   });
@@ -97,10 +86,3 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
-
-// document.getElementById('toggle-button').addEventListener('click', function() {
-//     document.getElementById('side-section').classList.add('is-active');
-// });
-// document.getElementById('close-button').addEventListener('click', function() {
-//     document.getElementById('side-section').classList.remove('is-active');
-// });

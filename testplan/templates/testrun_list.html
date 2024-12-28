@@ -34,15 +34,13 @@
                     {% if tc_count_by_sts.testcase_status__status_value == 'Passed' %}
                       {% widthratio tc_count_by_sts.status_count testrun_tc_count 100 as wdt %}
                       <div class="progress-bar is-success"
-                           role="progressbar"
                            style="width: {% widthratio tc_count_by_sts.status_count testrun_tc_count 100 %}%"
                            title="{{ tc_count_by_sts.status_count }} {{ tc_count_by_sts.testcase_status__status_value }} {{ wdt }}">
                       </div>
                     {% endif %}
                     {% if tc_count_by_sts.testcase_status__status_value == 'Not Run' %}
-                      {% widthratio tc_count_by_sts.status_count testrun_tc_count 100 as wdt %}
+                      {% widthratio tc_count_by_sts.status_count testrun_tc_count 100 as wdt %}
                       <div class="progress-bar is-secondary"
-                           role="progressbar"
                            style="width: {% widthratio tc_count_by_sts.status_count testrun_tc_count 100 %}%"
                            title="{{ tc_count_by_sts.status_count }} {{ tc_count_by_sts.testcase_status__status_value }} {{ wdt }}">
                       </div>
@@ -50,7 +48,6 @@
                     {% if tc_count_by_sts.testcase_status__status_value == 'Blocked' %}
                       {% widthratio tc_count_by_sts.status_count testrun_tc_count 100 as wdt %}
                       <div class="progress-bar is-warning"
-                           role="progressbar"
                            style="width: {% widthratio tc_count_by_sts.status_count testrun_tc_count 100 %}%"
                            title="{{ tc_count_by_sts.status_count }} {{ tc_count_by_sts.testcase_status__status_value }} {{ wdt }}">
                       </div>
@@ -58,7 +55,6 @@
                     {% if tc_count_by_sts.testcase_status__status_value == 'Skipped' %}
                       {% widthratio tc_count_by_sts.status_count testrun_tc_count 100 as wdt %}
                       <div class="progress-bar is-info"
-                           role="progressbar"
                            style="width: {% widthratio tc_count_by_sts.status_count testrun_tc_count 100 %}%"
                            title="{{ tc_count_by_sts.status_count }} {{ tc_count_by_sts.testcase_status__status_value }} {{ wdt }}">
                       </div>
@@ -66,7 +62,6 @@
                     {% if tc_count_by_sts.testcase_status__status_value == 'Failed' %}
                       {% widthratio tc_count_by_sts.status_count testrun_tc_count 100 as wdt %}
                       <div class="progress-bar is-danger"
-                           role="progressbar"
                            style="width: {% widthratio tc_count_by_sts.status_count testrun_tc_count 100 %}%"
                            title="{{ tc_count_by_sts.status_count }} {{ tc_count_by_sts.testcase_status__status_value }} {{ wdt }}">
                       </div>
@@ -74,7 +69,6 @@
                     {% if tc_count_by_sts.testcase_status__status_value == 'Running' %}
                       {% widthratio tc_count_by_sts.status_count testrun_tc_count 100 as wdt %}
                       <div class="progress-bar is-success"
-                           role="progressbar"
                            style="width: {% widthratio tc_count_by_sts.status_count testrun_tc_count 100 %}%"
                            title="{{ tc_count_by_sts.status_count }} {{ tc_count_by_sts.testcase_status__status_value }} {{ wdt }}">
                       </div>

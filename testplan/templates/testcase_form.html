@@ -2,11 +2,9 @@
 
 {% block title %}
   {% if project.name %}
-    {{
-    project.name }} - New Test Case
+    {{ project.name }} - New Test Case
   {% else %}
-    {{ testcase.project.name }} - {{
-    testcase.tcname }}
+    {{ testcase.project.name }} - {{ testcase.tcname }}
   {% endif %}
 {% endblock title %}
 {% block content %}
@@ -102,7 +100,7 @@
           <label class="label" for="id_sourcedb">Source Connection</label>
           <div class="select is-fullwidth">
             <select name="sourcedb" required="" id="id_sourcedb" class="select">
-              {% for connection in db_connections %}    
+              {% for connection in db_connections %}
                 <option value="{{ connection.id }}"
                   {% if connection.id == testcase.sourcedb.id %}selected{% endif %}>{{ connection.name }}
                 </option>
