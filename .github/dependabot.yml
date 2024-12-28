@@ -3,33 +3,9 @@
 # Please see the documentation for all configuration options:
 # https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
 
-# version: 2
-# updates:
-#   - package-ecosystem: "pip" # See documentation for possible values
-#     directory: "/requirements" # Location of package manifests
-#     schedule:
-#       interval: "weekly"
-
-
 version: 2
 updates:
-  - package-ecosystem: "pip"
-    directory: "/requirements"
-    # Specify the file path to base.txt
-    schedule:
-      interval: "daily"
-    file-name: "base.txt"
-
-  - package-ecosystem: "pip"
-    directory: "/requirements"
-    # Specify the file path to local.txt
-    schedule:
-      interval: "daily"
-    file-name: "local.txt"
-
-  - package-ecosystem: "pip"
-    directory: "/requirements"
-    # Specify the file path to production.txt
+  - package-ecosystem: "pip" # See documentation for possible values
+    directory: "/requirements" # Location of package manifests
     schedule:
       interval: "weekly"
-    file-name: "production.txt"
