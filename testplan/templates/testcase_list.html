@@ -6,7 +6,7 @@
 {% block content %}
   {% load static %}
 
-  <div class="container">
+  <div class="container-fluid">
     <nav class="breadcrumb" aria-label="breadcrumbs">
       <ul>
         <li>
@@ -22,43 +22,48 @@
         </li>
       </ul>
     </nav>
-    <table class="table is-narrow is-hoverable is-fullwidth">
-      <thead>
-        <tr>
-          <th></th>
-          <th>Test Case Title</th>
-          <th>Key Columns</th>
-          <th>Database</th>
-          <th>SQL</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for tc in testcase_list %}
-          <tr class="is-size-6">
-            <!-- This cell will take up
-                space on two rows -->
-            <td rowspan="2">
+    <div class="row box has-background-info is-bordered">
+      <div class="columns">
+        <div class="column is-3 has-text-centered is-size-6 has-text-weight-bold">Test Case Details</div>
+        <div class="column is-1 has-text-centered is-size-6 has-text-weight-bold">Database</div>
+        <div class="column is-8 has-text-centered is-size-6 has-text-weight-bold">SQL Statements</div>
+      </div>
+    </div>
+    {% for tc in testcase_list %}
+      <div class="box mb-3" id="testcase-{{ tc.id }}">
+        <div class="row">
+          <div class="columns">
+            <div class="column is-3">
               <a class="has-text-success"
-                 title="Edit"
-                 href="{% url 'edit_testcase' project.id tc.id %}">
+                title="Edit"
+                href="{% url 'edit_testcase' project.id tc.id %}">
                 <i class="fa fa-pen-to-square fa-fw fa-xs"></i>
               </a>
-              <a class="has-text-danger" title="Delete" href="#">
+              <a class="has-text-danger" title="Delete"
+                  hx-post="{% url 'delete_testcase' project.id tc.id %}"
+                  hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
+                  hx-target="#testcase-{{ tc.id }}"
+                  hx-confirm="Are you sure about deleting the testcase: '{{ tc.tcname }}?'"
+                  hx-swap="outerHTML">
                 <i class="fa fa-trash fa-fw fa-xs text-danger"></i>
               </a>
-            </td>
-            <td rowspan="2">{{ tc.tcname }}</td>
-            <td rowspan="2">{{ tc.keycolumns|truncatechars:50 }}</td>
-            <td class="col-1">{{ tc.sourcedb }}</td>
-            <td class="col-4">{{ tc.sourcesql|truncatechars:255 }}</td>
-          </tr>
-          <tr>
-            <td class="col-1">{{ tc.targetdb }}</td>
-            <td class="col-4">{{ tc.targetsql|truncatechars:255 }}</td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+              {{ tc.tcname }}
+            </div>
+            <div class="column is-1">{{ tc.sourcedb }}</div>
+            <div class="column is-8 is-bordered">{{ tc.sourcesql }}</div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="columns">
+            <div class="column is-3">
+              <strong>Key Columns: </strong>{{ tc.keycolumns }}
+            </div>
+            <div class="column is-1">{{ tc.targetdb }}</div>
+            <div class="column is-8 pt-5">{{ tc.targetsql }}</div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
     <!-- Pagination -->
     {% if page_obj.has_other_pages %}
       <nav aria-label="Page navigation Projects">
@@ -96,5 +101,5 @@
     </nav>
   {% endif %}
   <!-- end Pagination -->
-</div>
+  </div>
 {% endblock content %}

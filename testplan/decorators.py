@@ -21,7 +21,7 @@ def user_is_member(func):
         project_id = kwargs.get("project_id")
         project = get_object_or_404(Project, id=project_id)
         if not project.projectmember_set.filter(
-            user=request.user, role="member"
+            user=request.user, role__in=["member", "admin"]
         ).exists():
             return redirect("404_page")  # Or raise PermissionDenied if appropriate
         return func(request, *args, **kwargs)
