@@ -45,7 +45,9 @@ class TestCaseCreateView(LoginRequiredMixin, MemberPermissionMixin, CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["project"] = Project.objects.get(id=self.kwargs["project_id"])
-        context["db_connections"] = DbConnection.objects.all()
+        context["db_connections"] = DbConnection.objects.filter(
+            project_id=self.kwargs["project_id"]
+        )
         return context
 
     def get_initial(self):
@@ -107,7 +109,9 @@ class TestCaseUpdateView(LoginRequiredMixin, MemberPermissionMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["db_connections"] = DbConnection.objects.all()
+        context["db_connections"] = DbConnection.objects.filter(
+            project_id=self.kwargs["project_id"]
+        )
         return context
 
     def handle_no_permission(self) -> HttpResponseRedirect:

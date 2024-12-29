@@ -79,7 +79,6 @@ THIRD_PARTY_APPS = [
 
 LOCAL_APPS = [
     "data_compare.users",
-    # Your stuff: custom apps go here
     "project",
     "testplan",
 ]
@@ -290,3 +289,4 @@ SOCIALACCOUNT_FORMS = {"signup": "data_compare.users.forms.UserSocialSignupForm"
 
 # Your stuff...
 # ------------------------------------------------------------------------------
+ENCRYPTION_KEY = env("ENCRYPTION_KEY")

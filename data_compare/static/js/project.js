@@ -3,7 +3,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const toast = document.getElementById("toast");
   const toastElement = document.getElementById("notification");
   const server_message = document.getElementById("server_message");
-  // const toast = new bootstrap.Toast(toastElement, { delay: 10000 })
   htmx.on("showMessage", (e) => {
     toast.removeAttribute("hidden");
     server_message.innerText = e.detail.value;
@@ -41,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const button = document.querySelector(".notification .delete");
   button.addEventListener("click", () => {
     button.parentNode.parentElement.setAttribute("hidden", "");
-    cls_list = Array.from(button.parentElement.classList);
+    let cls_list = Array.from(button.parentElement.classList);
     cls_list.forEach((cls) => {
       if (cls !== "notification") {
         button.parentElement.classList.remove(cls);

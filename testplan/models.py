@@ -37,14 +37,6 @@ class TestCase(models.Model):
         on_delete=models.SET(get_deleted_user_instance),
     )
 
-    class Meta:
-        permissions = [
-            ("can_edit_testcase", "Can edit test case"),
-            ("can_view_testcase", "Can view test case"),
-            ("can_delete_testcase", "Can delete test case"),
-            ("can_create_testcase", "Can create test case"),
-        ]
-
     def __str__(self):
         return str(self.id)
 

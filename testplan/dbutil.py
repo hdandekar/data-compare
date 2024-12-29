@@ -6,6 +6,8 @@ import pandas as pd
 import psycopg
 from pandas.errors import DatabaseError
 
+from data_compare.utils.crypto import decrypt_password
+
 logger = logging.getLogger(__name__)
 
 
@@ -15,7 +17,7 @@ def pg_con(conn):
         port=conn.portno,
         dbname=conn.dbname,
         user=conn.username,
-        password=conn.password,
+        password=decrypt_password(conn.password),
     )
     return cnx
 

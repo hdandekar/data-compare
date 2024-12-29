@@ -4,6 +4,7 @@ from django.urls import reverse
 from django.utils.text import slugify
 
 from data_compare.users.models import User
+from data_compare.utils.crypto import decrypt_password
 
 
 class Project(models.Model):
@@ -88,6 +89,12 @@ class DbConnection(models.Model):
     class Meta:
         verbose_name = "DB Connection"
         ordering = ["-id"]
+
+    def get_password(self):
+        if self.password == "" or self.password is None:
+            return ""
+        else:
+            return decrypt_password(self.password)
 
 
 PROJECT_MEMBER_ROLE_CHOICES = [
