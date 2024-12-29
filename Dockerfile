@@ -38,6 +38,7 @@ ENV TRUSTED_ORIGINS=''
 ENV REDIS_URL=''
 ENV C_BROKER_URL=''
 ENV C_RESULT_BACKEND=''
+ENV ENCRYPTION_KEY=''
 
 RUN python manage.py collectstatic --settings=config.settings.production
 
