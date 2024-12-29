@@ -22,8 +22,21 @@ def execute_comparison(testrun_tc_history_id, testcase_id, testrun_case_id):
     src_conn = testcase.sourcedb
     tgt_conn = testcase.targetdb
 
-    src_data = dbutil.get_data(src_conn, testcase.sourcesql)
-    tgt_data = dbutil.get_data(tgt_conn, testcase.targetsql)
+    src_data = {}
+    tgt_data = {}
+
+    try:
+        src_data = dbutil.get_data(src_conn, testcase.sourcesql)
+    except Exception as error:
+        src_data["status"] = "error"
+        src_data["message"] = error
+
+    try:
+        tgt_data = dbutil.get_data(tgt_conn, testcase.targetsql)
+    except Exception as error:
+        tgt_data["status"] = "error"
+        tgt_data["message"] = error
+
     if src_data["status"] == "success" and tgt_data["status"] == "success":
         try:
             compare_results = dbutil.compare_data(

@@ -17,6 +17,7 @@ from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
 from django_htmx.http import HttpResponseClientRedirect
 
 from data_compare.users.models import User
+from data_compare.utils.crypto import encrypt_password
 
 from .forms import ConnectionForm
 from .models import (PROJECT_MEMBER_ROLE_CHOICES, DbConnection, DbType,
@@ -39,8 +40,8 @@ def connection_create(request, project_id):
                 db_connection = form.save(commit=False)
                 db_connection.created_by = request.user
                 db_connection.project = Project.objects.get(id=project_id)
-                # db_connection.password = make_password(form.cleaned_data["password"])
-                db_connection.password = form.cleaned_data["password"]
+                pwd = form.cleaned_data["password"]
+                db_connection.password = encrypt_password(pwd)
                 db_connection.save()
                 return HttpResponse(
                     status=204,
@@ -144,7 +145,8 @@ def connection_edit(request, project_id, pk):
         if form.is_valid():
             db_connection = form.save(commit=False)
             if "password" in form.cleaned_data:
-                db_connection.password = form.cleaned_data["password"]
+                pwd = form.cleaned_data["password"]
+                db_connection.password = encrypt_password(pwd)
                 db_connection.save()
             else:
                 db_connection.save()
@@ -162,7 +164,6 @@ def connection_edit(request, project_id, pk):
             )
         else:
             form = ConnectionForm(data=request.GET)
-            # return HttpResponse(status=400, headers={"HX-Trigger": json.dumps({"errors": form.errors})})
             return render(
                 request,
                 "connection/connection_form.html",
@@ -189,19 +190,36 @@ def index(request, project_id):
 @login_required
 def connection_delete(request, project_id, pk):
     connection = get_object_or_404(DbConnection, id=pk)
-    connection.delete()
-    return HttpResponse(
-        status=204,
-        headers={
-            "HX-Trigger": json.dumps(
-                {
-                    "listChanged": None,
-                    "showMessage": f"{connection.name} deleted.",
-                    "eventType": "deleted",
-                }
-            )
-        },
-    )
+    try:
+        connection.delete()
+        return HttpResponse(
+            status=204,
+            headers={
+                "HX-Trigger": json.dumps(
+                    {
+                        "listChanged": None,
+                        "showMessage": f"{connection.name} deleted.",
+                        "eventType": "deleted",
+                    }
+                )
+            },
+        )
+    except ProtectedError as e:
+        src_db_count = connection.sourcedb.count()
+        tgt_db_count = connection.targetdb.count()
+        logger.error(f"Protected Error: {e}")
+        return HttpResponse(
+            status=204,
+            headers={
+                "HX-Trigger": json.dumps(
+                    {
+                        "listChanged": None,
+                        "showMessage": f"'{connection.name}' cannot be deleted as it is being used by {src_db_count} testcases as source database, {tgt_db_count} as target database",
+                        "eventType": "deleted",
+                    }
+                )
+            },
+        )
 
 
 @login_required
@@ -280,7 +298,6 @@ class ProjectUpdateView(LoginRequiredMixin, UpdateView):
                 self.request, "You do not have permission to submit this form."
             )
             return self.form_invalid(form)
-        # form = super().form_valid(form)
         project = form.save(commit=False)
         project.modified_by = self.request.user
         project.save()
@@ -500,5 +517,5 @@ class ProjectDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
         return render(self.request, _404_Page)
 
     def get_object(self, queryset=...):
-        object = get_object_or_404(Project, id=self.kwargs.get("pk"))
-        return object
+        project = get_object_or_404(Project, id=self.kwargs.get("pk"))
+        return project
