@@ -6,7 +6,7 @@
       </div>
       <div class="column">
         {% if is_project_admin %}
-          <form hx-post="{% url 'project_members' project.id %}?action=add"
+          <form hx-post="{% url 'project_members' project.id 1 %}?action=add"
                 method="post"
                 hx-target="#member-table"
                 hx-swap="beforeend">
@@ -69,5 +69,49 @@
         </tbody>
       </table>
     </div>
+    <!-- Pagination -->
+  {% if members.has_other_pages %}
+  <nav class="pagination is-small is-right">
+    <ul class="pagination-list">
+      {% if members.has_previous %}
+        <li>
+          <a class="pagination-link"
+             hx-get="{% url 'project_members' project.id members.previous_page_number %}"
+             hx-target="#config_content"
+             hx-swap="outerhtml"><i class="fa-solid fa-angles-left"></i></a>
+        </li>
+      {% endif %}
+      {% for i in page_range|default_if_none:members.paginator.get_elided_page_range %}
+        {% if members.number == i %}
+          <li>
+            <a href="#" class="pagination-link is-current" aria-label="Goto page {{ i }}">{{ i }}</a>
+          </li>
+        {% else %}
+          {% if i == members.paginator.ELLIPSIS %}
+            <a href="#" class="pagination-link" aria-label="Goto page {{ i }}">{{ i }}</a>
+          {% else %}
+            <li class="pagination-link">
+              {% with pg_no=i %}
+                <a class="page-link"
+                   hx-get="{% url 'project_members' project.id pg_no %}"
+                   hx-target="#config_content"
+                   hx-swap="outerhtml">{{ i }}</a>
+              {% endwith %}
+            </li>
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+      {% if members.has_next %}
+        <li>
+          <a class="pagination-link"
+             hx-get="{% url 'project_members' project.id members.next_page_number %}"
+             hx-target="#config_content"
+             hx-swap="outerhtml"><i class="fa-solid fa-angles-right"></i></a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+{% endif %}
+<!-- end Pagination -->
   </div>
 {% endblock content %}

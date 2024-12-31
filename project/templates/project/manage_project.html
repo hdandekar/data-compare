@@ -15,14 +15,7 @@
               name="name"
               id="id_name"
               class="input is-small"
-              {%
-              if
-              not
-              is_project_admin
-              %}disabled{%
-              endif
-              %}
-              required
+              {% if not is_project_admin %}disabled{% endif %} required
               placeholder="Project Name"
               autocomplete="off"
               />
@@ -39,14 +32,7 @@
                 name="project_code"
                 id="id_project_code"
                 class="input is-small"
-                {%
-                if
-                not
-                is_project_admin
-                %}disabled{%
-                endif
-                %}
-                required
+                {% if not is_project_admin %}disabled{% endif %} required
                 placeholder="Project Code"
                 />
               </div>
@@ -57,20 +43,10 @@
           <div class="column">
             <div class="field">
               <label class="label" for="id_description">Project Description</label>
-              <textarea
-          id="id_description"
-          name="description"
-          class="textarea is-small"
-          {%
-          if
-          not
-          is_project_admin
-          %}readonly{%
-          endif
-          %}
-          placeholder="e.g. Describe briefly about the project..."
-        >
-{{ project.description }}</textarea>
+              <textarea id="id_description" name="description" class="textarea is-small"
+                    {% if not is_project_admin %}readonly{% endif %}
+                    placeholder="e.g. Describe briefly about the project..." >{{ project.description }}
+              </textarea>
             </div>
             {% if form.description.errors %}<p class="help is-danger">{{ form.description.errors|striptags }}</p>{% endif %}
           </div>

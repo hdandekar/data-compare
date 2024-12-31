@@ -3,7 +3,7 @@ import logging
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db.models.deletion import ProtectedError
@@ -12,16 +12,27 @@ from django.http.response import HttpResponseRedirect
 from django.middleware.csrf import get_token
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
-                                  UpdateView)
+from django.views.generic import (
+    CreateView,
+    DeleteView,
+    DetailView,
+    ListView,
+    UpdateView,
+)
 from django_htmx.http import HttpResponseClientRedirect
 
 from data_compare.users.models import User
 from data_compare.utils.crypto import encrypt_password
+from testplan.mixins import AdminPermissionMixin, MemberPermissionMixin
 
 from .forms import ConnectionForm
-from .models import (PROJECT_MEMBER_ROLE_CHOICES, DbConnection, DbType,
-                     Project, ProjectMember)
+from .models import (
+    PROJECT_MEMBER_ROLE_CHOICES,
+    DbConnection,
+    DbType,
+    Project,
+    ProjectMember,
+)
 from .util import check_db_connection
 
 CONNECTION_LIST_VIEW = "connection:list"
@@ -214,7 +225,7 @@ def connection_delete(request, project_id, pk):
                 "HX-Trigger": json.dumps(
                     {
                         "listChanged": None,
-                        "showMessage": f"'{connection.name}' cannot be deleted as it is being used by {src_db_count} testcases as source database, {tgt_db_count} as target database",
+                        "showMessage": f"'{connection.name}' cannot be deleted as it is being used by {src_db_count} testcases as source database, {tgt_db_count} as target database",  # noqa E501
                         "eventType": "deleted",
                     }
                 )
@@ -351,9 +362,22 @@ class ProjectUpdateView(LoginRequiredMixin, UpdateView):
         )
 
 
-def project_members(request, project_id):
+def project_members(request, project_id, page=1):
     project = Project.objects.get(id=project_id)
     project_members = project.projectmember_set.all().select_related("user")
+    project_members_count = project_members.count()
+
+    paginator = Paginator(project_members, per_page=20)
+
+    try:
+        project_members = paginator.page(page)
+        page_range = paginator.get_elided_page_range(number=page)
+    except PageNotAnInteger:
+        project_members = paginator.page(1)
+        page_range = paginator.get_elided_page_range(number=page)
+    except EmptyPage:
+        project_members = paginator.page(paginator.num_pages)
+        page_range = paginator.get_elided_page_range(number=page)
     is_project_admin = project.is_admin(request.user)
     if request.method == "GET":
         return render(
@@ -361,6 +385,8 @@ def project_members(request, project_id):
             "project/partials/project_members.html",
             {
                 "members": project_members,
+                "project_members_count": project_members_count,
+                "page_range": page_range,
                 "project": project,
                 "is_project_admin": is_project_admin,
             },
@@ -446,13 +472,13 @@ class ProjectListView(LoginRequiredMixin, ListView):
             .order_by("-owner")
             .select_related("owner")
         )
-        paginator = Paginator(member_projects, per_page=5)
+        paginator = Paginator(member_projects, per_page=20)
         context["projects"] = paginator.get_page(page_num)
         logger.info("just before returning ProjectListView context")
         return context
 
 
-class ProjectDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+class ProjectDeleteView(LoginRequiredMixin, AdminPermissionMixin, DeleteView):
     model = Project
 
     def get_object(self, queryset=None):
@@ -481,12 +507,6 @@ class ProjectDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
                 },
             )
 
-    def test_func(self):
-        project = self.get_object()
-        if project.owner == self.request.user:
-            return True
-        return False
-
     def handle_no_permission(self):
         project = self.get_object()
         if self.raise_exception:
@@ -504,18 +524,13 @@ class ProjectDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         )
 
 
-class ProjectDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
+class ProjectDetailView(LoginRequiredMixin, MemberPermissionMixin, DetailView):
     model = Project
     template_name = "project/project_detail.html"
-
-    def test_func(self):
-        if self.request.user in self.get_object().members.all():
-            return True
-        return False
 
     def handle_no_permission(self) -> HttpResponseRedirect:
         return render(self.request, _404_Page)
 
     def get_object(self, queryset=...):
-        project = get_object_or_404(Project, id=self.kwargs.get("pk"))
+        project = get_object_or_404(Project, id=self.kwargs.get("project_id"))
         return project

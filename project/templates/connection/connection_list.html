@@ -37,11 +37,11 @@
   </table>
   <!-- Pagination -->
   {% if connections.has_other_pages %}
-    <nav aria-label="Page navigation connections">
-      <ul class="pagination pagination-sm justify-content-end">
+    <nav aria-label="Page navigation connections" class="pagination is-small is-right">
+      <ul class="pagination-list">
         {% if connections.has_previous %}
           <li>
-            <a class="page-link"
+            <a class="pagination-link"
                hx-get="{% url 'list_connection' project.id connections.previous_page_number %}"
                hx-target="#connection_items"
                hx-swap="outerhtml"><i class="fa-solid fa-angles-left"></i></a>
@@ -50,19 +50,19 @@
         {% for i in page_range|default_if_none:connections.paginator.get_elided_page_range %}
           {% if connections.number == i %}
             <li class="active page-item">
-              <span class="page-link">{{ i }}
+              <span class="pagination-link is-current">{{ i }}
                 <span class="sr-only">(current)</span>
               </span>
             </li>
           {% else %}
             {% if i == connections.paginator.ELLIPSIS %}
               <li class="page-item">
-                <span class="page-link">{{ i }}</span>
+                <span class="pagination-link">{{ i }}</span>
               </li>
             {% else %}
               <li class="page-item">
                 {% with pg_no=i %}
-                  <a class="page-link"
+                  <a class="pagination-link"
                      hx-get="{% url 'list_connection' project.id pg_no %}"
                      hx-target="#connection_items"
                      hx-swap="outerhtml">{{ i }}</a>
@@ -73,7 +73,7 @@
         {% endfor %}
         {% if connections.has_next %}
           <li>
-            <a class="page-link"
+            <a class="pagination-link"
                hx-get="{% url 'list_connection' project.id connections.next_page_number %}"
                hx-target="#connection_items"
                hx-swap="outerhtml"><i class="fa-solid fa-angles-right"></i></a>

@@ -27,7 +27,7 @@
           </li>
           <li>
             <a class="has-text-weight-bold"
-               hx-get="{% url 'project_members' project.id %}"
+               hx-get="{% url 'project_members' project.id 1 %}"
                hx-target="#config_content"
                hx-swap="innerHTML"
                hx-on:click="setActive(this)">Members</a>

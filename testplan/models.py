@@ -9,6 +9,36 @@ def get_deleted_user_instance():
     return get_user_model().objects.get_or_create(username="deleted")[0]
 
 
+class TestCaseFolder(models.Model):
+    project = models.ForeignKey(
+        Project, on_delete=models.CASCADE, related_name="project_folders"
+    )
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(
+        User,
+        related_name="tc_folder_created_by",
+        on_delete=models.SET(get_deleted_user_instance),
+    )
+    modified_by = models.ForeignKey(
+        User,
+        related_name="tc_folder_modified_by",
+        null=True,
+        on_delete=models.SET(get_deleted_user_instance),
+    )
+    name = models.CharField(max_length=255)
+    parent = models.ForeignKey(
+        "self",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+        related_name="subfolder",
+    )
+
+    def __str__(self):
+        return self.name
+
+
 class TestCase(models.Model):
     tcname = models.CharField(max_length=50, blank=False, null=False)
     project = models.ForeignKey(
@@ -35,6 +65,9 @@ class TestCase(models.Model):
         related_name="testcase_modified_by",
         null=True,
         on_delete=models.SET(get_deleted_user_instance),
+    )
+    folder = models.ForeignKey(
+        TestCaseFolder, on_delete=models.CASCADE, related_name="folder_testcases"
     )
 
     def __str__(self):

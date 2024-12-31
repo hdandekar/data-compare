@@ -3,7 +3,10 @@
 <div class="modal-content is-width-70">
   <div class="box content">
     <h5 class="is-size-4">
-      {% if object.name %} {{ object.name }} project {% else %} Add New Project
+      {% if object.name %}
+        {{ object.name }} project
+      {% else %}
+        Add New Project
       {% endif %}
     </h5>
     <form
