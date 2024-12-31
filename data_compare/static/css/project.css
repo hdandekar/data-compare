@@ -477,3 +477,17 @@ tr.htmx-swapping td {
 .is-bordered {
   border-bottom: 1px solid #ddd;
 }
+
+.is-bordered-left {
+  border-left: 1px solid #ddd;
+}
+
+.is-bordered-right {
+  border-right: 1px solid #ddd;
+}
+
+
+.menu-list a,
+.menu-list button {
+  font-size: 1.25em;
+}

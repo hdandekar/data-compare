@@ -65,19 +65,19 @@ class DbType(models.Model):
 
 
 class DbConnection(models.Model):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=255)
     dbtype = models.ForeignKey(
         DbType, related_name="dbtype", on_delete=models.PROTECT, null=True
     )
     project = models.ForeignKey(
         Project, related_name="project", on_delete=models.CASCADE
     )
-    dbname = models.CharField(max_length=200)
-    hostname = models.CharField(max_length=200)
-    username = models.CharField(max_length=100)
-    password = models.CharField(max_length=100)
+    dbname = models.CharField(max_length=255)
+    hostname = models.CharField(max_length=255)
+    username = models.CharField(max_length=255)
+    password = models.CharField(max_length=255)
     portno = models.IntegerField()
-    schema_name = models.CharField(max_length=100, blank=True)
+    schema_name = models.CharField(max_length=255, blank=True)
     created_by = models.ForeignKey(
         User, related_name="connection", on_delete=models.PROTECT
     )
@@ -111,3 +111,6 @@ class ProjectMember(models.Model):
     role = models.CharField(
         max_length=50, choices=PROJECT_MEMBER_ROLE_CHOICES, default="member"
     )
+
+    class Meta:
+        ordering = ["-date_joined"]

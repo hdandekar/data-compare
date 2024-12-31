@@ -1,5 +1,3 @@
-import os
-
 from cryptography.fernet import Fernet
 
 from config.settings.base import ENCRYPTION_KEY

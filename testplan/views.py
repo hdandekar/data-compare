@@ -11,15 +11,26 @@ from django.db.models.deletion import ProtectedError
 from django.http import HttpResponse
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
-from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
-                                  UpdateView)
+from django.views.generic import (
+    CreateView,
+    DeleteView,
+    DetailView,
+    ListView,
+    UpdateView,
+)
 
 from project.models import DbConnection
 from testplan import tasks
 from testplan.decorators import user_is_member
 from testplan.mixins import AdminPermissionMixin, MemberPermissionMixin
-from testplan.models import (Project, TestCase, TestRun, TestRunTestCase,
-                             TestRunTestCaseHistory)
+from testplan.models import (
+    Project,
+    TestCase,
+    TestCaseFolder,
+    TestRun,
+    TestRunTestCase,
+    TestRunTestCaseHistory,
+)
 
 _404_Page = "404.html"
 
@@ -28,7 +39,15 @@ logger = logging.getLogger(__name__)
 
 class TestCaseCreateView(LoginRequiredMixin, MemberPermissionMixin, CreateView):
     model = TestCase
-    fields = ["tcname", "sourcedb", "sourcesql", "targetdb", "targetsql", "keycolumns"]
+    fields = [
+        "tcname",
+        "sourcedb",
+        "sourcesql",
+        "targetdb",
+        "targetsql",
+        "keycolumns",
+        "folder",
+    ]
     template_name = "testcase_form.html"
 
     def form_valid(self, form):
@@ -48,6 +67,7 @@ class TestCaseCreateView(LoginRequiredMixin, MemberPermissionMixin, CreateView):
         context["db_connections"] = DbConnection.objects.filter(
             project_id=self.kwargs["project_id"]
         )
+        context["folders"] = context["project"].project_folders.all()
         return context
 
     def get_initial(self):
@@ -57,36 +77,21 @@ class TestCaseCreateView(LoginRequiredMixin, MemberPermissionMixin, CreateView):
         initial["project"] = project
         return initial
 
-    def test_func(self):
-        project = Project.objects.get(id=self.kwargs["project_id"])
-        if self.request.user in project.members.all():
-            return True
-        return False
-
-    def handle_no_permission(self) -> HttpResponseRedirect:
-        return render(self.request, _404_Page)
-
-
-class TestCaseListView(LoginRequiredMixin, MemberPermissionMixin, ListView):
-    model = TestCase
-    template_name = "testcase_list.html"
-    paginate_by = 10
-
-    def get_queryset(self):
-        return TestCase.objects.filter(project_id=self.kwargs["project_id"])
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["project"] = Project.objects.get(id=self.kwargs["project_id"])
-        return context
-
     def handle_no_permission(self) -> HttpResponseRedirect:
         return render(self.request, _404_Page)
 
 
 class TestCaseUpdateView(LoginRequiredMixin, MemberPermissionMixin, UpdateView):
     model = TestCase
-    fields = ["tcname", "sourcedb", "sourcesql", "targetdb", "targetsql", "keycolumns"]
+    fields = [
+        "tcname",
+        "sourcedb",
+        "sourcesql",
+        "targetdb",
+        "targetsql",
+        "keycolumns",
+        "folder",
+    ]
     template_name = "testcase_form.html"
 
     def form_valid(self, form):
@@ -103,7 +108,9 @@ class TestCaseUpdateView(LoginRequiredMixin, MemberPermissionMixin, UpdateView):
             queryset = self.get_queryset()
         project_id = self.kwargs.get("project_id")
         testcase_id = self.kwargs.get("testcase_id")
-        queryset = queryset.filter(project=project_id, id=testcase_id)
+        queryset = queryset.select_related("sourcedb", "targetdb").filter(
+            project=project_id, id=testcase_id
+        )
         testcase = queryset.get()
         return testcase
 
@@ -112,6 +119,7 @@ class TestCaseUpdateView(LoginRequiredMixin, MemberPermissionMixin, UpdateView):
         context["db_connections"] = DbConnection.objects.filter(
             project_id=self.kwargs["project_id"]
         )
+        context["folders"] = self.object.project.project_folders.all()
         return context
 
     def handle_no_permission(self) -> HttpResponseRedirect:
@@ -436,6 +444,7 @@ class TestRunCaseDeleteView(LoginRequiredMixin, AdminPermissionMixin, DeleteView
 
 
 @login_required
+@user_is_member
 def execute_testcase(request, project_id, testrun_id, testrun_testcase_id):
     """
     Initiates execution of the test case in a test run, not adding decorator to check  `user_is_member`
@@ -491,6 +500,7 @@ def execute_testcase(request, project_id, testrun_id, testrun_testcase_id):
 
 
 @login_required
+@user_is_member
 def testrun_testcase_history_list(request, project_id, testrun_id, testrun_testcase_id):
     """
     Lists testcases history for a testrun
@@ -581,5 +591,90 @@ def testrun_case_result_summary(
                 "project": project,
                 "testrun": testrun,
                 "testrun_testcase": testrun_testcase,
+            },
+        )
+
+
+class TestCaseFolderIndexView(LoginRequiredMixin, MemberPermissionMixin, ListView):
+    model = TestCaseFolder
+    template_name = "testcase_list.html"
+    context_object_name = "root_folders"
+
+    def get_queryset(self):
+        return TestCaseFolder.objects.filter(
+            parent__isnull=True, project_id=self.kwargs["project_id"]
+        ).select_related()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["project"] = Project.objects.get(id=self.kwargs["project_id"])
+        context["all_test_cases"] = TestCase.objects.select_related(
+            "sourcedb", "targetdb"
+        ).filter(project_id=self.kwargs["project_id"])
+        return context
+
+    def handle_no_permission(self) -> HttpResponseRedirect:
+        return render(self.request, _404_Page)
+
+
+class TestCaseFolderSubfoldersView(
+    LoginRequiredMixin, MemberPermissionMixin, DetailView
+):
+    model = TestCaseFolder
+    template_name = "partials/folder_subfolder.html"
+    context_object_name = "folder"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["project"] = get_object_or_404(Project, id=self.kwargs["project_id"])
+        context["subfolders"] = self.object.subfolder.select_related("parent").all()
+        test_cases = self.get_all_test_cases(self.object)
+        context["test_cases"] = test_cases
+        return context
+
+    def get_all_test_cases(self, folder):
+        """
+        Recursively gather test cases from the folder and its subfolders.
+        """
+        test_cases = list(
+            folder.folder_testcases.select_related("sourcedb", "targetdb").filter(
+                project_id=self.kwargs["project_id"]
+            )
+        )
+        for subfolder in folder.subfolder.prefetch_related("parent").all():
+            test_cases.extend(self.get_all_test_cases(subfolder))
+        return test_cases
+
+    def handle_no_permission(self) -> HttpResponseRedirect:
+        return render(self.request, _404_Page)
+
+
+class TestCaseFolderCreateView(LoginRequiredMixin, MemberPermissionMixin, CreateView):
+    model = TestCaseFolder
+    template_name = "testfolder_form.html"
+    fields = ["name", "parent"]
+
+    def get_form(self):
+        form = super().get_form()
+        form.fields["parent"].queryset = TestCaseFolder.objects.filter(
+            project_id=self.kwargs["project_id"]
+        )
+        return form
+
+    def form_valid(self, form):
+        tc_folder = form.save(commit=False)
+        tc_folder.created_by = self.request.user
+        tc_folder.project = Project.objects.get(id=self.kwargs["project_id"])
+        tc_folder.save()
+        return HttpResponse(
+            status=204,
+            headers={
+                "HX-Trigger": json.dumps(
+                    {
+                        "listChanged": None,
+                        "showMessage": f"{tc_folder.name} added.",
+                        "eventType": "created",
+                    }
+                )
             },
         )

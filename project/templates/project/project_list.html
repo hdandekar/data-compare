@@ -22,9 +22,8 @@
               <a title="Edit" href="{% url 'project_details' project.id %}">
                 <i class="fa fa-pen-to-square fa-fw" aria-hidden="true"></i>
               </a>
-              <a class="has-text-danger"
-                 hx-post="{% url 'delete_project' project.id %}"
-                 hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'>
+              <a class="has-text-danger" hx-post="{% url 'delete_project' project.id %}"
+                 hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}' aria-label="Delete Project">
                 <i class="fa fa-trash fa-fw" aria-hidden="true"></i>
               </a>
             {% endif %}
@@ -84,7 +83,7 @@
         {% for i in page_range|default_if_none:projects.paginator.get_elided_page_range %}
           {% if projects.number == i %}
             <li>
-              <a href="#" class="pagination-link" aria-label="Goto page {{ i }}">{{ i }}</a>
+              <a href="#" class="pagination-link is-current" aria-label="Goto page {{ i }}">{{ i }}</a>
             </li>
           {% else %}
             {% if i == projects.paginator.ELLIPSIS %}

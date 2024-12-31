@@ -11,8 +11,18 @@ urlpatterns = [
     ),
     path(
         "project/<int:project_id>/testcases",
-        views.TestCaseListView.as_view(),
+        views.TestCaseFolderIndexView.as_view(),
         name="list_testcase",
+    ),
+    path(
+        "project/<int:project_id>/folder/<int:pk>/subfolders/",
+        views.TestCaseFolderSubfoldersView.as_view(),
+        name="folder_subfolders",
+    ),
+    path(
+        "project/<int:project_id>/folder/create",
+        views.TestCaseFolderCreateView.as_view(),
+        name="create_folder",
     ),
     path(
         "project/<int:project_id>/testcase/<int:testcase_id>/edit",

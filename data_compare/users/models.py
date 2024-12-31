@@ -2,8 +2,7 @@ import os
 
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
-from django.db.models import (CharField, EmailField, ImageField, TextField,
-                              URLField)
+from django.db.models import CharField, EmailField, ImageField, TextField, URLField
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
