@@ -12,6 +12,7 @@ from django.http.response import HttpResponseRedirect
 from django.middleware.csrf import get_token
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.views.decorators.http import require_http_methods
 from django.views.generic import (
     CreateView,
     DeleteView,
@@ -41,8 +42,10 @@ _404_Page = "404.html"
 logger = logging.getLogger(__name__)
 
 
+@require_http_methods(["GET", "POST"])
 @login_required
 def connection_create(request, project_id):
+    connection_form_html = "connection/connection_form.html"
     dbtypes = DbType.objects.all()
     if request.method == "POST":
         if "save" in request.POST:
@@ -69,7 +72,7 @@ def connection_create(request, project_id):
             else:
                 return render(
                     request,
-                    "connection/connection_form.html",
+                    connection_form_html,
                     {"form": form, "dbtypes": dbtypes},
                 )
         if "test" in request.POST:
@@ -111,11 +114,10 @@ def connection_create(request, project_id):
 
     else:
         form = ConnectionForm()
-    return render(
-        request, "connection/connection_form.html", {"form": form, "dbtypes": dbtypes}
-    )
+    return render(request, connection_form_html, {"form": form, "dbtypes": dbtypes})
 
 
+@require_http_methods(["GET"])
 @login_required
 def connection_list(request, project_id, page=1):
     project = Project.objects.get(id=project_id)
@@ -144,8 +146,10 @@ def connection_list(request, project_id, page=1):
     )
 
 
+@require_http_methods(["GET", "POST"])
 @login_required
 def connection_edit(request, project_id, pk):
+    connection_form_html = "connection/connection_form.html"
     connection = get_object_or_404(DbConnection, id=pk)
     dbtypes = DbType.objects.exclude(dbname=connection.dbtype.dbname)
     if request.method == "POST":
@@ -177,18 +181,19 @@ def connection_edit(request, project_id, pk):
             form = ConnectionForm(data=request.GET)
             return render(
                 request,
-                "connection/connection_form.html",
+                connection_form_html,
                 {"form": form, "connection": connection, "dbtypes": dbtypes},
             )
     else:
         form = ConnectionForm(instance=connection)
     return render(
         request,
-        "connection/connection_form.html",
+        connection_form_html,
         {"form": form, "connection": connection, "dbtypes": dbtypes},
     )
 
 
+@require_http_methods(["GET"])
 @login_required
 def index(request, project_id):
     return render(
@@ -198,6 +203,7 @@ def index(request, project_id):
     )
 
 
+@require_http_methods(["GET"])
 @login_required
 def connection_delete(request, project_id, pk):
     connection = get_object_or_404(DbConnection, id=pk)
@@ -233,6 +239,7 @@ def connection_delete(request, project_id, pk):
         )
 
 
+@require_http_methods(["GET"])
 @login_required
 def project_index(request):
     logger.info("Rendering Project Index")
@@ -362,6 +369,7 @@ class ProjectUpdateView(LoginRequiredMixin, UpdateView):
         )
 
 
+@require_http_methods(["GET", "POST"])
 def project_members(request, project_id, page=1):
     project = Project.objects.get(id=project_id)
     project_members = project.projectmember_set.all().select_related("user")
