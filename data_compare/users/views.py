@@ -4,6 +4,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.http import HttpResponse
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from django.views.decorators.http import require_http_methods
 from django.views.generic import DetailView, RedirectView, UpdateView
 
 User = get_user_model()
@@ -56,6 +57,7 @@ class UserRedirectView(LoginRequiredMixin, RedirectView):
 user_redirect_view = UserRedirectView.as_view()
 
 
+@require_http_methods(["POST"])
 def check_username(request):
     email = request.POST.get("email")
     login_url = reverse("account_login")

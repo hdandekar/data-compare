@@ -9,11 +9,6 @@
         Create New Folder
       {% endif %}
     </h5>
-    <form>
-        {% csrf_token %}
-        {{ form.as_p }}
-    </form>
-
     <form hx-post="{{ request.path }}" hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'>
       <div class="box">
         <br />

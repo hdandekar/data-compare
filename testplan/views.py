@@ -11,6 +11,7 @@ from django.db.models.deletion import ProtectedError
 from django.http import HttpResponse
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_http_methods
 from django.views.generic import (
     CreateView,
     DeleteView,
@@ -233,6 +234,7 @@ class TestRunListView(LoginRequiredMixin, MemberPermissionMixin, ListView):
         return render(self.request, _404_Page)
 
 
+@require_http_methods(["GET"])
 @login_required
 @user_is_member
 def testrun_index(request, project_id):
@@ -246,6 +248,7 @@ def testrun_index(request, project_id):
         return render(request, _404_Page)
 
 
+@require_http_methods(["GET"])
 @login_required
 @user_is_member
 def get_testrun_testcases(request, project_id, testrun_id):
@@ -299,6 +302,7 @@ def get_testrun_testcases(request, project_id, testrun_id):
         return render(request, _404_Page)
 
 
+@require_http_methods(["GET"])
 @login_required
 @user_is_member
 def get_project_testcases(request, project_id, testrun_id):
@@ -443,6 +447,9 @@ class TestRunCaseDeleteView(LoginRequiredMixin, AdminPermissionMixin, DeleteView
         )
 
 
+require_http_methods(["POST"])
+
+
 @login_required
 @user_is_member
 def execute_testcase(request, project_id, testrun_id, testrun_testcase_id):
@@ -499,6 +506,7 @@ def execute_testcase(request, project_id, testrun_id, testrun_testcase_id):
         )
 
 
+@require_http_methods(["GET"])
 @login_required
 @user_is_member
 def testrun_testcase_history_list(request, project_id, testrun_id, testrun_testcase_id):
@@ -530,6 +538,7 @@ def testrun_testcase_history_list(request, project_id, testrun_id, testrun_testc
         return redirect("testrun_detail", project_id=project_id, testrun_id=testrun_id)
 
 
+@require_http_methods(["GET"])
 @login_required
 @user_is_member
 def testrun_case_result_summary(

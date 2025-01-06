@@ -10,6 +10,9 @@ from testplan.models import TestCase, TestRunTestCase, TestRunTestCaseHistory
 logger = logging.getLogger(__name__)
 
 
+TC_FAILED = "Test Case Failed"
+
+
 @shared_task
 def execute_comparison(testrun_tc_history_id, testcase_id, testrun_case_id):
     testruncasehist = get_object_or_404(
@@ -48,7 +51,7 @@ def execute_comparison(testrun_tc_history_id, testcase_id, testrun_case_id):
             testruncasehist.execution_end = timezone.localtime()
             testruncasehist.save()
             if compare_results["status"] == "Fail":
-                logger.info("Test Case Failed")
+                logger.info(TC_FAILED)
                 # Update testcase_run_status_id = Failed(3)
                 testruncasehist.testcase_run_status_id = 3
                 testruncasehist.comments = (
@@ -66,19 +69,18 @@ def execute_comparison(testrun_tc_history_id, testcase_id, testrun_case_id):
                 testruncasehist.save()
 
             if compare_results["status"] == "Skipped":
-                logger.info("Test Case Failed")
+                logger.info(TC_FAILED)
                 # Update testcase_run_status_id = Failed(3)
                 testruncasehist.testcase_run_status_id = 5
                 testruncasehist.comments = compare_results["message"]
                 testruncasehist.save()
             if compare_results["status"] == "Error":
-                logger.info("Test Case Failed")
+                logger.info(TC_FAILED)
                 # Update testcase_run_status_id = Failed(3)
                 testruncasehist.testcase_run_status_id = 7
                 testruncasehist.comments = compare_results["message"]
                 testruncasehist.save()
         except Exception as error:
-            logger.error("Some error occured")
             logger.error(error)
     else:
         comments = ""

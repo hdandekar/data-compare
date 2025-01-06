@@ -34,8 +34,10 @@
             <th class="has-text-centered">Full Name</th>
             <th class="has-text-centered">Email</th>
             <th class="has-text-centered">Joined On</th>
-            <th class="has-text-centered">Role</th>
-            {% if is_project_admin %}<th class="has-text-centered">Action</th>{% endif %}
+            {% if is_project_admin %}
+              <th class="has-text-centered">Role</th>
+              <th class="has-text-centered">Action</th>
+            {% endif %}
           </tr>
         </thead>
         <tbody id="member-table">
@@ -44,15 +46,15 @@
               <td class="is-vcentered has-text-centered">{{ member.user.name }}</td>
               <td class="is-vcentered has-text-centered">{{ member.user.email }}</td>
               <td class="is-vcentered has-text-centered">{{ member.date_joined|date:"d-M-y" }}</td>
-              <td class="is-vcentered has-text-centered">
-                <div class="select">
-                  <select class="is-small">
-                    <option value="admin" {% if member.role == 'admin' %}selected{% endif %}>Admin</option>
-                    <option value="member" {% if member.role == 'member' %}selected{% endif %}>Member</option>
-                  </select>
-                </div>
-              </td>
               {% if is_project_admin %}
+                <td class="is-vcentered has-text-centered">
+                  <div class="select">
+                    <select class="is-small">
+                      <option value="admin" {% if member.role == 'admin' %}selected{% endif %}>Admin</option>
+                      <option value="member" {% if member.role == 'member' %}selected{% endif %}>Member</option>
+                    </select>
+                  </div>
+                </td>
                 <td class="has-text-danger is-vcentered has-text-centered">
                   <button class="has-text-danger"
                           hx-post="/project/{{ project.id }}/project_members?action=remove&user_id={{ member.user.id }}"
