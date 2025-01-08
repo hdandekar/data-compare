@@ -25,6 +25,11 @@ urlpatterns = [
         name="create_folder",
     ),
     path(
+        "project/<int:project_id>/folder/<int:folder_id>",
+        views.TestCaseFolderUpdateView.as_view(),
+        name="edit_folder",
+    ),
+    path(
         "project/<int:project_id>/testcase/<int:testcase_id>/edit",
         views.TestCaseUpdateView.as_view(),
         name="edit_testcase",

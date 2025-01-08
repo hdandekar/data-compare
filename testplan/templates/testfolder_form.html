@@ -27,9 +27,10 @@
               <label class="label" for="id_parent">Parent Folder</label>
               <div class="select is-fullwidth">
                 <select name="parent" id="id_parent" class="select">
-                  {% for key,value in form.fields.parent.choices %}
-                    <option value="{{ key }}"
-                      {% if key == object.folder.id %}selected{% endif %}>{{ value }}
+                  {% for id, name in form.fields.parent.choices %}
+                    <option value="{{ id }}"
+                      {% if id == form.parent.value %}selected{% endif %}>
+                    {{ name }}
                     </option>
                   {% endfor %}
                 </select>
