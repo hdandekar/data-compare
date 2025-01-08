@@ -17,27 +17,51 @@
       </ul>
     </nav>
     <div class="columns">
-
       <aside class="menu column is-3" aria-label="Test Case Folders">
         <button class="button is-success is-fullwidth mb-2" hx-get="{% url 'create_folder' project.id %}" hx-target="#dialog">
           Create New Folder
         </button>
         <ul class="menu-list">
-          <li><a href="{% url 'list_testcase' project.id %}" class="item is-active">All</a></li>
+          <li><a href="{% url 'list_testcase' project.id%}" class="item is-active">Root</a></li>
           <li>
             <ul>
               {% for folder in root_folders %}
               <li>
-                <button class="item"
-                        hx-get="{% url 'folder_subfolders' project.id folder.id %}"
+                <div class="field has-addons">
+                  <p class="control">
+                    {% if folder.name != 'root' %}
+                    <button class="button is-size-6 item"
+                            hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
+                            hx-delete="{% url 'edit_folder' project.id folder.id %}"
+                            hx-target="#dialog">
+                      <span class="icon is-small">
+                        <i class="fas fa-trash has-text-danger"></i>
+                      </span>
+                    </button>
+                    {% endif %}
+                  </p>
+                  <p class="control">
+                    {% if folder.name != 'root' %}
+                    <button class="button is-size-6 item"
+                            hx-get="{% url 'edit_folder' project.id folder.id %}"
+                            hx-target="#dialog">
+                      <span class="icon is-small">
+                          <i class="fas fa-edit has-text-success"></i>
+                      </span>
+                    </button>
+                    {% endif %}
+                  </p>
+                  <p class="control w-100">
+                    <button class="button is-size-6 item"
+                        hx-get="{% url 'folder_subfolders' project.id folder.id%}"
                         hx-target="#subfolder-list-{{ folder.id }}"
                         hx-swap="innerHTML"
                         onclick="setActive(event)">
-                  <span>
-                      <i class="fa-solid fa-folder pr-2"></i>
+                      <span class="fas fa-folder pr-2"></span>
                       {{ folder.name }}
-                  </span>
-                </button>
+                    </button>
+                  </p>
+                </div>
                 <div id="subfolder-list-{{ folder.id }}"></div>
               </li>
               {% endfor %}
@@ -124,7 +148,7 @@
     event.currentTarget.classList.add('is-active');
     const openFolder = document.querySelectorAll('.fa-folder-open');
     openFolder.forEach(folder => folder.classList.remove('fa-folder-open'))
-    event.currentTarget.children[0].children[0].classList.add('fa-folder-open');
-  }
+    event.currentTarget.children[0].classList.add('fa-folder-open');
+  };
 </script>
 {% endblock inline_javascript %}

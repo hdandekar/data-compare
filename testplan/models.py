@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.forms import ValidationError
 
 from data_compare.users.models import User
 from project.models import DbConnection, Project
@@ -37,6 +38,25 @@ class TestCaseFolder(models.Model):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        """Checks for presence of root folder, if does not exists allows creation else does not allow"""
+        if self.name.lower() == "root":
+            if (
+                TestCaseFolder.objects.filter(project=self.project, name="root")
+                .exclude(pk=self.pk)
+                .exists()
+            ):
+                raise ValidationError(
+                    'Folder name "root" is already available in this project.'
+                )
+        super().save(*args, **kwargs)
+
+    def delete(self, using=None, keep_parents=False):
+        """Set the testcases folder_id to the parent_id of the folder being deleted"""
+        if self.parent:
+            self.folder_testcases.update(folder=self.parent)
+        super().delete(using, keep_parents)
 
 
 class TestCase(models.Model):

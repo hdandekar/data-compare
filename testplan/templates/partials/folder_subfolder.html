@@ -3,16 +3,37 @@
   <ul>
     {% for subfolder in subfolders %}
       <li>
-        <button class="item"
+        <div class="field has-addons">
+          <p class="control">
+            <button class="button is-size-6 item"
+                    hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
+                    hx-delete="{% url 'edit_folder' project.id subfolder.id %}"
+                    hx-target="#dialog">
+              <span class="icon is-small">
+                <i class="fas fa-trash has-text-danger"></i>
+              </span>
+            </button>
+          </p>
+          <p class="control">
+            <button class="button is-size-6 item"
+                    hx-get="{% url 'edit_folder' project.id subfolder.id %}"
+                    hx-target="#dialog">
+              <span class="icon is-small">
+                <i class="fas fa-edit has-text-success"></i>
+              </span>
+            </button>
+          </p>
+          <p class="control w-100">
+            <button class="button is-size-6 item"
                 hx-get="{% url 'folder_subfolders' project.id subfolder.id %}"
                 hx-target="#subfolder-list-{{ subfolder.id }}"
                 hx-swap="innerHTML"
                 onclick="setActive(event)">
-          <span>
-            <i class="fa-solid fa-folder pr-2"></i>
+              <span class="fas fa-folder pr-2"></span>
               {{ subfolder.name }}
-          </span>
-        </button>
+            </button>
+          </p>
+        </div>
         <div id="subfolder-list-{{ subfolder.id }}"></div>
       </li>
     {% endfor %}

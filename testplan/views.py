@@ -2,14 +2,16 @@ import json
 import logging
 
 import pandas as pd
+from django import forms
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.db.models.aggregates import Count
 from django.db.models.deletion import ProtectedError
 from django.http import HttpResponse
 from django.http.response import HttpResponseRedirect
+from django.middleware.csrf import get_token
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_http_methods
 from django.views.generic import (
@@ -18,6 +20,7 @@ from django.views.generic import (
     DetailView,
     ListView,
     UpdateView,
+    View,
 )
 
 from project.models import DbConnection
@@ -32,6 +35,7 @@ from testplan.models import (
     TestRunTestCase,
     TestRunTestCaseHistory,
 )
+from testplan.utils import build_hierarchy
 
 _404_Page = "404.html"
 
@@ -81,6 +85,19 @@ class TestCaseCreateView(LoginRequiredMixin, MemberPermissionMixin, CreateView):
     def handle_no_permission(self) -> HttpResponseRedirect:
         return render(self.request, _404_Page)
 
+    def get_form(self, instance=None):
+        form = super().get_form()
+        all_folders = TestCaseFolder.objects.filter(
+            project_id=self.kwargs["project_id"]
+        )
+        hierarchy = build_hierarchy(all_folders)
+        # Creating choices with indented names based on hierarchy level
+        choices = [
+            (folder.id, "--" * level + " " + folder.name) for folder, level in hierarchy
+        ]
+        form.fields["folder"].choices = choices
+        return form
+
 
 class TestCaseUpdateView(LoginRequiredMixin, MemberPermissionMixin, UpdateView):
     model = TestCase
@@ -120,8 +137,20 @@ class TestCaseUpdateView(LoginRequiredMixin, MemberPermissionMixin, UpdateView):
         context["db_connections"] = DbConnection.objects.filter(
             project_id=self.kwargs["project_id"]
         )
-        context["folders"] = self.object.project.project_folders.all()
         return context
+
+    def get_form(self, instance=None):
+        form = super().get_form()
+        all_folders = TestCaseFolder.objects.filter(
+            project_id=self.kwargs["project_id"]
+        )
+        hierarchy = build_hierarchy(all_folders)
+        # Creating choices with indented names based on hierarchy level
+        choices = [
+            (folder.id, "--" * level + " " + folder.name) for folder, level in hierarchy
+        ]
+        form.fields["folder"].choices = choices
+        return form
 
     def handle_no_permission(self) -> HttpResponseRedirect:
         return render(self.request, _404_Page)
@@ -610,9 +639,24 @@ class TestCaseFolderIndexView(LoginRequiredMixin, MemberPermissionMixin, ListVie
     context_object_name = "root_folders"
 
     def get_queryset(self):
-        return TestCaseFolder.objects.filter(
-            parent__isnull=True, project_id=self.kwargs["project_id"]
-        ).select_related()
+        project = Project.objects.get(id=self.kwargs["project_id"])
+        try:
+            root = TestCaseFolder.objects.get(
+                name="root", project_id=self.kwargs["project_id"], parent__isnull=True
+            )
+            return TestCaseFolder.objects.filter(
+                project_id=self.kwargs["project_id"], parent_id=root.id
+            ).select_related()
+        except ObjectDoesNotExist as e:
+            logger.info(f"Creating root folder for 1st time, error is {e}")
+            root = TestCaseFolder.objects.create(
+                name="root",
+                project_id=self.kwargs["project_id"],
+                created_by=project.owner,
+            )
+            return TestCaseFolder.objects.filter(
+                project_id=self.kwargs["project_id"], parent_id=root.id
+            ).select_related()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -636,7 +680,11 @@ class TestCaseFolderSubfoldersView(
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["project"] = get_object_or_404(Project, id=self.kwargs["project_id"])
-        context["subfolders"] = self.object.subfolder.select_related("parent").all()
+        context["subfolders"] = (
+            self.object.subfolder.select_related("parent")
+            .all()
+            .exclude(name="root", parent__isnull=True)
+        )
         test_cases = self.get_all_test_cases(self.object)
         context["test_cases"] = test_cases
         return context
@@ -650,8 +698,6 @@ class TestCaseFolderSubfoldersView(
                 project_id=self.kwargs["project_id"]
             )
         )
-        for subfolder in folder.subfolder.prefetch_related("parent").all():
-            test_cases.extend(self.get_all_test_cases(subfolder))
         return test_cases
 
     def handle_no_permission(self) -> HttpResponseRedirect:
@@ -668,22 +714,150 @@ class TestCaseFolderCreateView(LoginRequiredMixin, MemberPermissionMixin, Create
         form.fields["parent"].queryset = TestCaseFolder.objects.filter(
             project_id=self.kwargs["project_id"]
         )
+        all_folders = TestCaseFolder.objects.filter(
+            project_id=self.kwargs["project_id"]
+        )
+        hierarchy = build_hierarchy(all_folders)
+        choices = [
+            (folder.id, "--" * level + " " + folder.name) for folder, level in hierarchy
+        ]
+        form.fields["parent"].choices = choices
         return form
 
     def form_valid(self, form):
         tc_folder = form.save(commit=False)
         tc_folder.created_by = self.request.user
         tc_folder.project = Project.objects.get(id=self.kwargs["project_id"])
-        tc_folder.save()
-        return HttpResponse(
-            status=204,
-            headers={
-                "HX-Trigger": json.dumps(
-                    {
-                        "listChanged": None,
-                        "showMessage": f"{tc_folder.name} added.",
-                        "eventType": "created",
-                    }
-                )
-            },
+        try:
+            tc_folder.save()
+            return HttpResponse(
+                status=204,
+                headers={
+                    "HX-Trigger": json.dumps(
+                        {
+                            "listChanged": None,
+                            "showMessage": f"{tc_folder.name} added.",
+                            "eventType": "created",
+                        }
+                    )
+                },
+            )
+        except forms.ValidationError as e:
+            logger.error(f"Error Occured {e}")
+            form.add_error("name", e)
+            return self.form_invalid(form)
+
+
+class TestCaseFolderUpdateView(LoginRequiredMixin, MemberPermissionMixin, View):
+    model = TestCaseFolder
+
+    def get_object(self):
+        project_id = self.kwargs.get("project_id")
+        folder_id = self.kwargs.get("folder_id")
+        folder = TestCaseFolder.objects.get(project_id=project_id, id=folder_id)
+        return folder
+
+    def get_descendants(self, folder):
+        descendants = set()
+        children = TestCaseFolder.objects.filter(parent=folder)
+        for child in children:
+            descendants.add(child.id)
+            descendants.update(self.get_descendants(child))
+        return descendants
+
+    def get_form(self, data=None, instance=None):
+        class TempForm(forms.ModelForm):
+            class Meta:
+                model = TestCaseFolder
+                fields = ["name", "parent"]
+
+        form = TempForm(data, instance=instance)
+        exclude_ids = {instance.id} if instance else set()
+        if instance:
+            exclude_ids.update(self.get_descendants(instance))
+        form.fields["parent"].queryset = TestCaseFolder.objects.filter(
+            project_id=self.kwargs["project_id"]
+        ).exclude(id__in=exclude_ids)
+
+        all_folders = TestCaseFolder.objects.filter(
+            project_id=self.kwargs["project_id"]
+        ).exclude(id__in=exclude_ids)
+
+        hierarchy = build_hierarchy(all_folders)
+        # Creating choices with indented names based on hierarchy level
+        choices = [
+            (folder.id, "--" * level + " " + folder.name) for folder, level in hierarchy
+        ]
+        form.fields["parent"].choices = choices
+        return form
+
+    def get(self, request, project_id, folder_id):
+        folder = get_object_or_404(TestCaseFolder, project_id=project_id, id=folder_id)
+        form = self.get_form(instance=folder)
+        csrf_token = get_token(request)
+        return render(
+            request,
+            "testfolder_form.html",
+            {"csrf_token": csrf_token, "object": folder, "form": form},
         )
+
+    def post(self, request, project_id, folder_id):
+        folder = get_object_or_404(TestCaseFolder, project_id=project_id, id=folder_id)
+        if "delete" in request.POST:
+            return self.delete(request, project_id, folder_id)
+        form = self.get_form(data=request.POST, instance=folder)
+
+        if form.is_valid():
+            tc_folder = form.save(commit=False)
+            tc_folder.modified_by = self.request.user
+            tc_folder.project = Project.objects.get(id=self.kwargs["project_id"])
+            try:
+                tc_folder.save()
+                messages.success(request, f"{tc_folder.name} updated successfully'")
+                return HttpResponse(
+                    status=201,
+                    headers={
+                        "HX-Trigger": json.dumps(
+                            {
+                                "listChanged": None,
+                                "showMessage": f"{tc_folder.name} updated",
+                                "eventType": "updated",
+                            }
+                        ),
+                        "HX-Refresh": "true",
+                    },
+                )
+            except forms.ValidationError as e:
+                logger.error(f"Error Occured {e}")
+                form.add_error("name", e)
+                return self.form_invalid(form)
+
+    def form_invalid(self, form):
+        return render(
+            self.request,
+            "testfolder_form.html",
+            {"form": form, "object": self.get_object()},
+        )
+
+    def delete(self, request, project_id, folder_id):
+        folder = get_object_or_404(TestCaseFolder, project_id=project_id, id=folder_id)
+        try:
+            folder.delete()
+            messages.warning(
+                request,
+                f"{folder.name} deleted successfully, all its testcases are moved to {folder.parent} folder",
+            )
+            return HttpResponse(
+                status=201,
+                headers={"HX-Refresh": "true"},
+            )
+        except Exception as error:
+            logger.error(f"error is {error}")
+            messages.error(
+                request,
+                f"Something went wrong in deleting the folder {folder}, our engineers have been notified",
+            )
+            return HttpResponse(
+                status=400,
+                headers={"HX-Refresh": "true"},
+            )

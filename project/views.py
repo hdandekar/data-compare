@@ -24,6 +24,7 @@ from django_htmx.http import HttpResponseClientRedirect
 
 from data_compare.users.models import User
 from data_compare.utils.crypto import encrypt_password
+from testplan.decorators import user_is_member
 from testplan.mixins import AdminPermissionMixin, MemberPermissionMixin
 
 from .forms import ConnectionForm
@@ -42,8 +43,9 @@ _404_Page = "404.html"
 logger = logging.getLogger(__name__)
 
 
-@require_http_methods(["GET", "POST"])
 @login_required
+@user_is_member
+@require_http_methods(["GET", "POST"])
 def connection_create(request, project_id):
     connection_form_html = "connection/connection_form.html"
     dbtypes = DbType.objects.all()
@@ -119,6 +121,7 @@ def connection_create(request, project_id):
 
 @require_http_methods(["GET"])
 @login_required
+@user_is_member
 def connection_list(request, project_id, page=1):
     project = Project.objects.get(id=project_id)
     connections = DbConnection.objects.filter(project_id=project_id)
@@ -148,6 +151,7 @@ def connection_list(request, project_id, page=1):
 
 @require_http_methods(["GET", "POST"])
 @login_required
+@user_is_member
 def connection_edit(request, project_id, pk):
     connection_form_html = "connection/connection_form.html"
     connection = get_object_or_404(DbConnection, id=pk)
@@ -205,6 +209,7 @@ def index(request, project_id):
 
 @require_http_methods(["GET"])
 @login_required
+@user_is_member
 def connection_delete(request, project_id, pk):
     connection = get_object_or_404(DbConnection, id=pk)
     try:
@@ -370,6 +375,7 @@ class ProjectUpdateView(LoginRequiredMixin, UpdateView):
 
 
 @require_http_methods(["GET", "POST"])
+@user_is_member
 def project_members(request, project_id, page=1):
     project = Project.objects.get(id=project_id)
     project_members = project.projectmember_set.all().select_related("user")
@@ -490,7 +496,7 @@ class ProjectDeleteView(LoginRequiredMixin, AdminPermissionMixin, DeleteView):
     model = Project
 
     def get_object(self, queryset=None):
-        project = Project.objects.get(id=self.kwargs.get("pk"))
+        project = Project.objects.get(id=self.kwargs.get("project_id"))
         return project
 
     def post(self, *args, **kwargs):

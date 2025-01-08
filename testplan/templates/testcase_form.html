@@ -80,11 +80,12 @@
           </label>
           <div class="select is-fullwidth">
             <select name="folder" required="" id="id_folder" class="select">
-              {% for folder in folders %}
-                <option value="{{ folder.id }}"
-                  {% if folder.id == testcase.folder.id %}selected{% endif %}>{{ folder.name }}
-                </option>
-              {% endfor %}
+              {% for id, name in form.fields.folder.choices %}
+              <option value="{{ id }}"
+                {% if id == testcase.folder.id %}selected{% endif %}>
+              {{ name }}
+              </option>
+            {% endfor %}
             </select>
           </div>
         </div>
