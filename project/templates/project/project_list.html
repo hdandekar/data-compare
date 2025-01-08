@@ -40,7 +40,7 @@
             </a>
           </td>
           <td class="has-text-centered is-vcentered">
-            <a href="{% url 'list_testcase' project.id %}">
+            <a href="{% url 'testcases' project.id %}">
               {% with tc_total=project.project_testcases.count %}
                 {{ tc_total|default:0 }}
               {% endwith %}

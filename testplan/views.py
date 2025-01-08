@@ -6,7 +6,8 @@ from django import forms
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
+from django.core.exceptions import PermissionDenied
+from django.core.paginator import Paginator
 from django.db.models.aggregates import Count
 from django.db.models.deletion import ProtectedError
 from django.http import HttpResponse
@@ -61,7 +62,7 @@ class TestCaseCreateView(LoginRequiredMixin, MemberPermissionMixin, CreateView):
         testcase.project = Project.objects.get(id=self.kwargs["project_id"])
         testcase.save()
         form.save_m2m()
-        return redirect("list_testcase", testcase.project.id)
+        return redirect("testcases", testcase.project.id)
 
     def form_invalid(self, form):
         return self.render_to_response(self.get_context_data(form=form))
@@ -476,9 +477,7 @@ class TestRunCaseDeleteView(LoginRequiredMixin, AdminPermissionMixin, DeleteView
         )
 
 
-require_http_methods(["POST"])
-
-
+@require_http_methods(["POST"])
 @login_required
 @user_is_member
 def execute_testcase(request, project_id, testrun_id, testrun_testcase_id):
@@ -633,37 +632,38 @@ def testrun_case_result_summary(
         )
 
 
+@require_http_methods(["GET"])
+@login_required
+@user_is_member
+def project_testcase_index(request, project_id):
+    logger.info("Rendering Project testcases")
+    root = TestCaseFolder.objects.get(
+        name="root", project_id=project_id, parent__isnull=True
+    )
+    root_folders = TestCaseFolder.objects.filter(
+        project_id=project_id, parent_id=root.id
+    ).select_related()
+    return render(
+        request,
+        "project_testcases.html",
+        {"project": Project.objects.get(id=project_id), "root_folders": root_folders},
+    )
+
+
 class TestCaseFolderIndexView(LoginRequiredMixin, MemberPermissionMixin, ListView):
     model = TestCaseFolder
-    template_name = "testcase_list.html"
+    template_name = "testcases.html"
     context_object_name = "root_folders"
-
-    def get_queryset(self):
-        project = Project.objects.get(id=self.kwargs["project_id"])
-        try:
-            root = TestCaseFolder.objects.get(
-                name="root", project_id=self.kwargs["project_id"], parent__isnull=True
-            )
-            return TestCaseFolder.objects.filter(
-                project_id=self.kwargs["project_id"], parent_id=root.id
-            ).select_related()
-        except ObjectDoesNotExist as e:
-            logger.info(f"Creating root folder for 1st time, error is {e}")
-            root = TestCaseFolder.objects.create(
-                name="root",
-                project_id=self.kwargs["project_id"],
-                created_by=project.owner,
-            )
-            return TestCaseFolder.objects.filter(
-                project_id=self.kwargs["project_id"], parent_id=root.id
-            ).select_related()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        page_num = self.kwargs.get("page")
         context["project"] = Project.objects.get(id=self.kwargs["project_id"])
-        context["all_test_cases"] = TestCase.objects.select_related(
-            "sourcedb", "targetdb"
-        ).filter(project_id=self.kwargs["project_id"])
+        test_cases = TestCase.objects.select_related("sourcedb", "targetdb").filter(
+            project_id=self.kwargs["project_id"]
+        )
+        paginator = Paginator(test_cases, per_page=2)
+        context["test_cases"] = paginator.get_page(page_num)
         return context
 
     def handle_no_permission(self) -> HttpResponseRedirect:
@@ -679,6 +679,7 @@ class TestCaseFolderSubfoldersView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        page_num = self.kwargs.get("page")
         context["project"] = get_object_or_404(Project, id=self.kwargs["project_id"])
         context["subfolders"] = (
             self.object.subfolder.select_related("parent")
@@ -686,7 +687,8 @@ class TestCaseFolderSubfoldersView(
             .exclude(name="root", parent__isnull=True)
         )
         test_cases = self.get_all_test_cases(self.object)
-        context["test_cases"] = test_cases
+        paginator = Paginator(test_cases, per_page=2)
+        context["test_cases"] = paginator.get_page(page_num)
         return context
 
     def get_all_test_cases(self, folder):

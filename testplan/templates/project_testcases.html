@@ -5,10 +5,14 @@
 {% endblock title %}
 {% block content %}
   <div class="container-fluid">
+    <!-- Breadcrumb Start -->
     <nav class="breadcrumb" aria-label="breadcrumbs">
       <ul>
         <li><a href="{% url 'projects' %}">{{ project.name }}</a></li>
-        <li><a href="{% url 'list_testcase' project.id %}">Test Cases</a></li>
+        <li><a hx-get="#"
+                hx-target="#test-case-list"
+                hx-swap="innerHTML"
+                hx-on:click="setActive(this)">Test Cases</a></li>
         <li>
           <a href="{% url 'create_testcase' project.id %}">
             <i class="fa-solid fa-plus fa-lg has-text-success"></i>
@@ -16,13 +20,22 @@
         </li>
       </ul>
     </nav>
+    <!-- Breadcrumb End -->
     <div class="columns">
       <aside class="menu column is-3" aria-label="Test Case Folders">
         <button class="button is-success is-fullwidth mb-2" hx-get="{% url 'create_folder' project.id %}" hx-target="#dialog">
           Create New Folder
         </button>
         <ul class="menu-list">
-          <li><a href="{% url 'list_testcase' project.id%}" class="item is-active">Root</a></li>
+          <li>
+            <a class="is-active"
+                hx-get="{% url 'list_testcases' project.id 1 %}"
+                hx-target="#test-case-list"
+                hx-swap="innerHTML"
+                hx-on:click="setActive(this)">
+                Root
+            </a>
+          </li>
           <li>
             <ul>
               {% for folder in root_folders %}
@@ -53,7 +66,7 @@
                   </p>
                   <p class="control w-100">
                     <button class="button is-size-6 item"
-                        hx-get="{% url 'folder_subfolders' project.id folder.id%}"
+                        hx-get="{% url 'folder_subfolders' project.id folder.id 1 %}"
                         hx-target="#subfolder-list-{{ folder.id }}"
                         hx-swap="innerHTML"
                         onclick="setActive(event)">
@@ -93,43 +106,13 @@
             </div>
           </div>
           <div id="test-case-list">
-            {% for tc in all_test_cases %}
-            <div class="box mb-3" id="testcase-{{ tc.id }}">
-                <div class="row">
-                    <div class="columns">
-                        <div class="column is-3">
-                            <a class="has-text-success" title="Edit" href="{% url 'edit_testcase' project.id tc.id %}">
-                                <i class="fa fa-pen-to-square fa-fw fa-xs"></i>
-                            </a>
-                            <a class="has-text-danger" title="Delete"
-                               hx-post="{% url 'delete_testcase' project.id tc.id %}"
-                               hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
-                               hx-target="#testcase-{{ tc.id }}"
-                               hx-confirm="Are you sure about deleting the testcase: '{{ tc.tcname }}?'"
-                               hx-swap="outerHTML">
-                                <i class="fa fa-trash fa-fw fa-xs text-danger"></i>
-                            </a>
-                            {{ tc.tcname }}
-                        </div>
-                        <div class="column is-1">{{ tc.sourcedb }}</div>
-                        <div class="column is-8 is-bordered has-overflow-scroll">
-                            <p>{{ tc.sourcesql }}</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="columns">
-                        <div class="column is-3">
-                            <strong>Key Columns: </strong>{{ tc.keycolumns }}
-                        </div>
-                        <div class="column is-1">{{ tc.targetdb }}</div>
-                        <div class="column is-8 pt-5 is-bordered has-overflow-scroll">
-                            <p>{{ tc.targetsql }}</p>
-                        </div>
-                    </div>
-                </div>
+            <div hx-get="{% url 'list_testcases' project.id 1 %}"
+                  hx-target="#test-case-list"
+                  hx-swap="innerHTML"
+                  hx-trigger="load"
+                  hx-on:click="setActive(this)">
+              <span class="visually-hidden text-center">Loading...</span>
             </div>
-          {% endfor %}
           </div>
         </div>
       </div>

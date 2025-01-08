@@ -25,7 +25,7 @@
           </p>
           <p class="control w-100">
             <button class="button is-size-6 item"
-                hx-get="{% url 'folder_subfolders' project.id subfolder.id %}"
+                hx-get="{% url 'folder_subfolders' project.id subfolder.id 1 %}"
                 hx-target="#subfolder-list-{{ subfolder.id }}"
                 hx-swap="innerHTML"
                 onclick="setActive(event)">
@@ -42,41 +42,49 @@
 
 <!-- Display Test Cases in Main Content Area -->
   <div id="test-case-list" hx-swap-oob="true">
-    {% for tc in test_cases %}
-      <div class="box mb-3" id="testcase-{{ tc.id }}">
-          <div class="row">
-              <div class="columns">
-                  <div class="column is-3">
-                      <a class="has-text-success" title="Edit" href="{% url 'edit_testcase' project.id tc.id %}">
-                          <i class="fa fa-pen-to-square fa-fw fa-xs"></i>
-                      </a>
-                      <a class="has-text-danger" title="Delete"
-                         hx-post="{% url 'delete_testcase' project.id tc.id %}"
-                         hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
-                         hx-target="#testcase-{{ tc.id }}"
-                         hx-confirm="Are you sure about deleting the testcase: '{{ tc.tcname }}?'"
-                         hx-swap="outerHTML">
-                          <i class="fa fa-trash fa-fw fa-xs text-danger"></i>
-                      </a>
-                      {{ tc.tcname }}
-                  </div>
-                  <div class="column is-1">{{ tc.sourcedb }}</div>
-                  <div class="column is-8 is-bordered has-overflow-scroll">
-                      <p>{{ tc.sourcesql }}</p>
-                  </div>
-              </div>
-          </div>
-          <div class="row">
-              <div class="columns">
-                  <div class="column is-3">
-                      <strong>Key Columns: </strong>{{ tc.keycolumns }}
-                  </div>
-                  <div class="column is-1">{{ tc.targetdb }}</div>
-                  <div class="column is-8 pt-5 is-bordered has-overflow-scroll">
-                      <p>{{ tc.targetsql }}</p>
-                  </div>
-              </div>
-          </div>
-      </div>
-    {% endfor %}
+    {% include 'partials/testcase_list.html' %}
+<!-- Pagination -->
+{% if test_cases.has_other_pages %}
+    <nav class="pagination is-small is-right">
+        <ul class="pagination-list">
+        {% if test_cases.has_previous %}
+            <li>
+            <a class="pagination-link"
+                hx-get="{% url 'folder_subfolders' project.id folder.id test_cases.previous_page_number %}"
+                hx-target="#test-case-list"
+                hx-swap="outerhtml"><i class="fa-solid fa-angles-left"></i></a>
+            </li>
+        {% endif %}
+        {% for i in page_range|default_if_none:test_cases.paginator.get_elided_page_range %}
+            {% if test_cases.number == i %}
+            <li>
+                <a href="#" class="pagination-link is-current" aria-label="Goto page {{ i }}">{{ i }}</a>
+            </li>
+            {% else %}
+            {% if i == test_cases.paginator.ELLIPSIS %}
+                <a href="#" class="pagination-link" aria-label="Goto page {{ i }}">{{ i }}</a>
+            {% else %}
+                <li class="pagination-link">
+                {% with pg_no=i %}
+                    <a class="page-link"
+                        hx-get="{% url 'folder_subfolders' project.id folder.id pg_no %}"
+                        hx-target="#test-case-list"
+                        hx-swap="outerhtml">{{ i }}</a>
+                {% endwith %}
+                </li>
+            {% endif %}
+            {% endif %}
+        {% endfor %}
+        {% if test_cases.has_next %}
+            <li>
+            <a class="pagination-link"
+                hx-get="{% url 'folder_subfolders' project.id folder.id test_cases.next_page_number %}"
+                hx-target="#test-case-list"
+                hx-swap="outerhtml"><i class="fa-solid fa-angles-right"></i></a>
+            </li>
+        {% endif %}
+        </ul>
+    </nav>
+{% endif %}
+  <!-- end Pagination -->
   </div>

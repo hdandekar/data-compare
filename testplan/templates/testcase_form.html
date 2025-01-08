@@ -19,9 +19,9 @@
       </li>
       <li>
         {% if project.name %}
-          <a href="{% url 'list_testcase' project.id %}">Test Cases</a>
+          <a href="{% url 'testcases' project.id %}">Test Cases</a>
         {% else %}
-          <a href="{% url 'list_testcase' testcase.project.id %}">Test Cases</a>
+          <a href="{% url 'testcases' testcase.project.id %}">Test Cases</a>
         {% endif %}
       </li>
       <li>
@@ -160,12 +160,12 @@
     <div class="buttons is-centered">
       <button class="button is-primary" name="save">Save</button>
       {% if project.name %}
-        <a href="{% url 'list_testcase' project.id %}"
+        <a href="{% url 'testcases' project.id %}"
            class="button is-light">
            Cancel
         </a>
       {% else %}
-        <a href="{% url 'list_testcase' testcase.project.id %}"
+        <a href="{% url 'testcases' testcase.project.id %}"
            class="button is-light">Cancel</a>
       {% endif %}
     </div>
