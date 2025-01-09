@@ -1,8 +1,8 @@
-FROM python:3-alpine AS builder
+FROM python:3.12-slim AS builder
 
 WORKDIR /app
 
-RUN python3 -m venv venv
+RUN python -m venv venv
 ENV VIRTUAL_ENV=/app/venv
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
@@ -13,7 +13,7 @@ COPY . .
 RUN pip install -r production.txt -r connectors.txt
 
 # Stage 2
-FROM alpine:3.21 AS runner
+FROM python:3.12-slim AS runner
 
 ENV VIRTUAL_ENV=/app/venv
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
