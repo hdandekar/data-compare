@@ -1,3 +1,6 @@
+{% if not test_cases %}
+<p class="has-text-centered">No Test Cases</p>
+{% endif %}
 {% for tc in test_cases %}
 <div class="box mb-3" id="testcase-{{ tc.id }}">
     <div class="row">

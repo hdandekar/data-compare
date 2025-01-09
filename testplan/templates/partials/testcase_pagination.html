@@ -5,7 +5,7 @@
         {% if test_cases.has_previous %}
             <li>
             <a class="pagination-link"
-                hx-get="{% url 'list_testcases' project.id test_cases.previous_page_number %}"
+                hx-get="{% url 'list_testcases' project.id test_cases.previous_page_number %}?folder={{ folder.id }}"
                 hx-target="#test-case-list"
                 hx-swap="outerhtml"><i class="fa-solid fa-angles-left"></i></a>
             </li>
@@ -22,7 +22,7 @@
                 <li class="pagination-link">
                 {% with pg_no=i %}
                     <a class="page-link"
-                        hx-get="{% url 'list_testcases' project.id pg_no %}"
+                        hx-get="{% url 'list_testcases' project.id pg_no %}?folder={{ folder.id }}"
                         hx-target="#test-case-list"
                         hx-swap="outerhtml">{{ i }}</a>
                 {% endwith %}
@@ -33,7 +33,7 @@
         {% if test_cases.has_next %}
             <li>
             <a class="pagination-link"
-                hx-get="{% url 'list_testcases' project.id test_cases.next_page_number %}"
+                hx-get="{% url 'list_testcases' project.id test_cases.next_page_number %}?folder={{ folder.id }}"
                 hx-target="#test-case-list"
                 hx-swap="outerhtml"><i class="fa-solid fa-angles-right"></i></a>
             </li>

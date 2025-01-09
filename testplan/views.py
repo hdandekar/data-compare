@@ -62,7 +62,7 @@ class TestCaseCreateView(LoginRequiredMixin, MemberPermissionMixin, CreateView):
         testcase.project = Project.objects.get(id=self.kwargs["project_id"])
         testcase.save()
         form.save_m2m()
-        return redirect("testcases", testcase.project.id)
+        return redirect("project_testcases", testcase.project.id)
 
     def form_invalid(self, form):
         return self.render_to_response(self.get_context_data(form=form))
@@ -117,7 +117,7 @@ class TestCaseUpdateView(LoginRequiredMixin, MemberPermissionMixin, UpdateView):
         testcase = form.save(commit=False)
         testcase.modified_by = self.request.user
         testcase.save()
-        return redirect("list_testcase", testcase.project.id)
+        return redirect("testcases", testcase.project.id)
 
     def form_invalid(self, form):
         return self.render_to_response(self.get_context_data(form=form))
@@ -658,12 +658,24 @@ class TestCaseFolderIndexView(LoginRequiredMixin, MemberPermissionMixin, ListVie
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         page_num = self.kwargs.get("page")
+        folder_id = self.request.GET.get("folder")
+
         context["project"] = Project.objects.get(id=self.kwargs["project_id"])
         test_cases = TestCase.objects.select_related("sourcedb", "targetdb").filter(
             project_id=self.kwargs["project_id"]
         )
+        if folder_id:
+            test_cases = test_cases.filter(folder_id=folder_id)
+            folder = TestCaseFolder.objects.get(id=folder_id)
+            context["folder"] = TestCaseFolder.objects.get(id=folder_id)
+            context["subfolders"] = (
+                folder.subfolder.select_related("parent")
+                .all()
+                .exclude(name="root", parent__isnull=True)
+            )
         paginator = Paginator(test_cases, per_page=2)
         context["test_cases"] = paginator.get_page(page_num)
+
         return context
 
     def handle_no_permission(self) -> HttpResponseRedirect:

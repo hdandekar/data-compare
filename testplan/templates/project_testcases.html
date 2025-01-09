@@ -47,8 +47,9 @@
                             hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
                             hx-delete="{% url 'edit_folder' project.id folder.id %}"
                             hx-target="#dialog">
-                      <span class="icon is-small">
-                        <i class="fas fa-trash has-text-danger"></i>
+                      <span class="icon is-small" title="Delete Folder">
+                        <i class="fas fa-trash has-text-danger">
+                        </i>
                       </span>
                     </button>
                     {% endif %}
@@ -58,19 +59,30 @@
                     <button class="button is-size-6 item"
                             hx-get="{% url 'edit_folder' project.id folder.id %}"
                             hx-target="#dialog">
-                      <span class="icon is-small">
+                      <span class="icon is-small" title="Edit Folder ">
                           <i class="fas fa-edit has-text-success"></i>
                       </span>
                     </button>
                     {% endif %}
                   </p>
+                  <p class="control">
+                    <button class="button is-size-6 item"
+                            hx-get="{% url 'folder_subfolders' project.id folder.id %}"
+                            hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
+                            hx-target="#subfolder-list-{{ folder.id }}"
+                            hx-swap="innerHTML">
+                      <span class="icon is-small" title="Expand Folder">
+                        <i class="fas fa-folder-tree"></i>
+                      </span>
+                    </button>
+                  </p>
                   <p class="control w-100">
                     <button class="button is-size-6 item"
-                        hx-get="{% url 'folder_subfolders' project.id folder.id 1 %}"
-                        hx-target="#subfolder-list-{{ folder.id }}"
+                        hx-get="{% url 'list_testcases' project.id 1 %}?folder={{ folder.id }}"
+                        hx-target="#test-case-list"
                         hx-swap="innerHTML"
                         onclick="setActive(event)">
-                      <span class="fas fa-folder pr-2"></span>
+                      <span class="fas fa-folder pr-2" title="Get testCases"></span>
                       {{ folder.name }}
                     </button>
                   </p>
@@ -105,7 +117,7 @@
               <div class="column is-8 has-text-centered is-size-6 has-text-weight-bold">SQL Statements</div>
             </div>
           </div>
-          <div id="test-case-list">
+          <div id="test-case-list" hx-swap-oob="true">
             <div hx-get="{% url 'list_testcases' project.id 1 %}"
                   hx-target="#test-case-list"
                   hx-swap="innerHTML"
