@@ -1,0 +1,44 @@
+<!-- Pagination -->
+{% if test_cases.has_other_pages %}
+    <nav class="pagination is-small is-right">
+        <ul class="pagination-list">
+        {% if test_cases.has_previous %}
+            <li>
+            <a class="pagination-link"
+                hx-get="{% url 'list_testcases' project.id test_cases.previous_page_number %}?folder={{ folder.id }}"
+                hx-target="#test-case-list"
+                hx-swap="outerhtml"><i class="fa-solid fa-angles-left"></i></a>
+            </li>
+        {% endif %}
+        {% for i in page_range|default_if_none:test_cases.paginator.get_elided_page_range %}
+            {% if test_cases.number == i %}
+            <li>
+                <a href="#" class="pagination-link is-current" aria-label="Goto page {{ i }}">{{ i }}</a>
+            </li>
+            {% else %}
+            {% if i == test_cases.paginator.ELLIPSIS %}
+                <a href="#" class="pagination-link" aria-label="Goto page {{ i }}">{{ i }}</a>
+            {% else %}
+                <li class="pagination-link">
+                {% with pg_no=i %}
+                    <a class="page-link"
+                        hx-get="{% url 'list_testcases' project.id pg_no %}?folder={{ folder.id }}"
+                        hx-target="#test-case-list"
+                        hx-swap="outerhtml">{{ i }}</a>
+                {% endwith %}
+                </li>
+            {% endif %}
+            {% endif %}
+        {% endfor %}
+        {% if test_cases.has_next %}
+            <li>
+            <a class="pagination-link"
+                hx-get="{% url 'list_testcases' project.id test_cases.next_page_number %}?folder={{ folder.id }}"
+                hx-target="#test-case-list"
+                hx-swap="outerhtml"><i class="fa-solid fa-angles-right"></i></a>
+            </li>
+        {% endif %}
+        </ul>
+    </nav>
+{% endif %}
+  <!-- end Pagination -->

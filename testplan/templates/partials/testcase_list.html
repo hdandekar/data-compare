@@ -1,0 +1,40 @@
+{% if not test_cases %}
+<p class="has-text-centered">No Test Cases</p>
+{% endif %}
+{% for tc in test_cases %}
+<div class="box mb-3" id="testcase-{{ tc.id }}">
+    <div class="row">
+        <div class="columns">
+            <div class="column is-3">
+                <a class="has-text-success" title="Edit" href="{% url 'edit_testcase' project.id tc.id %}">
+                    <i class="fa fa-pen-to-square fa-fw fa-xs"></i>
+                </a>
+                <a class="has-text-danger" title="Delete"
+                   hx-post="{% url 'delete_testcase' project.id tc.id %}"
+                   hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
+                   hx-target="#testcase-{{ tc.id }}"
+                   hx-confirm="Are you sure about deleting the testcase: '{{ tc.tcname }}?'"
+                   hx-swap="outerHTML">
+                    <i class="fa fa-trash fa-fw fa-xs text-danger"></i>
+                </a>
+                {{ tc.tcname }}
+            </div>
+            <div class="column is-1">{{ tc.sourcedb }}</div>
+            <div class="column is-8 is-bordered has-overflow-scroll">
+                <p>{{ tc.sourcesql }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="columns">
+            <div class="column is-3">
+                <strong>Key Columns: </strong>{{ tc.keycolumns }}
+            </div>
+            <div class="column is-1">{{ tc.targetdb }}</div>
+            <div class="column is-8 pt-5 is-bordered has-overflow-scroll">
+                <p>{{ tc.targetsql }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}

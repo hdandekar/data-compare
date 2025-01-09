@@ -11,11 +11,16 @@ urlpatterns = [
     ),
     path(
         "project/<int:project_id>/testcases",
-        views.TestCaseFolderIndexView.as_view(),
-        name="list_testcase",
+        views.project_testcase_index,
+        name="project_testcases",
     ),
     path(
-        "project/<int:project_id>/folder/<int:pk>/subfolders/",
+        "project/<int:project_id>/testcases/<int:page>",
+        views.TestCaseFolderIndexView.as_view(),
+        name="list_testcases",
+    ),
+    path(
+        "project/<int:project_id>/folder/<int:pk>",
         views.TestCaseFolderSubfoldersView.as_view(),
         name="folder_subfolders",
     ),
@@ -25,7 +30,7 @@ urlpatterns = [
         name="create_folder",
     ),
     path(
-        "project/<int:project_id>/folder/<int:folder_id>",
+        "project/<int:project_id>/folder/<int:folder_id>/edit",
         views.TestCaseFolderUpdateView.as_view(),
         name="edit_folder",
     ),

@@ -90,6 +90,9 @@ class TestCase(models.Model):
         TestCaseFolder, on_delete=models.CASCADE, related_name="folder_testcases"
     )
 
+    class Meta:
+        ordering = ["-id"]
+
     def __str__(self):
         return str(self.id)
 

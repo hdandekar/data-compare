@@ -1,4 +1,4 @@
-<!-- Subfolders section -->
+<!-- Subfolders Section Start -->
 <div id="subfolder-list-{{ folder.id }}">
   <ul>
     {% for subfolder in subfolders %}
@@ -9,7 +9,7 @@
                     hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
                     hx-delete="{% url 'edit_folder' project.id subfolder.id %}"
                     hx-target="#dialog">
-              <span class="icon is-small">
+              <span class="icon is-small" title="Delete">
                 <i class="fas fa-trash has-text-danger"></i>
               </span>
             </button>
@@ -18,18 +18,37 @@
             <button class="button is-size-6 item"
                     hx-get="{% url 'edit_folder' project.id subfolder.id %}"
                     hx-target="#dialog">
-              <span class="icon is-small">
+              <span class="icon is-small" title="Edit">
                 <i class="fas fa-edit has-text-success"></i>
               </span>
             </button>
           </p>
+          <p class="control">
+            {% if subfolder.subfolder.count == 0 %}
+              <button class="button is-size-6 item" disabled>
+                <span class="icon is-small" title="No Subfolder">
+                    <i class="fas fa-folder-closed"></i>
+                  </span>
+              </button>
+            {% else %}
+              <button class="button is-size-6 item"
+                  hx-get="{% url 'folder_subfolders' project.id subfolder.id %}"
+                  hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
+                  hx-target="#subfolder-list-{{ subfolder.id }}"
+                  hx-swap="innerHTML">
+                <span class="icon is-small" title="Expand Folder">
+                  <i class="fas fa-folder-tree"></i>
+                </span>
+              </button>
+            {% endif %}
+          </p>
           <p class="control w-100">
             <button class="button is-size-6 item"
-                hx-get="{% url 'folder_subfolders' project.id subfolder.id %}"
-                hx-target="#subfolder-list-{{ subfolder.id }}"
+                hx-get="{% url 'list_testcases' project.id 1 %}?folder={{ subfolder.id }}"
+                hx-target="#test-case-list"
                 hx-swap="innerHTML"
                 onclick="setActive(event)">
-              <span class="fas fa-folder pr-2"></span>
+              <span class="fas fa-folder pr-2" title="Get testCases"></span>
               {{ subfolder.name }}
             </button>
           </p>
@@ -40,43 +59,4 @@
   </ul>
 </div>
 
-<!-- Display Test Cases in Main Content Area -->
-  <div id="test-case-list" hx-swap-oob="true">
-    {% for tc in test_cases %}
-      <div class="box mb-3" id="testcase-{{ tc.id }}">
-          <div class="row">
-              <div class="columns">
-                  <div class="column is-3">
-                      <a class="has-text-success" title="Edit" href="{% url 'edit_testcase' project.id tc.id %}">
-                          <i class="fa fa-pen-to-square fa-fw fa-xs"></i>
-                      </a>
-                      <a class="has-text-danger" title="Delete"
-                         hx-post="{% url 'delete_testcase' project.id tc.id %}"
-                         hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
-                         hx-target="#testcase-{{ tc.id }}"
-                         hx-confirm="Are you sure about deleting the testcase: '{{ tc.tcname }}?'"
-                         hx-swap="outerHTML">
-                          <i class="fa fa-trash fa-fw fa-xs text-danger"></i>
-                      </a>
-                      {{ tc.tcname }}
-                  </div>
-                  <div class="column is-1">{{ tc.sourcedb }}</div>
-                  <div class="column is-8 is-bordered has-overflow-scroll">
-                      <p>{{ tc.sourcesql }}</p>
-                  </div>
-              </div>
-          </div>
-          <div class="row">
-              <div class="columns">
-                  <div class="column is-3">
-                      <strong>Key Columns: </strong>{{ tc.keycolumns }}
-                  </div>
-                  <div class="column is-1">{{ tc.targetdb }}</div>
-                  <div class="column is-8 pt-5 is-bordered has-overflow-scroll">
-                      <p>{{ tc.targetsql }}</p>
-                  </div>
-              </div>
-          </div>
-      </div>
-    {% endfor %}
-  </div>
+<!-- Subfolder Section End -->
