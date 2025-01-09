@@ -13,7 +13,7 @@ COPY . .
 RUN pip install -r production.txt -r connectors.txt
 
 # Stage 2
-FROM python:3-alpine AS runner
+FROM alpine:3.21 AS runner
 
 ENV VIRTUAL_ENV=/app/venv
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
@@ -27,7 +27,7 @@ COPY . .
 COPY run.sh /run.sh
 RUN chmod +x /run.sh
 
-ENV DJANGO_SECRET_KEY='#a*(l02@96-k=ft*+90rf$)dz$@&$h==7nqhl2(pd^sz-2_8y='
+ENV DJANGO_SECRET_KEY=''
 ENV POSTGRES_HOST=''
 ENV POSTGRES_USER=''
 ENV POSTGRES_DB=''
